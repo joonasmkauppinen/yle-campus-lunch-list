@@ -17,3 +17,4 @@
 - TypeScript
 - React/Next.js for frontend/backend.
 - Vercel for deployment, hosting and CDN caching.
+- Cheerio and Playwright for web scraping.
