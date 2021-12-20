@@ -1,11 +1,9 @@
 /** @jsxImportSource @emotion/react */
 
-import type { NextPage } from 'next'
+import type { NextPage } from 'next';
 import styled from '@emotion/styled';
 
 import { Datetime } from '../components/Datetime/Datetime';
-import { MenuTextParagraph } from '../components/MenuTextParagraph/MenuTextParagraph';
-import { SectionTitleButton } from '../components/SectionTitleButton/SectionTitleButton';
 import { TitleH1 } from '../components/TitleH1/TitleH1';
 import { RestaurantName, SINGLE_DAY_MENUS } from '../test-data/single-day-menus';
 import { RestaurantItemSection } from '../components/RestaurantItemSection/RestaurantItemSection';
@@ -24,13 +22,20 @@ const Home: NextPage = () => {
     <PageContainerDiv>
       <Datetime>maanantai · 3.1.2022</Datetime>
       <TitleH1>Lounaslistat</TitleH1>
-      
+
       {restaurantNamesArray.map((key) => {
-        const { items, name, ariaLabel} = SINGLE_DAY_MENUS[key as RestaurantName];
-        return <RestaurantItemSection key={`section-${key}`} items={items} name={name} ariaLabel={ariaLabel} />;
+        const { items, name, ariaLabel } = SINGLE_DAY_MENUS[key as RestaurantName];
+        return (
+          <RestaurantItemSection
+            key={`section-${key}`}
+            items={items}
+            name={name}
+            ariaLabel={ariaLabel}
+          />
+        );
       })}
     </PageContainerDiv>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;

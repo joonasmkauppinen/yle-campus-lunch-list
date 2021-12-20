@@ -19,10 +19,14 @@ interface RestaurantItemSectionProps {
 export const RestaurantItemSection = ({ items, name, ariaLabel }: RestaurantItemSectionProps) => {
   return (
     <ContainerSection>
-      <SectionTitleButton label={name} ariaLabel={ariaLabel} onClick={() => alert(`TODO: Navigate to details page for '${name}'`)} />
+      <SectionTitleButton
+        label={name}
+        ariaLabel={ariaLabel}
+        onClick={() => alert(`TODO: Navigate to details page for '${name}'`)}
+      />
       {items.map((item, index) => (
         <MenuTextParagraph key={`${name}-${index}`}>{item}</MenuTextParagraph>
       ))}
     </ContainerSection>
   );
-}
+};

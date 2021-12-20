@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 
-import { HTMLAttributes } from "react";
+import { HTMLAttributes } from 'react';
 
 export const MenuTextParagraph = ({ children }: HTMLAttributes<HTMLParagraphElement>) => {
   return (
@@ -16,4 +16,4 @@ export const MenuTextParagraph = ({ children }: HTMLAttributes<HTMLParagraphElem
       {children}
     </p>
   );
-}
+};

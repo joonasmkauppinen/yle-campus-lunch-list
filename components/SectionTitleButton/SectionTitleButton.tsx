@@ -2,15 +2,15 @@
 
 import Image from 'next/image';
 
-interface SectionTitleButton {
+interface SectionTitleButtonProps {
   label: string;
   onClick?: () => void;
   ariaLabel: string;
 }
 
-export const SectionTitleButton = ({ label, onClick, ariaLabel }: SectionTitleButton) => {
+export const SectionTitleButton = ({ label, onClick, ariaLabel }: SectionTitleButtonProps) => {
   return (
-    <div 
+    <div
       onClick={onClick}
       css={{
         paddingTop: 9,
@@ -24,7 +24,7 @@ export const SectionTitleButton = ({ label, onClick, ariaLabel }: SectionTitleBu
           display: 'flex',
           flexDirection: 'row',
           alignItems: 'center',
-          justifyContent: 'space-between'
+          justifyContent: 'space-between',
         }}
       >
         <h2
@@ -38,18 +38,25 @@ export const SectionTitleButton = ({ label, onClick, ariaLabel }: SectionTitleBu
         >
           {label}
         </h2>
-        <Image role="button" aria-label='Avaa koko viikon lounaslistat.' src="/chevron-right.svg" width={24} height={24} alt="" />
+        <Image
+          role="button"
+          aria-label="Avaa koko viikon lounaslistat."
+          src="/chevron-right.svg"
+          width={24}
+          height={24}
+          alt=""
+        />
       </div>
-      <span 
-        css={{ 
+      <span
+        css={{
           backgroundColor: '#D9D9D9',
           position: 'absolute',
           bottom: 0,
           left: 0,
           right: 0,
-          height: 1
+          height: 1,
         }}
       />
     </div>
-  )
-}
+  );
+};

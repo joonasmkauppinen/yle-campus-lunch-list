@@ -6,7 +6,7 @@ interface TitleH1Props {
 
 export const TitleH1 = ({ children }: TitleH1Props) => {
   return (
-    <h1 
+    <h1
       css={{
         color: '#1B1B1B',
         fontSize: 34,
@@ -17,5 +17,5 @@ export const TitleH1 = ({ children }: TitleH1Props) => {
     >
       {children}
     </h1>
-  )
-}
+  );
+};

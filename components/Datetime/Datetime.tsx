@@ -1,10 +1,10 @@
 /** @jsxImportSource @emotion/react */
 
-import { TimeHTMLAttributes } from "react"
+import { TimeHTMLAttributes } from 'react';
 
 export const Datetime = ({ children, ...htmlTimeProps }: TimeHTMLAttributes<HTMLElement>) => {
   return (
-    <time 
+    <time
       css={{
         color: '#808080',
         textTransform: 'uppercase',
@@ -15,5 +15,5 @@ export const Datetime = ({ children, ...htmlTimeProps }: TimeHTMLAttributes<HTML
     >
       {children}
     </time>
-  )
-}
+  );
+};
