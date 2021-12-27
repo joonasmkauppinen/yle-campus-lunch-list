@@ -24,6 +24,15 @@ interface Restaurants {
   gvc: RestaurantItem;
 }
 
+export type WeekDay =
+  | 'monday'
+  | 'tuesday'
+  | 'wednesday'
+  | 'thursday'
+  | 'friday'
+  | 'saturday'
+  | 'sunday';
+
 export type RestaurantName = 'isopaja' | 'huoltamo' | 'båx' | 'dylan' | 'gvc' | 'studio10';
 
 export const CURRENT_WEEK_MENU: Restaurants = {
