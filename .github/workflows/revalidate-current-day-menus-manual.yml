@@ -1,10 +1,14 @@
 name: Manual workflow to revalidate root page
 
+on: workflow_dispatch
+
 jobs:
   revalidate_root_manual:
     name: Revalidate root page manual
     runs-on: ubuntu-latest
-    uses: fjogeleit/http-request-action@v1
-    with:
-      url: 'https://yle-campus-lunch-list.vercel.app/api/revalidate/current-day-menus?secret=${{ secrets.NEXT_APP_REVALIDATION_TOKEN }}'
-      method: 'GET'
+    steps:
+      - name: Call next app's revalidate url 📡
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://yle-campus-lunch-list.vercel.app/api/revalidate/current-day-menus?secret=${{ secrets.NEXT_APP_REVALIDATION_TOKEN }}'
+          method: 'GET'
