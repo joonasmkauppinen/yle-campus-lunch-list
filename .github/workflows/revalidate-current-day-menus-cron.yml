@@ -1,0 +1,17 @@
+name: Cron job to update root page
+on:
+  schedule:
+    # GitHub runs cron jobs on UTC time. We want to this job to run everyday
+    # at 10 o'clock. Finland's timezone is +3 in summer and +2 on winter.
+    # So this job runs at 10 o'clock in summer and at 9 o'click in winter.
+    # * is a special character in YAML so you have to quote this string
+    - cron: '0 7 * * *'
+
+jobs:
+  revalidate_root:
+    name: Revalidate root page
+    runs-on: ubuntu-latest
+    uses: fjogeleit/http-request-action@v1
+    with:
+      url: 'https://yle-campus-lunch-list.vercel.app/api/revalidate/current-day-menus?secret=${{ secrets.NEXT_APP_REVALIDATION_TOKEN }}'
+      method: 'GET'
