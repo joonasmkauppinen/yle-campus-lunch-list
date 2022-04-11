@@ -1,11 +1,16 @@
-import { chromium } from '@playwright/test';
+import chromium from 'chrome-aws-lambda';
+import playwright from 'playwright-core';
 
 import { STUDIO_10_URL } from '../constants/restaurantUrls';
 
 export const scrapeStudio10CurrentWeekMenu = async () => {
   let result: string[];
 
-  const browser = await chromium.launch();
+  const browser = await playwright.chromium.launch({
+    args: chromium.args,
+    executablePath: await chromium.executablePath,
+    headless: chromium.headless,
+  });
   const context = await browser.newContext();
 
   const page = await context.newPage();
