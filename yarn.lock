@@ -2896,6 +2896,13 @@ pkg-dir@^2.0.0:
   dependencies:
     find-up "^2.1.0"
 
+playwright-chromium@^1.20.2:
+  version "1.20.2"
+  resolved "https://registry.yarnpkg.com/playwright-chromium/-/playwright-chromium-1.20.2.tgz#e6494f2a315afbfebab0083ff4b14459c9f3863b"
+  integrity sha512-KsiPLRC1v56qLWqjzeEoDZNVW/eFrP5ad0PFQAa74u5EwnnId89LgOHEZFy487tt3xJdv3Ayyfdn8zwsUpS3Qg==
+  dependencies:
+    playwright-core "1.20.2"
+
 playwright-core@1.20.2:
   version "1.20.2"
   resolved "https://registry.yarnpkg.com/playwright-core/-/playwright-core-1.20.2.tgz#02336afd9a631d59a666f11f3492550201c6c31b"
