@@ -1,16 +1,11 @@
-import chromium from 'chrome-aws-lambda';
-import playwright from 'playwright-core';
+import playwright from 'playwright-aws-lambda';
 
 import { ISO_PAJA_URL } from '../constants/restaurantUrls';
 
 export const scrapeIsoPaja = async () => {
   let result: string[];
 
-  const browser = await playwright.chromium.launch({
-    args: chromium.args,
-    executablePath: await chromium.executablePath,
-    headless: chromium.headless,
-  });
+  const browser = await playwright.launchChromium();
   const context = await browser.newContext();
 
   const page = await context.newPage();
