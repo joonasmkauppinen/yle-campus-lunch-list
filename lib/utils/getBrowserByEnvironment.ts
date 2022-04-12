@@ -2,14 +2,12 @@ import playwright from 'playwright-core';
 
 export const getBrowserByEnvironment = async () => {
   if (process.env.AWS_LAMBDA_FUNCTION_NAME !== undefined) {
-    const args = (await import('chrome-aws-lambda')).default.args;
-    const executablePath = (await import('chrome-aws-lambda')).default.executablePath;
-    const headless = (await import('chrome-aws-lambda')).default.headless;
+    const chromium = (await import('chrome-aws-lambda')).default;
 
     return playwright.chromium.launch({
-      args: args,
-      executablePath: await executablePath,
-      headless: headless,
+      args: chromium.args,
+      executablePath: await chromium.executablePath,
+      headless: chromium.headless,
     });
   } else {
     return playwright.chromium.launch();
