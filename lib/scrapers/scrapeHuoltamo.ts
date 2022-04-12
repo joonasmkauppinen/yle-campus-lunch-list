@@ -1,18 +1,12 @@
-import chromium from 'chrome-aws-lambda';
-import playwright from 'playwright-core';
-
 import { HUOLTAMO_URL } from '../constants/restaurantUrls';
+import { getBrowserByEnvironment } from '../utils/getBrowserByEnvironment';
 
 const weekDayNamesArray = ['MAANANTAI', 'TIISTAI', 'KESKIVIIKKO', 'TORSTAI', 'PERJANTAI'];
 
 export const scrapeHuoltamo = async (weekdayIndex: number) => {
   let result: string[];
 
-  const browser = await playwright.chromium.launch({
-    args: chromium.args,
-    executablePath: await chromium.executablePath,
-    headless: chromium.headless,
-  });
+  const browser = await getBrowserByEnvironment();
   const context = await browser.newContext();
 
   const page = await context.newPage();
