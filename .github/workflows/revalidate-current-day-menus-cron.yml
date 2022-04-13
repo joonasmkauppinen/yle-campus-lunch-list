@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Call next app's revalidate url 📡
-        uses: fjogeleit/http-request-action@v1
+        uses: satak/webrequest-action@master
         with:
-          url: 'https://yle-campus-lunch-list.vercel.app/api/revalidate/current-day-menus?secret=${{ secrets.NEXT_APP_REVALIDATION_TOKEN }}'
-          method: 'GET'
+          url: https://yle-campus-lunch-list.vercel.app/api/revalidate/current-day-menus?secret=${{ secrets.NEXT_APP_REVALIDATION_TOKEN }}
+          method: GET
