@@ -7,25 +7,24 @@ import { PageTitleWithDate } from '../components/PageTitleWithDate/PageTitleWith
 import { RestaurantOneDayMenu } from '../components/RestaurantOneDayMenu/RestaurantOneDayMenu';
 import { WeekDayEnum } from '../lib/utils/regexUtils';
 import { WeekDay } from '../lib/types/weekdays';
-import { getHuoltamoCurrentDayMenu } from '../lib/utils/getHuoltamoCurrentDayMenu';
 import { getIsoPajaCurrentDayMenu } from '../lib/utils/getIsoPajaCurrentDayMenu';
 import { getStudio10CurrentDayMenu } from '../lib/utils/getStudio10CurrentDayMenu';
 import { RestaurantMenus } from '../lib/types/restaurantMenus';
 import { WEEKDAYS_ARRAY } from '../lib/constants/weekdaysArray';
-import { scrapeHuoltamo } from '../lib/scrapers/scrapeHuoltamo';
-import { scrapeIsoPaja } from '../lib/scrapers/scrapeIsoPaja';
-import { scrapeStudio10CurrentWeekMenu } from '../lib/scrapers/scrapeStudio10';
+import { scrapeIsoPaja } from '../lib/scrapers/cheerio/scrapeIsoPaja';
+import { scrapeStudio10 } from '../lib/scrapers/cheerio/scrapeStudio10';
+import { getHuoltamoCurrentDayMenuFromApi } from '../lib/utils/getHuoltamoCurrentDayMenuFromApi';
 
 interface HomeProps {
   restaurant: RestaurantMenus;
   isoDate: string;
 }
+const TIME_ZONE = 'Europe/Helsinki';
 
 const Home: NextPage<HomeProps> = ({ restaurant, isoDate }) => {
-  const timeZone = 'Europe/Helsinki';
-  const zonedIsoDate = utcToZonedTime(isoDate, timeZone);
+  const zonedIsoDate = utcToZonedTime(isoDate, TIME_ZONE);
   const pattern = 'd.MM.yyyy';
-  const date = format(zonedIsoDate, pattern, { timeZone });
+  const date = format(zonedIsoDate, pattern, { timeZone: TIME_ZONE });
   const weekdayIndex = getDay(zonedIsoDate);
   const weekday = WEEKDAYS_ARRAY[weekdayIndex];
 
@@ -49,11 +48,12 @@ export const getStaticProps: GetStaticProps<HomeProps> = async () => {
   }) as WeekDay;
   const isoDate = new Date().toISOString();
   const weekDayIndex = WeekDayEnum[currentDay];
+  const zonedIsoDate = utcToZonedTime(isoDate, TIME_ZONE);
 
   const restaurant: RestaurantMenus = {
-    huoltamo: await getHuoltamoCurrentDayMenu(weekDayIndex, scrapeHuoltamo),
+    huoltamo: await getHuoltamoCurrentDayMenuFromApi(zonedIsoDate),
+    studio10: await getStudio10CurrentDayMenu(weekDayIndex, scrapeStudio10),
     isoPaja: await getIsoPajaCurrentDayMenu(weekDayIndex, scrapeIsoPaja),
-    studio10: await getStudio10CurrentDayMenu(weekDayIndex, scrapeStudio10CurrentWeekMenu),
   };
 
   return {

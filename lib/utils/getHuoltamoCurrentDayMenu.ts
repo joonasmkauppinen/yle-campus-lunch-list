@@ -1,4 +1,4 @@
-import { scrapeHuoltamo } from '../scrapers/scrapeHuoltamo';
+import { scrapeHuoltamo } from '../scrapers/playwright/scrapeHuoltamo';
 import { WeekDayEnum } from './regexUtils';
 
 export const getHuoltamoCurrentDayMenu = async (

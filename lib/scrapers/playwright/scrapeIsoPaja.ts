@@ -1,5 +1,5 @@
-import { ISO_PAJA_URL } from '../constants/restaurantUrls';
-import { getBrowserByEnvironment } from '../utils/getBrowserByEnvironment';
+import { ISO_PAJA_URL } from '../../constants/restaurantUrls';
+import { getBrowserByEnvironment } from '../../utils/getBrowserByEnvironment';
 
 export const scrapeIsoPaja = async () => {
   let result: string[];

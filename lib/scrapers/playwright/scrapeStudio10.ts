@@ -1,5 +1,5 @@
-import { STUDIO_10_URL } from '../constants/restaurantUrls';
-import { getBrowserByEnvironment } from '../utils/getBrowserByEnvironment';
+import { STUDIO_10_URL } from '../../constants/restaurantUrls';
+import { getBrowserByEnvironment } from '../../utils/getBrowserByEnvironment';
 
 export const scrapeStudio10CurrentWeekMenu = async () => {
   let result: string[];

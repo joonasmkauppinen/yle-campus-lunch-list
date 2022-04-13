@@ -1,5 +1,5 @@
-import { HUOLTAMO_URL } from '../constants/restaurantUrls';
-import { getBrowserByEnvironment } from '../utils/getBrowserByEnvironment';
+import { HUOLTAMO_URL } from '../../constants/restaurantUrls';
+import { getBrowserByEnvironment } from '../../utils/getBrowserByEnvironment';
 
 const weekDayNamesArray = ['MAANANTAI', 'TIISTAI', 'KESKIVIIKKO', 'TORSTAI', 'PERJANTAI'];
 
