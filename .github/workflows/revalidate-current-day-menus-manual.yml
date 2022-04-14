@@ -12,3 +12,4 @@ jobs:
         with:
           url: https://yle-campus-lunch-list.vercel.app/api/revalidate/current-day-menus?secret=${{ secrets.NEXT_APP_REVALIDATION_TOKEN }}
           method: GET
+          timeout: 15000
