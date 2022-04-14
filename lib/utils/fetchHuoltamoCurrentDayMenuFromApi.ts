@@ -2,6 +2,8 @@ import fetch from 'node-fetch';
 import { isSameDay } from 'date-fns';
 
 import { INTRA_HUOLTAMO_API_URL } from '../constants/restaurantUrls';
+import { utcToZonedTime } from 'date-fns-tz';
+import { TIME_ZONE } from '../constants/timeZone';
 
 interface IntraRestaurantItemRaw {
   id: string;
@@ -29,7 +31,7 @@ interface IntraApiResponse {
   items: IntraRestaurantItemRaw[];
 }
 
-export const getHuoltamoCurrentDayMenuFromApi = async (zonedIsoDate: Date) => {
+export const fetchHuoltamoCurrentDayMenuFromApi = async (zonedIsoDate: Date) => {
   try {
     const response = await fetch(INTRA_HUOLTAMO_API_URL);
     const data = (await response.json()) as IntraApiResponse;
@@ -39,7 +41,7 @@ export const getHuoltamoCurrentDayMenuFromApi = async (zonedIsoDate: Date) => {
       .map((item) => ({ ...item, menu: JSON.parse(item.menu) } as IntraRestaurantItem));
 
     const currentDayMenu = huoltamoItems
-      .find((item) => isSameDay(new Date(item.date), zonedIsoDate))
+      .find((item) => isSameDay(utcToZonedTime(item.date, TIME_ZONE), zonedIsoDate))
       ?.menu.map((item) => `${item.value} ${item.diet ? `(${item.diet})` : ''}`);
 
     return currentDayMenu || [];

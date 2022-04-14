@@ -13,13 +13,13 @@ import { RestaurantMenus } from '../lib/types/restaurantMenus';
 import { WEEKDAYS_ARRAY } from '../lib/constants/weekdaysArray';
 import { scrapeIsoPaja } from '../lib/scrapers/cheerio/scrapeIsoPaja';
 import { scrapeStudio10 } from '../lib/scrapers/cheerio/scrapeStudio10';
-import { getHuoltamoCurrentDayMenuFromApi } from '../lib/utils/getHuoltamoCurrentDayMenuFromApi';
+import { fetchHuoltamoCurrentDayMenuFromApi } from '../lib/utils/fetchHuoltamoCurrentDayMenuFromApi';
+import { TIME_ZONE } from '../lib/constants/timeZone';
 
 interface HomeProps {
   restaurant: RestaurantMenus;
   isoDate: string;
 }
-const TIME_ZONE = 'Europe/Helsinki';
 
 const Home: NextPage<HomeProps> = ({ restaurant, isoDate }) => {
   const zonedIsoDate = utcToZonedTime(isoDate, TIME_ZONE);
@@ -51,7 +51,7 @@ export const getStaticProps: GetStaticProps<HomeProps> = async () => {
   const zonedIsoDate = utcToZonedTime(isoDate, TIME_ZONE);
 
   const restaurant: RestaurantMenus = {
-    huoltamo: await getHuoltamoCurrentDayMenuFromApi(zonedIsoDate),
+    huoltamo: await fetchHuoltamoCurrentDayMenuFromApi(zonedIsoDate),
     studio10: await getStudio10CurrentDayMenu(weekDayIndex, scrapeStudio10),
     isoPaja: await getIsoPajaCurrentDayMenu(weekDayIndex, scrapeIsoPaja),
   };
