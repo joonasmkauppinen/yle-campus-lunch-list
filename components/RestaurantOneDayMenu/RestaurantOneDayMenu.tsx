@@ -14,7 +14,6 @@ const ContainerDiv = styled.div({
   paddingBottom: 8,
   position: 'relative',
   marginBottom: 8,
-  cursor: 'pointer',
 });
 
 const ElementsContainerDiv = styled.div({
