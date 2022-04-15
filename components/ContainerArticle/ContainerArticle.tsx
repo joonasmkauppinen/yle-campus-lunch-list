@@ -5,4 +5,9 @@ export const PageContainer = styled.article({
   marginRight: 10,
   marginTop: 50,
   marginBottom: 80,
+  '@media (min-width: 670px)': {
+    maxWidth: 670,
+    marginLeft: 'auto',
+    marginRight: 'auto',
+  },
 });
