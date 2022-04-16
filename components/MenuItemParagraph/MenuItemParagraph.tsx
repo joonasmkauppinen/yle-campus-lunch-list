@@ -4,9 +4,10 @@ import rehypeRaw from 'rehype-raw';
 
 export const StyledParagraph = styled.p({
   margin: 0,
+  marginBottom: 16,
   fontSize: '1em',
   color: '#1B1B1B',
-  lineHeight: '38px',
+  lineHeight: '26px',
   fontWeight: 500,
 });
 
