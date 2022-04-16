@@ -15,6 +15,7 @@ import { scrapeIsoPaja } from '../lib/scrapers/cheerio/scrapeIsoPaja';
 import { scrapeStudio10 } from '../lib/scrapers/cheerio/scrapeStudio10';
 import { fetchHuoltamoCurrentDayMenuFromApi } from '../lib/utils/fetchHuoltamoCurrentDayMenuFromApi';
 import { TIME_ZONE } from '../lib/constants/timeZone';
+import { HUOLTAMO_URL, ISO_PAJA_URL, STUDIO_10_URL } from '../lib/constants/restaurantUrls';
 
 interface HomeProps {
   restaurant: RestaurantMenus;
@@ -35,9 +36,21 @@ const Home: NextPage<HomeProps> = ({ restaurant, isoDate }) => {
         <meta data-updated={zonedIsoDate} />
       </Head>
       <PageTitleWithDate date={date} title="Lounaslistat" weekday={weekday} />
-      <RestaurantOneDayMenu restaurantName="Huoltamo" menuItems={restaurant.huoltamo} />
-      <RestaurantOneDayMenu restaurantName="Studio 10" menuItems={restaurant.studio10} />
-      <RestaurantOneDayMenu restaurantName="Iso Paja" menuItems={restaurant.isoPaja} />
+      <RestaurantOneDayMenu
+        restaurantName="Huoltamo"
+        menuItems={restaurant.huoltamo}
+        restaurantUrl={HUOLTAMO_URL}
+      />
+      <RestaurantOneDayMenu
+        restaurantName="Studio 10"
+        menuItems={restaurant.studio10}
+        restaurantUrl={STUDIO_10_URL}
+      />
+      <RestaurantOneDayMenu
+        restaurantName="Iso Paja"
+        menuItems={restaurant.isoPaja}
+        restaurantUrl={ISO_PAJA_URL}
+      />
     </>
   );
 };

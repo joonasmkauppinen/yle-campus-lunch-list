@@ -26,9 +26,24 @@ const ElementsContainerDiv = styled.div({
 interface RestaurantOneDayMenuProps {
   menuItems: string[];
   restaurantName: string;
+  restaurantUrl: string;
 }
 
-export const RestaurantOneDayMenu = ({ menuItems, restaurantName }: RestaurantOneDayMenuProps) => {
+const RestaurantLink = styled.a({
+  fontSize: 13,
+  color: 'blue',
+  marginTop: 8,
+  marginBottom: 18,
+  ':hover': {
+    textDecoration: 'underline',
+  },
+});
+
+export const RestaurantOneDayMenu = ({
+  menuItems,
+  restaurantName,
+  restaurantUrl,
+}: RestaurantOneDayMenuProps) => {
   return (
     <ContainerSection>
       <ContainerDiv>
@@ -37,6 +52,9 @@ export const RestaurantOneDayMenu = ({ menuItems, restaurantName }: RestaurantOn
         </ElementsContainerDiv>
         <DividerLineSpan />
       </ContainerDiv>
+      <RestaurantLink href={restaurantUrl} target="_blank">
+        Ravintolan omat sivut &#8599;
+      </RestaurantLink>
       {menuItems.length === 0 ? (
         <StyledParagraph>Listaa ei saatu haettua.</StyledParagraph>
       ) : (
