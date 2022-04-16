@@ -2,6 +2,7 @@ import styled from '@emotion/styled';
 import { DividerLineSpan } from '../DividerLineSpan/DividerLineSpan';
 import { Heading2 } from '../Heading2/Heading2';
 import { MenuItemParagraph, StyledParagraph } from '../MenuItemParagraph/MenuItemParagraph';
+import { RestaurantLink } from '../RestaurantLink/RestaurantLink';
 
 const ContainerSection = styled.section({
   display: 'flex',
@@ -28,16 +29,6 @@ interface RestaurantOneDayMenuProps {
   restaurantName: string;
   restaurantUrl: string;
 }
-
-const RestaurantLink = styled.a({
-  fontSize: 13,
-  color: 'blue',
-  marginTop: 8,
-  marginBottom: 18,
-  ':hover': {
-    textDecoration: 'underline',
-  },
-});
 
 export const RestaurantOneDayMenu = ({
   menuItems,
