@@ -2,11 +2,11 @@ name: Cron job to update root page
 
 on:
   schedule:
-    # GitHub runs cron jobs on UTC time. We want to this job to run everyday
-    # at 10 o'clock. Finland's timezone is +3 in summer and +2 on winter.
-    # So this job runs at 10 o'clock in summer and at 9 o'click in winter.
+    # GitHub runs cron jobs on UTC +0 time. We want this job to run everyday
+    # at 8 o'clock. Finland's timezone is +3 in summer and +2 on winter.
+    # So this job runs at 8 o'clock in summer and at 7 o'click in winter.
     # * is a special character in YAML so you have to quote this string
-    - cron: '0 7 * * *'
+    - cron: '0 5 * * *'
 
 jobs:
   revalidate_root:
