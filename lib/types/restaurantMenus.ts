@@ -5,4 +5,5 @@ export interface RestaurantMenus {
   isoPaja: MenuItems;
   huoltamo: MenuItems;
   box: MenuItems;
+  dylan: MenuItems;
 }
