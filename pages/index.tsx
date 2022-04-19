@@ -15,7 +15,16 @@ import { scrapeIsoPaja } from '../lib/scrapers/cheerio/scrapeIsoPaja';
 import { scrapeStudio10 } from '../lib/scrapers/cheerio/scrapeStudio10';
 import { fetchHuoltamoCurrentDayMenuFromApi } from '../lib/utils/fetchHuoltamoCurrentDayMenuFromApi';
 import { TIME_ZONE } from '../lib/constants/timeZone';
-import { HUOLTAMO_URL, ISO_PAJA_URL, STUDIO_10_URL } from '../lib/constants/restaurantUrls';
+import {
+  BOX_URL,
+  DYLAN_URL,
+  HUOLTAMO_URL,
+  ISO_PAJA_URL,
+  STUDIO_10_URL,
+} from '../lib/constants/restaurantUrls';
+import { scrapeBox } from '../lib/scrapers/cheerio/scrapeBox';
+import { getBoxCurrentDayMenu } from '../lib/utils/getBoxCurrentDayMenu';
+import { fetchDylanCurrentDayMenuFromApi } from '../lib/utils/fetchDylanCurrentDayMenuFromApi';
 
 interface HomeProps {
   restaurant: RestaurantMenus;
@@ -51,6 +60,16 @@ const Home: NextPage<HomeProps> = ({ restaurant, isoDate }) => {
         menuItems={restaurant.isoPaja}
         restaurantUrl={ISO_PAJA_URL}
       />
+      <RestaurantOneDayMenu
+        restaurantName="Båx"
+        menuItems={restaurant.box}
+        restaurantUrl={BOX_URL}
+      />
+      <RestaurantOneDayMenu
+        restaurantName="Dylan"
+        menuItems={restaurant.dylan}
+        restaurantUrl={DYLAN_URL}
+      />
     </>
   );
 };
@@ -67,6 +86,8 @@ export const getStaticProps: GetStaticProps<HomeProps> = async () => {
     huoltamo: await fetchHuoltamoCurrentDayMenuFromApi(zonedIsoDate),
     studio10: await getStudio10CurrentDayMenu(weekDayIndex, scrapeStudio10),
     isoPaja: await getIsoPajaCurrentDayMenu(weekDayIndex, scrapeIsoPaja),
+    box: await getBoxCurrentDayMenu(weekDayIndex, scrapeBox),
+    dylan: await fetchDylanCurrentDayMenuFromApi(weekDayIndex),
   };
 
   return {

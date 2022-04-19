@@ -10,7 +10,8 @@ export const scrapeStudio10 = async () => {
     const menuListItems = $('.mm-lounaslista')
       .map((_, element) => $(element).html())
       .toArray()
-      .flatMap((item) => item.split('\n'));
+      .flatMap((item) => item.split('\n'))
+      .filter((item) => /\s/.test(item));
 
     return menuListItems;
   } catch (err) {

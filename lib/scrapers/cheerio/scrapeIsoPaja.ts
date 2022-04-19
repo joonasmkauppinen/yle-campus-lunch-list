@@ -9,7 +9,8 @@ export const scrapeIsoPaja = async () => {
     const $ = cheerio.load(body);
     const menuItems = $('[data-mesh-id="comp-kyrlvrhqinlineContent-gridContainer"] .font_8')
       .map((_, element) => $(element).text())
-      .toArray();
+      .toArray()
+      .filter((item) => /\s/.test(item));
 
     return menuItems;
   } catch (err) {
