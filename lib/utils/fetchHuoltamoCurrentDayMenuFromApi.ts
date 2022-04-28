@@ -4,6 +4,7 @@ import { isSameDay } from 'date-fns';
 import { INTRA_HUOLTAMO_API_URL } from '../constants/restaurantUrls';
 import { utcToZonedTime } from 'date-fns-tz';
 import { TIME_ZONE } from '../constants/timeZone';
+import { MenuItems } from '../types/restaurantMenus';
 
 interface IntraRestaurantItemRaw {
   id: string;
@@ -31,7 +32,9 @@ interface IntraApiResponse {
   items: IntraRestaurantItemRaw[];
 }
 
-export const fetchHuoltamoCurrentDayMenuFromApi = async (zonedIsoDate: Date) => {
+export const fetchHuoltamoCurrentDayMenuFromApi = async (
+  zonedIsoDate: Date,
+): Promise<MenuItems> => {
   try {
     const response = await fetch(INTRA_HUOLTAMO_API_URL);
     const data = (await response.json()) as IntraApiResponse;
@@ -40,11 +43,16 @@ export const fetchHuoltamoCurrentDayMenuFromApi = async (zonedIsoDate: Date) => 
       .filter((item) => item.restaurant === 'Ravintola Huoltamo Palmia')
       .map((item) => ({ ...item, menu: JSON.parse(item.menu) } as IntraRestaurantItem));
 
-    const currentDayMenu = huoltamoItems
+    const currentDayMenuArr = huoltamoItems
       .find((item) => isSameDay(utcToZonedTime(item.date, TIME_ZONE), zonedIsoDate))
       ?.menu.map((item) => `${item.value} ${item.diet ? `(${item.diet})` : ''}`);
 
-    return currentDayMenu || [];
+    if (!currentDayMenuArr) {
+      return [];
+    }
+
+    const currentDayMenuItems: MenuItems = currentDayMenuArr.map((item) => ({ text: item }));
+    return currentDayMenuItems;
   } catch (err) {
     console.error(err);
     return [];
