@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { MenuItems } from '../../lib/types/restaurantMenus';
 import { DividerLineSpan } from '../DividerLineSpan/DividerLineSpan';
 import { Heading2 } from '../Heading2/Heading2';
 import { MenuItemParagraph, StyledParagraph } from '../MenuItemParagraph/MenuItemParagraph';
@@ -25,7 +26,7 @@ const ElementsContainerDiv = styled.div({
 });
 
 interface RestaurantOneDayMenuProps {
-  menuItems: string[];
+  menuItems: MenuItems;
   restaurantName: string;
   restaurantUrl: string;
 }
@@ -50,7 +51,10 @@ export const RestaurantOneDayMenu = ({
         <StyledParagraph>Listaa ei saatu haettua.</StyledParagraph>
       ) : (
         menuItems.map((item, index) => (
-          <MenuItemParagraph markdown={item} key={`${restaurantName}-${index}`} />
+          <MenuItemParagraph
+            markdown={item.markdown || item.text}
+            key={`${restaurantName}-${index}`}
+          />
         ))
       )}
     </ContainerSection>

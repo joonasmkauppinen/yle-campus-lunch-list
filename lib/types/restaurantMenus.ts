@@ -1,4 +1,9 @@
-export type MenuItems = string[];
+export interface MenuItem {
+  text: string;
+  markdown?: string;
+}
+
+export type MenuItems = MenuItem[];
 
 export interface RestaurantMenus {
   studio10: MenuItems;

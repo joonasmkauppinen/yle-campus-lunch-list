@@ -5,6 +5,7 @@ export const RestaurantLink = styled.a({
   color: 'blue',
   marginTop: 8,
   marginBottom: 16,
+  alignSelf: 'start',
   ':hover': {
     textDecoration: 'underline',
   },
