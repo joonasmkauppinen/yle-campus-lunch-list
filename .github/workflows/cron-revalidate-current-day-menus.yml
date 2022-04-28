@@ -2,14 +2,14 @@ name: Cron job to update root page
 
 on:
   schedule:
-    # GitHub runs cron jobs on UTC +0 time. We want this job to run everyday
-    # at 8 o'clock. Finland's timezone is +3 in summer and +2 on winter.
-    # So this job runs at 8 o'clock in summer and at 7 o'click in winter.
+    # GitHub runs cron jobs on UTC +0 time. We want this job to run every
+    # morning. Finland's timezone is +3 in summer and +2 in winter. So this job
+    # runs at 7 o'clock in summer and at 6 o'click in winter.
     # * is a special character in YAML so you have to quote this string
-    - cron: '0 5 * * *'
+    - cron: '0 4 * * *'
 
 jobs:
-  revalidate_root:
+  revalidate_root_page:
     name: Revalidate root page
     runs-on: ubuntu-latest
     steps:
@@ -17,5 +17,16 @@ jobs:
         uses: fjogeleit/http-request-action@v1
         with:
           url: https://yle-campus-lunch-list.vercel.app/api/revalidate/current-day-menus?secret=${{ secrets.NEXT_APP_REVALIDATION_TOKEN }}
+          method: GET
+          timeout: 15000
+
+  revalidate_api_current_day_menus:
+    name: Revalidate /api/current-day-menus cache
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call /api/current-day-menus endpoint
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: https://yle-campus-lunch-list.vercel.app/api/current-day-menus
           method: GET
           timeout: 15000
