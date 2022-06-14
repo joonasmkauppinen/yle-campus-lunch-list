@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import { MenuItems } from '../../lib/types/restaurantMenus';
 import { DividerLineSpan } from '../DividerLineSpan/DividerLineSpan';
 import { Heading2 } from '../Heading2/Heading2';
-import { MenuItemParagraph, StyledParagraph } from '../MenuItemParagraph/MenuItemParagraph';
+import { MenuItemText, StyledLi } from '../MenuItemParagraph/MenuItemParagraph';
 import { RestaurantLink } from '../RestaurantLink/RestaurantLink';
 
 const ContainerSection = styled.section({
@@ -23,6 +23,12 @@ const ElementsContainerDiv = styled.div({
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'space-between',
+});
+
+const ListItemsContainerUl = styled.ul({
+  listStyle: 'none',
+  margin: 0,
+  padding: 0,
 });
 
 interface RestaurantOneDayMenuProps {
@@ -47,16 +53,18 @@ export const RestaurantOneDayMenu = ({
       <RestaurantLink href={restaurantUrl} target="_blank">
         Ravintolan omat sivut &#8599;
       </RestaurantLink>
-      {menuItems.length === 0 ? (
-        <StyledParagraph>Listaa ei saatu haettua.</StyledParagraph>
-      ) : (
-        menuItems.map((item, index) => (
-          <MenuItemParagraph
-            markdown={item.markdown || item.text}
-            key={`${restaurantName}-${index}`}
-          />
-        ))
-      )}
+      <ListItemsContainerUl>
+        {menuItems.length === 0 ? (
+          <StyledLi>Listaa ei saatu haettua.</StyledLi>
+        ) : (
+          menuItems.map((item, index) => (
+            <MenuItemText
+              markdown={item.markdown || item.text}
+              key={`${restaurantName}-${index}`}
+            />
+          ))
+        )}
+      </ListItemsContainerUl>
     </ContainerSection>
   );
 };

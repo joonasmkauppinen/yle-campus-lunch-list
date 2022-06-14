@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 
-export const StyledParagraph = styled.p({
+export const StyledLi = styled.li({
   margin: 0,
   marginBottom: 16,
   fontSize: '1em',
@@ -11,18 +11,18 @@ export const StyledParagraph = styled.p({
   fontWeight: 500,
 });
 
-interface MenuItemParagraphProps {
+interface MenuItemTextProps {
   markdown: string;
 }
 
-export const MenuItemParagraph = ({ markdown }: MenuItemParagraphProps) => {
+export const MenuItemText = ({ markdown }: MenuItemTextProps) => {
   return (
     <ReactMarkdown
       // eslint-disable-next-line react/no-children-prop
       children={markdown}
       rehypePlugins={[rehypeRaw]}
       components={{
-        p: ({ children }) => <StyledParagraph>{children}</StyledParagraph>,
+        p: ({ children }) => <StyledLi>{children}</StyledLi>,
       }}
     />
   );
