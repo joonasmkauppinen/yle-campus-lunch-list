@@ -9,10 +9,11 @@ export const scrapeIsoPaja = async (): Promise<MenuItems> => {
     const response = await fetch(ISO_PAJA_URL);
     const body = await response.text();
     const $ = cheerio.load(body);
-    const menuItemsArr = $('[data-mesh-id="comp-kyrlvrhqinlineContent-gridContainer"] .font_8')
+    const menuItemsArr = $('#comp-kyrlvrhq .font_8')
       .map((_, element) => $(element).text())
       .toArray()
-      .filter((item) => /\s/.test(item));
+      .map((item) => item.trim())
+      .filter(Boolean); // Filter out falsy values - "", 0, NaN, null, undefined, false
 
     const menuItems: MenuItems = menuItemsArr.map((item) => ({ text: item }));
 
