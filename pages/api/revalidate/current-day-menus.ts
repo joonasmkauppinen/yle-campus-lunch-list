@@ -1,5 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+/**
+ * Revalidates the root page static html.
+ */
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   // Check for secret to confirm this is a valid request
   if (req.query.secret !== process.env.NEXT_APP_REVALIDATION_TOKEN) {
