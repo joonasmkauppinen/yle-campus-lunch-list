@@ -57,7 +57,6 @@ function MyApp({ Component, pageProps }: AppProps) {
           property="og:image"
           content="https://yle-campus-lunch-list.vercel.app/icons/icon_192x192.png"
         />
-
         {/* <!-- apple splash screen images --> */}
         {/* <link rel='apple-touch-startup-image' href='/images/apple_splash_2048.png' sizes='2048x2732' />
             <link rel='apple-touch-startup-image' href='/images/apple_splash_1668.png' sizes='1668x2224' />
