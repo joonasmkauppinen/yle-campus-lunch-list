@@ -16,6 +16,7 @@ import {
   STUDIO_10_URL,
 } from '../lib/constants/restaurantUrls';
 import { getAllRestaurantsCurrentDayMenus } from '../lib/utils/getAllRestaurantsCurrentDayMenus';
+import { GoogleAnalyticsScript } from '../components/GoogleAnalyticsScript/GoogleAnalyticsScript';
 
 interface HomeProps {
   restaurant: RestaurantMenus;
@@ -35,6 +36,9 @@ const Home: NextPage<HomeProps> = ({ restaurant, isoDate }) => {
         <title>{`Lounaslistat - ${weekday}`}</title>
         <meta data-updated={zonedIsoDate} />
       </Head>
+
+      <GoogleAnalyticsScript />
+
       <PageTitleWithDate date={date} title="Lounaslistat" weekday={weekday} />
       <RestaurantOneDayMenu
         restaurantName="Huoltamo"
