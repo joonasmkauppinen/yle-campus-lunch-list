@@ -15,6 +15,14 @@
 - Learn better semantic HTML
 - Learn SEO
 
+### Future plans
+
+If there is a point in time when I don't have anything better to do, then these are the features to I'd like to implement at some point.
+
+- Create dedicated pages for each restaurant that includes to whole week menus.
+- Create pages for each restaurant menu for each day of the week. Goal here being, that those pages would index into google. And finally people would be able to find Huoltamo's menus straight from Google!
+- Add PWA config to the page and implement some kind of a notification system to notify people about the menus on lunch time.
+
 ### Technologies
 
 - TypeScript
@@ -24,7 +32,7 @@
 
 ## Resources
 
-- Site production url: [`https://yle-campus-lunch-list.vercel.app/`](https://yle-campus-lunch-list.vercel.app/)
+- App production url: [`https://yle-campus-lunch-list.vercel.app/`](https://yle-campus-lunch-list.vercel.app/)
 - [Vercel dashboard](https://vercel.com/joonasmkauppinen/yle-campus-lunch-list) (hobby account, only @joonasmkauppinen can access)
 - [Figma design layouts (view access)](https://www.figma.com/file/ckeATTSGr5adcHYNqHPORC/Yle-campus-lunch-menu?node-id=0%3A1)
 - [GH Actions](https://github.com/joonasmkauppinen/yle-campus-lunch-list/actions)
@@ -34,25 +42,25 @@
 Clone repo:
 
 ```bash
-$ git clone git@github.com:joonasmkauppinen/yle-campus-lunch-list.git
+git clone git@github.com:joonasmkauppinen/yle-campus-lunch-list.git
 ```
 
 Open repo:
 
 ```bash
-$ cd yle-campus-lunch-list
+cd yle-campus-lunch-list
 ```
 
 Install dependencies:
 
 ```bash
-$ yarn install
+yarn install
 ```
 
 Start demo:
 
 ```bash
-$ yarn dev
+yarn dev
 ```
 
 ### Production build
@@ -64,26 +72,29 @@ Other than that, Vercel takes care of building the project during deployment.
 Create optimized production build:
 
 ```bash
-$ yarn build
+yarn build
 ```
 
 Run production build locally:
 
 ```bash
-$ yarn start
+yarn start
 ```
 
-## Deployments
+### Project structure
 
-TODO
+The project is mainly following the structure that Next generates when creating a new project, but there are the following additions:
+
+- `./components` - All the components live here.
+- `./lib` - All non component files are placed here. Meaning plain TypeScript files.
 
 ## Page revalidation
 
-TODO
+Revalidation is using [Next's on demand ISR feature](https://nextjs.org/docs/basic-features/data-fetching/incremental-static-regeneration#on-demand-revalidation-beta). The revalidation function is called in a custom api route. These are placed in the directory [`pages/api/revalidate/*`](./pages/api/revalidate).
 
-## Project structure
+Pages are revalidated every morning using a GitHub Action workflow, that is running a cron job. More details in the workflow file [`.github/workflows/revalidate-current-day-menus-cron.yml`](.github/workflows/revalidate-current-day-menus-cron.yml).
 
-TODO
+There's also a manual workflow that can be triggered by hand at any time. You'll find this workflow from the [actions tab in the repo](https://github.com/joonasmkauppinen/yle-campus-lunch-list/actions/workflows/manual-revalidate-current-day-menus.yml).
 
 ## Lunch list data sources
 
@@ -118,10 +129,6 @@ Here's the url:
 ```
 https://europe-west1-luncher-7cf76.cloudfunctions.net/api/v1/widget/3aba0b64-0d43-41ea-b665-1d2d6c0f2d5e/t14n3kFql5hOkmcEsTVt
 ```
-
-## Future plans
-
-TODO
 
 ## History
 
