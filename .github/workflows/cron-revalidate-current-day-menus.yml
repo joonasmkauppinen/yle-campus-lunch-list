@@ -18,10 +18,11 @@ jobs:
         with:
           url: https://yle-campus-lunch-list.vercel.app/api/revalidate/current-day-menus?secret=${{ secrets.NEXT_APP_REVALIDATION_TOKEN }}
           method: GET
-          timeout: 15000
+          timeout: 20000
 
   revalidate_api_current_day_menus:
     name: Revalidate /api/current-day-menus cache
+    needs: revalidate_root_page
     runs-on: ubuntu-latest
     steps:
       - name: Call /api/current-day-menus endpoint
@@ -29,4 +30,4 @@ jobs:
         with:
           url: https://yle-campus-lunch-list.vercel.app/api/current-day-menus
           method: GET
-          timeout: 15000
+          timeout: 20000
