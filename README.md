@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/28673805/147505556-b502e8a1-b8b0-4387-b64b-9545a801bcb6.png">
+  <img width="200" src="https://user-images.githubusercontent.com/28673805/178212367-e90d5c62-eeed-4c31-a39a-740a9ef3a287.png">
 </p>
 <h1 align="center">Yle campus lunch lists</h1>
 
