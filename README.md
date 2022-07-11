@@ -30,6 +30,20 @@ If there is a point in time when I don't have anything better to do, then these 
 - Vercel for deployment, hosting.
 - Cheerio for web scraping.
 
+### Endpoints
+
+Pages:
+
+- Root page: https://yle-campus-lunch-list.vercel.app/
+
+API:
+
+- [`/api/current-day-menus`](https://yle-campus-lunch-list.vercel.app/api/current-day-menus) - Get the current day menus in JSON format. First request takes a while, because the data is scraped. Subsequent requests are served from cache.
+
+- [`/api/current-day-menus-nocache`](https://yle-campus-lunch-list.vercel.app/api/current-day-menus-nocache) - Returns the same response as `/api/current-day-menus`, but the response is never cached.
+
+- `/api/revalidate/current-day-menus` - Revalidation endpoint for the root page. This is using [Next's On-demand Revalidation feature](https://nextjs.org/docs/basic-features/data-fetching/incremental-static-regeneration#on-demand-revalidation). Cannot be accessed without a secret token.
+
 ## Resources
 
 - App production url: [`https://yle-campus-lunch-list.vercel.app/`](https://yle-campus-lunch-list.vercel.app/)
