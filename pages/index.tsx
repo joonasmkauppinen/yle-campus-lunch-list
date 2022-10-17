@@ -11,7 +11,7 @@ import { TIME_ZONE } from '../lib/constants/timeZone';
 import {
   BOX_URL,
   DYLAN_URL,
-  HUOLTAMO_URL,
+  INTRA_SITE_URL,
   ISO_PAJA_URL,
   STUDIO_10_URL,
 } from '../lib/constants/restaurantUrls';
@@ -43,7 +43,12 @@ const Home: NextPage<HomeProps> = ({ restaurant, isoDate }) => {
       <RestaurantOneDayMenu
         restaurantName="Huoltamo"
         menuItems={restaurant.huoltamo}
-        restaurantUrl={HUOLTAMO_URL}
+        restaurantUrl={INTRA_SITE_URL}
+      />
+      <RestaurantOneDayMenu
+        restaurantName="Piccolo"
+        menuItems={restaurant.piccolo}
+        restaurantUrl={INTRA_SITE_URL}
       />
       <RestaurantOneDayMenu
         restaurantName="Studio 10"

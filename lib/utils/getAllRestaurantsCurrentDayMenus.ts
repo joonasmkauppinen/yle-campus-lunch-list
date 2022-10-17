@@ -9,7 +9,7 @@ import { scrapeStudio10 } from '../scrapers/cheerio/scrapeStudio10';
 
 import { WeekDayEnum } from './regexUtils';
 import { fetchDylanCurrentDayMenuFromApi } from './fetchDylanCurrentDayMenuFromApi';
-import { fetchHuoltamoCurrentDayMenuFromApi } from './fetchHuoltamoCurrentDayMenuFromApi';
+import { fetchIntraCurrentDayMenuFromApi } from './fetchHuoltamoCurrentDayMenuFromApi';
 import { getBoxCurrentDayMenu } from './getBoxCurrentDayMenu';
 import { getIsoPajaCurrentDayMenu } from './getIsoPajaCurrentDayMenu';
 import { getStudio10CurrentDayMenu } from './getStudio10CurrentDayMenu';
@@ -22,12 +22,15 @@ export const getAllRestaurantsCurrentDayMenus = async () => {
   const weekDayIndex = WeekDayEnum[currentDay];
   const zonedIsoDate = utcToZonedTime(isoDate, TIME_ZONE);
 
+  const { huoltamo, piccolo } = await fetchIntraCurrentDayMenuFromApi(zonedIsoDate);
+
   const restaurant: RestaurantMenus = {
-    huoltamo: await fetchHuoltamoCurrentDayMenuFromApi(zonedIsoDate),
-    studio10: await getStudio10CurrentDayMenu(weekDayIndex, scrapeStudio10),
-    isoPaja: await getIsoPajaCurrentDayMenu(weekDayIndex, scrapeIsoPaja),
     box: await getBoxCurrentDayMenu(weekDayIndex, scrapeBox),
     dylan: await fetchDylanCurrentDayMenuFromApi(weekDayIndex),
+    huoltamo,
+    isoPaja: await getIsoPajaCurrentDayMenu(weekDayIndex, scrapeIsoPaja),
+    piccolo,
+    studio10: await getStudio10CurrentDayMenu(weekDayIndex, scrapeStudio10),
   };
 
   return {
