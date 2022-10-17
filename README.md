@@ -42,7 +42,7 @@ API:
 
 - [`/api/current-day-menus-nocache`](https://yle-campus-lunch-list.vercel.app/api/current-day-menus-nocache) - Returns the same response as `/api/current-day-menus`, but the response is never cached.
 
-- `/api/revalidate/current-day-menus` - Revalidation endpoint for the root page. This is using [Next's On-demand Revalidation feature](https://nextjs.org/docs/basic-features/data-fetching/incremental-static-regeneration#on-demand-revalidation). Cannot be accessed without a secret token.
+- `/api/revalidate/current-day-menus` - Revalidation endpoint for the root page. This is using [Next's On-demand Revalidation feature](https://nextjs.org/docs/basic-features/data-fetching/incremental-static-regeneration#on-demand-revalidation).
 
 ## Resources
 
