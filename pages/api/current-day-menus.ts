@@ -15,8 +15,8 @@ export default async function handler(
 ) {
   try {
     const { restaurant, zonedIsoDate } = await getAllRestaurantsCurrentDayMenus();
-    // Set a 20 hour cache
-    res.setHeader('Cache-Control', 's-maxage=72000');
+    // Set a 6 hour cache
+    res.setHeader('Cache-Control', 's-maxage=21600');
     res.status(200).json({ restaurant, dataScrapedIsoDate: zonedIsoDate });
   } catch (err) {
     return res.status(500).json({ error: err });
