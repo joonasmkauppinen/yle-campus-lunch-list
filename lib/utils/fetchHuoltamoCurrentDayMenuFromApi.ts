@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 import { isSameDay } from 'date-fns';
 
-import { INTRA_HUOLTAMO_API_URL } from '../constants/restaurantUrls';
+import { INTRA_API_URL } from '../constants/restaurantUrls';
 import { utcToZonedTime } from 'date-fns-tz';
 import { TIME_ZONE } from '../constants/timeZone';
 import { MenuItems } from '../types/restaurantMenus';
@@ -32,29 +32,50 @@ interface IntraApiResponse {
   items: IntraRestaurantItemRaw[];
 }
 
-export const fetchHuoltamoCurrentDayMenuFromApi = async (
+/**
+ * Intra API includes Huoltamo and Piccolo lunch items
+ */
+export const fetchIntraCurrentDayMenuFromApi = async (
   zonedIsoDate: Date,
-): Promise<MenuItems> => {
+): Promise<{ huoltamo: MenuItems; piccolo: MenuItems }> => {
   try {
-    const response = await fetch(INTRA_HUOLTAMO_API_URL);
+    const response = await fetch(INTRA_API_URL);
     const data = (await response.json()) as IntraApiResponse;
 
     const huoltamoItems = data.items
       .filter((item) => item.restaurant === 'Ravintola Huoltamo Palmia')
       .map((item) => ({ ...item, menu: JSON.parse(item.menu) } as IntraRestaurantItem));
 
-    const currentDayMenuArr = huoltamoItems
+    const piccoloItems = data.items
+      .filter((item) => item.restaurant === 'Piccolo')
+      .map((item) => ({ ...item, menu: JSON.parse(item.menu) } as IntraRestaurantItem));
+
+    const huoltamoCurrentDayMenuArr = huoltamoItems
       .find((item) => isSameDay(utcToZonedTime(item.date, TIME_ZONE), zonedIsoDate))
       ?.menu.map((item) => `${item.value} ${item.diet ? `(${item.diet})` : ''}`);
 
-    if (!currentDayMenuArr) {
-      return [];
+    const piccoloCurrentDayMenuArr = piccoloItems
+      .find((item) => isSameDay(utcToZonedTime(item.date, TIME_ZONE), zonedIsoDate))
+      ?.menu.map((item) => `${item.value} ${item.diet ? `(${item.diet})` : ''}`);
+
+    if (!huoltamoCurrentDayMenuArr || !piccoloCurrentDayMenuArr) {
+      return { huoltamo: [], piccolo: [] };
     }
 
-    const currentDayMenuItems: MenuItems = currentDayMenuArr.map((item) => ({ text: item }));
-    return currentDayMenuItems;
+    const huoltamoCurrentDayMenuItems: MenuItems = huoltamoCurrentDayMenuArr.map((item) => ({
+      text: item,
+    }));
+
+    const piccoloCurrentDayMenuItems: MenuItems = piccoloCurrentDayMenuArr.map((item) => ({
+      text: item,
+    }));
+
+    return { huoltamo: huoltamoCurrentDayMenuItems, piccolo: piccoloCurrentDayMenuItems };
   } catch (err) {
     console.error(err);
-    return [];
+    return {
+      huoltamo: [],
+      piccolo: [],
+    };
   }
 };
