@@ -6,7 +6,7 @@ export const StyledLi = styled.li({
   margin: 0,
   marginBottom: 16,
   fontSize: '1em',
-  color: '#1B1B1B',
+  color: 'var(--text-primary)',
   lineHeight: '26px',
   fontWeight: 500,
 });

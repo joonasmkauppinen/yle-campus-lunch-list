@@ -16,7 +16,8 @@ function MyApp({ Component, pageProps }: AppProps) {
         <meta name="description" content="Ylen kampuksen lounasravintoloiden lounaslistat." />
         <meta name="format-detection" content="telephone=no" />
         <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="theme-color" content="#ffffff" />
+        <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
 
         <link rel="apple-touch-icon" href="/icons/touch-icon-iphone.png" />
         <link rel="apple-touch-icon" sizes="152x152" href="/icons/touch-icon-ipad_152x152.png" />
