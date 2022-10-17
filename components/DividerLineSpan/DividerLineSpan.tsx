@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 
 export const DividerLineSpan = styled.span({
-  backgroundColor: '#D9D9D9',
+  backgroundColor: 'var(--divider)',
   position: 'absolute',
   bottom: 0,
   left: 0,
