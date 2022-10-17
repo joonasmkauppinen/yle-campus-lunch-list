@@ -12,7 +12,7 @@ export const scrapeIsoPaja = async (): Promise<MenuItems> => {
     const menuItemsArr = $('#comp-kyrlvrhq .font_8')
       .map((_, element) => $(element).text())
       .toArray()
-      .map((item) => item.trim())
+      .map((item) => item.replace(/\u200B/g, '').trim()) // Sometimes items can contain a zero width space, replace those.
       .filter(Boolean); // Filter out falsy values - "", 0, NaN, null, undefined, false
 
     const menuItems: MenuItems = menuItemsArr.map((item) => ({ text: item }));
