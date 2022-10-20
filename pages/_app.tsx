@@ -2,8 +2,30 @@ import '../styles/globals.css';
 import Head from 'next/head';
 import type { AppProps } from 'next/app';
 import { PageContainer } from '../components/ContainerArticle/ContainerArticle';
+import { useDarkMode } from '../jotai/darkModeAtom';
+import { useEffect } from 'react';
 
-function MyApp({ Component, pageProps }: AppProps) {
+const MyApp = ({ Component, pageProps }: AppProps) => {
+  const { darkMode, setDarkMode } = useDarkMode();
+
+  useEffect(() => {
+    if (darkMode) {
+      console.log('applying dark mode colors');
+      document.documentElement.style.setProperty('--text-primary', '#d9d9d9');
+      document.documentElement.style.setProperty('--text-secondary', '#a6a6a6');
+      document.documentElement.style.setProperty('--background', '#000000');
+      document.documentElement.style.setProperty('--divider', '#404040');
+      document.documentElement.style.setProperty('--text-link', ' #5380ff');
+    } else {
+      console.log('applying light mode colors');
+      document.documentElement.style.setProperty('--text-primary', '#1b1b1b');
+      document.documentElement.style.setProperty('--text-secondary', '#808080');
+      document.documentElement.style.setProperty('--background', '#ffffff');
+      document.documentElement.style.setProperty('--divider', '#d9d9d9');
+      document.documentElement.style.setProperty('--text-link', ' blue');
+    }
+  }, [darkMode, setDarkMode]);
+
   return (
     <>
       <Head>
@@ -92,6 +114,6 @@ function MyApp({ Component, pageProps }: AppProps) {
       </PageContainer>
     </>
   );
-}
+};
 
 export default MyApp;

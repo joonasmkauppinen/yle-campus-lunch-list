@@ -17,6 +17,7 @@ import {
 } from '../lib/constants/restaurantUrls';
 import { getAllRestaurantsCurrentDayMenus } from '../lib/utils/getAllRestaurantsCurrentDayMenus';
 import { GoogleAnalyticsScript } from '../components/GoogleAnalyticsScript/GoogleAnalyticsScript';
+import { ToolBar } from '../components/ToolBar/ToolBar';
 
 interface HomeProps {
   restaurant: RestaurantMenus;
@@ -38,6 +39,8 @@ const Home: NextPage<HomeProps> = ({ restaurant, isoDate }) => {
       </Head>
 
       <GoogleAnalyticsScript />
+
+      <ToolBar />
 
       <PageTitleWithDate date={date} title="Lounaslistat" weekday={weekday} />
       <RestaurantOneDayMenu

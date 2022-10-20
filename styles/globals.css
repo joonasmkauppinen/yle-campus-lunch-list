@@ -20,7 +20,16 @@ a {
   box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: light) {
+:root {
+  --text-primary: #1b1b1b;
+  --text-secondary: #808080;
+  --background: #ffffff;
+  --divider: #d9d9d9;
+  --text-link: blue;
+  transition: all 500ms ease-out;
+}
+
+/* @media (prefers-color-scheme: light) {
   :root {
     --text-primary: #1b1b1b;
     --text-secondary: #808080;
@@ -38,4 +47,4 @@ a {
     --divider: #404040;
     --text-link: #5380ff;
   }
-}
+} */
