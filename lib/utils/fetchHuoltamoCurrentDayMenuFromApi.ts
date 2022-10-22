@@ -58,17 +58,17 @@ export const fetchIntraCurrentDayMenuFromApi = async (
       .find((item) => isSameDay(utcToZonedTime(item.date, TIME_ZONE), zonedIsoDate))
       ?.menu.map((item) => `${item.value} ${item.diet ? `(${item.diet})` : ''}`);
 
-    if (!huoltamoCurrentDayMenuArr || !piccoloCurrentDayMenuArr) {
-      return { huoltamo: [], piccolo: [] };
-    }
+    const huoltamoCurrentDayMenuItems: MenuItems = huoltamoCurrentDayMenuArr
+      ? huoltamoCurrentDayMenuArr.map((item) => ({
+          text: item,
+        }))
+      : [];
 
-    const huoltamoCurrentDayMenuItems: MenuItems = huoltamoCurrentDayMenuArr.map((item) => ({
-      text: item,
-    }));
-
-    const piccoloCurrentDayMenuItems: MenuItems = piccoloCurrentDayMenuArr.map((item) => ({
-      text: item,
-    }));
+    const piccoloCurrentDayMenuItems: MenuItems = piccoloCurrentDayMenuArr
+      ? piccoloCurrentDayMenuArr.map((item) => ({
+          text: item,
+        }))
+      : [];
 
     return { huoltamo: huoltamoCurrentDayMenuItems, piccolo: piccoloCurrentDayMenuItems };
   } catch (err) {
