@@ -10,7 +10,8 @@ import { WEEKDAYS_ARRAY } from '../lib/constants/weekdaysArray';
 import { TIME_ZONE } from '../lib/constants/timeZone';
 import {
   BOX_URL,
-  DYLAN_URL,
+  DYLAN_BOLE_URL,
+  DYLAN_LUFT_URL,
   INTRA_SITE_URL,
   ISO_PAJA_URL,
   STUDIO_10_URL,
@@ -66,9 +67,14 @@ const Home: NextPage<HomeProps> = ({ restaurant, isoDate }) => {
         restaurantUrl={BOX_URL}
       />
       <RestaurantOneDayMenu
-        restaurantName="Dylan"
-        menuItems={restaurant.dylan}
-        restaurantUrl={DYLAN_URL}
+        restaurantName="Dylan Luft"
+        menuItems={restaurant.dylanLuft}
+        restaurantUrl={DYLAN_LUFT_URL}
+      />
+      <RestaurantOneDayMenu
+        restaurantName="Dylan Böle"
+        menuItems={restaurant.dylanBole}
+        restaurantUrl={DYLAN_BOLE_URL}
       />
     </>
   );

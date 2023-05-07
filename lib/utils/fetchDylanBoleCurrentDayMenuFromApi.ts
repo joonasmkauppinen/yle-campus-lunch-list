@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 
-import { DYLAN_API_URL } from '../constants/restaurantUrls';
+import { DYLAN_BOLE_API_URL } from '../constants/restaurantUrls';
 import { MenuItems } from '../types/restaurantMenus';
 
 interface LunchItems {
@@ -24,11 +24,11 @@ interface DylanApiResponse {
   data: DylanData;
 }
 
-export const fetchDylanCurrentDayMenuFromApi = async (
+export const fetchDylanBoleCurrentDayMenuFromApi = async (
   currentDayIndex: number,
 ): Promise<MenuItems> => {
   try {
-    const response = await fetch(DYLAN_API_URL);
+    const response = await fetch(DYLAN_BOLE_API_URL);
     const json = (await response.json()) as DylanApiResponse;
 
     const currentDayMenuArr = json.data.week.days

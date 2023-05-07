@@ -7,7 +7,8 @@ export type MenuItems = MenuItem[];
 
 export interface RestaurantMenus {
   box: MenuItems;
-  dylan: MenuItems;
+  dylanBole: MenuItems;
+  dylanLuft: MenuItems;
   huoltamo: MenuItems;
   isoPaja: MenuItems;
   piccolo: MenuItems;
