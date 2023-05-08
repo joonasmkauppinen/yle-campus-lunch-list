@@ -5,7 +5,7 @@
 
 <p align="center">Find all Yleisradio campus lunch lists in one place.</p>
 
-<p align="center">Huoltamo  ·  Studio 10  ·  Iso Paja  ·  Båx  ·  Dylan</p>
+<p align="center">Huoltamo  ·  Studio 10  ·  Iso Paja  ·  Båx  ·  Dylan Böle · Dylan Luft</p>
 
 ### Goals
 
