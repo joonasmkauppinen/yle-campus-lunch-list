@@ -11,6 +11,7 @@ export interface RestaurantMenus {
   dylanLuft: MenuItems;
   huoltamo: MenuItems;
   isoPaja: MenuItems;
+  visioPasila: MenuItems;
   piccolo: MenuItems;
   studio10: MenuItems;
 }

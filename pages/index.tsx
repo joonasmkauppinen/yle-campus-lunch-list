@@ -14,6 +14,7 @@ import {
   DYLAN_LUFT_URL,
   INTRA_SITE_URL,
   ISO_PAJA_URL,
+  VISIO_PASILA_URL,
   STUDIO_10_URL,
 } from '../lib/constants/restaurantUrls';
 import { getAllRestaurantsCurrentDayMenus } from '../lib/utils/getAllRestaurantsCurrentDayMenus';
@@ -60,6 +61,11 @@ const Home: NextPage<HomeProps> = ({ restaurant, isoDate }) => {
         restaurantName="Iso Paja"
         menuItems={restaurant.isoPaja}
         restaurantUrl={ISO_PAJA_URL}
+      />
+      <RestaurantOneDayMenu
+        restaurantName="Visio"
+        menuItems={restaurant.visioPasila}
+        restaurantUrl={VISIO_PASILA_URL}
       />
       <RestaurantOneDayMenu
         restaurantName="Båx"

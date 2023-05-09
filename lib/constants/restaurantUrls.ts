@@ -19,3 +19,12 @@ export const DYLAN_BOLE_API_URL =
 
 export const DYLAN_LUFT_API_URL =
   'https://europe-west1-luncher-7cf76.cloudfunctions.net/api/v1/widget/5843f3ec-6a2c-49ba-ba3e-b384f6c996f1/vqWqTJvP8zbDI7R1udwv';
+
+/**
+ * IMPORTANT: Append data query parameter to the end of the URL.
+ */
+export const VISIO_PASILA_API_URL =
+  'https://www.compass-group.fi/menuapi/day-menus?costCenter=3642&language=fi';
+
+export const VISIO_PASILA_URL =
+  'https://www.compass-group.fi/ravintolat-ja-ruokalistat/foodco/kaupungit/helsinki/visio/';
