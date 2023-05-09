@@ -14,6 +14,7 @@ import { getBoxCurrentDayMenu } from './getBoxCurrentDayMenu';
 import { getIsoPajaCurrentDayMenu } from './getIsoPajaCurrentDayMenu';
 import { getStudio10CurrentDayMenu } from './getStudio10CurrentDayMenu';
 import { fetchDylanLuftCurrentDayMenuFromApi } from './fetchDylanLuftCurrentDayMenuFromApi';
+import { fetchVisioPasilaCurrentDayMenuFromApi } from './fetchVisioPasilaCurrentDayMenuFromApi';
 
 export const getAllRestaurantsCurrentDayMenus = async () => {
   const currentDay = new Date().toLocaleDateString('default', {
@@ -31,6 +32,7 @@ export const getAllRestaurantsCurrentDayMenus = async () => {
     dylanLuft: await fetchDylanLuftCurrentDayMenuFromApi(weekDayIndex),
     huoltamo,
     isoPaja: await getIsoPajaCurrentDayMenu(weekDayIndex, scrapeIsoPaja),
+    visioPasila: await fetchVisioPasilaCurrentDayMenuFromApi(),
     piccolo,
     studio10: await getStudio10CurrentDayMenu(weekDayIndex, scrapeStudio10),
   };
