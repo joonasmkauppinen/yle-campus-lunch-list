@@ -9,13 +9,21 @@ export const scrapeIsoPaja = async (): Promise<MenuItems> => {
     const response = await fetch(ISO_PAJA_URL);
     const body = await response.text();
     const $ = cheerio.load(body);
-    const menuItemsArr = $('#comp-kyrlvrhq .font_8')
+    const menuItemsArr = $('.font_8')
       .map((_, element) => $(element).text())
-      .toArray()
-      .map((item) => item.replace(/\u200B/g, '').trim()) // Sometimes items can contain a zero width space, replace those.
-      .filter(Boolean); // Filter out falsy values - "", 0, NaN, null, undefined, false
+      .toArray();
 
-    const menuItems: MenuItems = menuItemsArr.map((item) => ({ text: item }));
+    const sliceStart = menuItemsArr.findIndex((item) => item === 'MAANANTAI');
+    const menuItems: MenuItems = menuItemsArr
+      // Remove items from start that are not menu items. Remove 3 items from end that are not menu items.
+      .slice(sliceStart, menuItemsArr.length - 3)
+
+      // Sometimes items can contain a zero width space, replace those.
+      .map((item) => item.replace(/\u200B/g, '').trim())
+
+      // Filter out falsy values - "", 0, NaN, null, undefined, false
+      .filter(Boolean)
+      .map((item) => ({ text: item }));
 
     return menuItems;
   } catch (err) {
