@@ -27,7 +27,7 @@ interface HomeProps {
 
 const Home: NextPage<HomeProps> = ({ restaurant, isoDate }) => {
   const zonedIsoDate = utcToZonedTime(isoDate, TIME_ZONE);
-  const pattern = 'd.MM.yyyy';
+  const pattern = 'd.M.yyyy';
   const date = format(zonedIsoDate, pattern, { timeZone: TIME_ZONE });
   const weekdayIndex = getDay(zonedIsoDate);
   const weekday = WEEKDAYS_ARRAY[weekdayIndex];
