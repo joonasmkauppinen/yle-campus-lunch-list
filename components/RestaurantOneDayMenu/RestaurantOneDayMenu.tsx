@@ -32,7 +32,7 @@ const ListItemsContainerUl = styled.ul({
 });
 
 interface RestaurantOneDayMenuProps {
-  menuItems: MenuItems;
+  menuItems?: MenuItems;
   restaurantName: string;
   restaurantUrl: string;
 }
@@ -54,7 +54,7 @@ export const RestaurantOneDayMenu = ({
         Ravintolan omat sivut &#8599;
       </RestaurantLink>
       <ListItemsContainerUl>
-        {menuItems.length === 0 ? (
+        {!menuItems || menuItems.length === 0 ? (
           <StyledLi>Listaa ei saatu haettua.</StyledLi>
         ) : (
           menuItems.map((item, index) => (
