@@ -7,7 +7,7 @@ export const DYLAN_LUFT_URL = 'https://www.dylan.fi/luft';
 export const INTRA_SITE_URL =
   'https://script.google.com/a/macros/yle.fi/s/AKfycbyIvxaGDwOSS-oZzVNb3AEGHzbBBoFS4-JSe5TjTPuJVwtS9AE/exec';
 
-export const ISO_PAJA_URL = 'https://www.hhravintolat.fi/iso-paja-lounaslista';
+export const ISO_PAJA_URL = 'https://isopaja.fi/';
 
 export const STUDIO_10_URL = 'https://gvcravintolat.fi/yle-studio10/';
 
