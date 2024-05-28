@@ -30,7 +30,7 @@ export const getAllRestaurantsCurrentDayMenus = async () => {
     box: await getBoxCurrentDayMenu(weekDayIndex, scrapeBox),
     dylanBole: await fetchDylanBoleCurrentDayMenuFromApi(weekDayIndex),
     dylanLuft: await fetchDylanLuftCurrentDayMenuFromApi(weekDayIndex),
-    huoltamo,
+    'huoltamo-saras': huoltamo,
     isoPaja: await getIsoPajaCurrentDayMenu(weekDayIndex, scrapeIsoPaja),
     visioPasila: await fetchVisioPasilaCurrentDayMenuFromApi(),
     piccolo,
