@@ -43,7 +43,7 @@ export const fetchIntraCurrentDayMenuFromApi = async (
     const data = (await response.json()) as IntraApiResponse;
 
     const huoltamoItems = data.items
-      .filter((item) => item.restaurant === 'Ravintola Huoltamo Palmia')
+      .filter((item) => item.restaurant.match(/Sara`s|Ravintola Huoltamo Palmia/g))
       .map((item) => ({ ...item, menu: JSON.parse(item.menu) } as IntraRestaurantItem));
 
     const piccoloItems = data.items

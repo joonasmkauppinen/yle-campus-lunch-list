@@ -43,8 +43,8 @@ const Home: NextPage<HomeProps> = ({ restaurant, isoDate }) => {
 
       <PageTitleWithDate date={date} title="Lounaslistat" weekday={weekday} />
       <RestaurantOneDayMenu
-        restaurantName="Huoltamo"
-        menuItems={restaurant.huoltamo}
+        restaurantName="Huoltamo / Sara`s"
+        menuItems={restaurant['huoltamo-saras']}
         restaurantUrl={INTRA_SITE_URL}
       />
       <RestaurantOneDayMenu

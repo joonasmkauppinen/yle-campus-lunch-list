@@ -9,7 +9,7 @@ export interface RestaurantMenus {
   box?: MenuItems;
   dylanBole?: MenuItems;
   dylanLuft?: MenuItems;
-  huoltamo?: MenuItems;
+  'huoltamo-saras'?: MenuItems;
   isoPaja?: MenuItems;
   visioPasila?: MenuItems;
   piccolo?: MenuItems;

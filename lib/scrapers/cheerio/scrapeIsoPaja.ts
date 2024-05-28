@@ -47,8 +47,10 @@ export const scrapeIsoPaja = async (): Promise<MenuItems> => {
           .find(':nth-child(1) div div div div')
           .children()
           .toArray()
-          .filter((item, index) => index !== 0)
-          .map((item) => ({ text: $(item).text() }));
+          .filter((_, index) => index !== 0)
+          .map((item) => $(item).text())
+          .filter((item) => item.trim() !== '')
+          .map((item) => ({ text: item }));
 
         return [{ text: normalizedWeekdayTitle }, ...menuItems];
       });
