@@ -1,8 +1,6 @@
 import { PageTitleWithDate } from '@/components/PageTitleWithDate';
-import {
-  RestaurantMenuListItem,
-  type RestaurantMenuListItemProps,
-} from '@/components/RestaurantMenuListItem';
+import { type RestaurantMenuListItemProps } from '@/components/RestaurantMenuListItem';
+import { RestaurantMenusSection } from '@/components/RestaurantMenusSection';
 import {
   AKSELI_URL,
   BOX_URL,
@@ -81,14 +79,7 @@ export default async function HomePage() {
       <div className="flex w-full max-w-2xl flex-col">
         <PageTitleWithDate title="Lounaslistat" />
 
-        {orderedRestaurants.map((restaurant, index) => (
-          <RestaurantMenuListItem
-            key={index}
-            restaurantName={restaurant.restaurantName}
-            menuItems={restaurant.menuItems}
-            restaurantUrl={restaurant.restaurantUrl}
-          />
-        ))}
+        <RestaurantMenusSection orderedRestaurants={orderedRestaurants} />
       </div>
     </main>
   );
