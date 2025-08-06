@@ -11,6 +11,7 @@ import {
   INTRA_SITE_URL,
   ISO_PAJA_URL,
   STUDIO_10_URL,
+  VESILINNA_URL,
   VISIO_PASILA_URL,
 } from '@/constants/restaurantUrls';
 import { getAllRestaurantsCurrentDayMenus } from '@/utils/getAllRestaurantsCurrentDayMenus';
@@ -62,6 +63,11 @@ export default async function HomePage() {
       restaurantName: 'Dylan Luft',
       restaurantUrl: DYLAN_LUFT_URL,
       menuItems: data.restaurant?.dylanLuft?.map((item) => item.text),
+    },
+    {
+      restaurantName: 'Vesilinna',
+      restaurantUrl: VESILINNA_URL,
+      menuItems: data.restaurant.vesilinna?.map((item) => item.text) ?? [],
     },
     {
       restaurantName: 'Dylan Bole',
