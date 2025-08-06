@@ -1,8 +1,8 @@
-import { PageTitleWithDate } from "@/components/PageTitleWithDate";
+import { PageTitleWithDate } from '@/components/PageTitleWithDate';
 import {
   RestaurantMenuListItem,
   type RestaurantMenuListItemProps,
-} from "@/components/RestaurantMenuListItem";
+} from '@/components/RestaurantMenuListItem';
 import {
   AKSELI_URL,
   BOX_URL,
@@ -12,57 +12,59 @@ import {
   ISO_PAJA_URL,
   STUDIO_10_URL,
   VISIO_PASILA_URL,
-} from "@/constants/restaurantUrls";
-import { getAllRestaurantsCurrentDayMenus } from "@/utils/getAllRestaurantsCurrentDayMenus";
+} from '@/constants/restaurantUrls';
+import { getAllRestaurantsCurrentDayMenus } from '@/utils/getAllRestaurantsCurrentDayMenus';
 
 export const revalidate = false; // Disable revalidation for this page
+
+export const dynamic = 'force-static'; // Force static rendering for this page
 
 export default async function HomePage() {
   const data = await getAllRestaurantsCurrentDayMenus();
 
   const orderedRestaurants: RestaurantMenuListItemProps[] = [
     {
-      restaurantName: "Huoltamo",
+      restaurantName: 'Huoltamo',
       restaurantUrl: INTRA_SITE_URL,
       menuItems: data.restaurant?.huoltamo?.map((item) => item.text),
     },
     {
-      restaurantName: "Piccolo",
+      restaurantName: 'Piccolo',
       restaurantUrl: INTRA_SITE_URL,
       menuItems: data.restaurant?.piccolo?.map((item) => item.text),
     },
     {
-      restaurantName: "Iso Paja",
+      restaurantName: 'Iso Paja',
       restaurantUrl: ISO_PAJA_URL,
       menuItems: data.restaurant?.isoPaja?.map((item) => item.text),
     },
     {
-      restaurantName: "Studio 10",
+      restaurantName: 'Studio 10',
       restaurantUrl: STUDIO_10_URL,
       menuItems: data.restaurant?.studio10?.map((item) => item.text),
     },
     {
-      restaurantName: "Visio Pasila",
+      restaurantName: 'Visio Pasila',
       restaurantUrl: VISIO_PASILA_URL,
       menuItems: data.restaurant?.visioPasila?.map((item) => item.text),
     },
     {
-      restaurantName: "Akseli",
+      restaurantName: 'Akseli',
       restaurantUrl: AKSELI_URL,
       menuItems: data.restaurant?.akseli?.map((item) => item.text),
     },
     {
-      restaurantName: "Båx",
+      restaurantName: 'Båx',
       restaurantUrl: BOX_URL,
       menuItems: data.restaurant.box?.map((item) => item.text) ?? [],
     },
     {
-      restaurantName: "Dylan Luft",
+      restaurantName: 'Dylan Luft',
       restaurantUrl: DYLAN_LUFT_URL,
       menuItems: data.restaurant?.dylanLuft?.map((item) => item.text),
     },
     {
-      restaurantName: "Dylan Bole",
+      restaurantName: 'Dylan Bole',
       restaurantUrl: DYLAN_BOLE_URL,
       menuItems: data.restaurant?.dylanBole?.map((item) => item.text),
     },
