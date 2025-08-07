@@ -14,9 +14,7 @@ import {
 } from '@/constants/restaurantUrls';
 import { getAllRestaurantsCurrentDayMenus } from '@/utils/getAllRestaurantsCurrentDayMenus';
 
-export const revalidate = false; // Disable revalidation for this page
-
-export const dynamic = 'force-static'; // Force static rendering for this page
+export const revalidate = 10_800; // Revalidate every 3 hours
 
 export default async function HomePage() {
   const data = await getAllRestaurantsCurrentDayMenus();
