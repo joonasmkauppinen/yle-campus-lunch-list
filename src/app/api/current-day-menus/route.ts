@@ -1,4 +1,4 @@
-import { getAllRestaurantsCurrentDayMenus } from "@/utils/getAllRestaurantsCurrentDayMenus";
+import { getExternalRestaurantsCurrentDayMenus } from '@/utils/getExternalRestaurantsCurrentDayMenus';
 
 export type MenuItem = {
   text: string;
@@ -27,7 +27,7 @@ export type GetRestaurantMenusResponse = {
 
 export async function GET() {
   try {
-    const result = await getAllRestaurantsCurrentDayMenus();
+    const result = await getExternalRestaurantsCurrentDayMenus();
 
     const responseBody: GetRestaurantMenusResponse = {
       restaurant: result.restaurant as RestaurantMenus,
@@ -36,14 +36,14 @@ export async function GET() {
     return new Response(JSON.stringify(responseBody), {
       status: 200,
       headers: {
-        "Content-Type": "application/json",
-        "Cache-Control": "s-maxage=21600",
+        'Content-Type': 'application/json',
+        'Cache-Control': 's-maxage=21600',
       },
     });
   } catch (err) {
     return new Response(JSON.stringify({ error: err }), {
       status: 500,
-      headers: { "Content-Type": "application/json" },
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 }
