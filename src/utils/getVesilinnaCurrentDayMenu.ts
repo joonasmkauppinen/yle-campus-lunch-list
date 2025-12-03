@@ -31,6 +31,13 @@ export const getVesilinnaCurrentDayMenu = async (
 
   const currentDayMenuItems = menuItemsRaw.slice(currentDayIndex, nextDayIndex);
 
+  for (const item of currentDayMenuItems) {
+    if (item.includes('jQuery')) {
+      // If the menu item contains 'jQuery', it is likely an error or script tag.
+      return [];
+    }
+  }
+
   if (currentDay === WeekDayEnum.Friday) {
     const firstMetadataItemIndex = currentDayMenuItems.findIndex(
       (item) => /Pidämme oikeudet muutoksiin/i.exec(item) !== null,
