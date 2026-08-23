@@ -1,109 +1,125 @@
-<p align="center">
-  <img width="200" src="https://user-images.githubusercontent.com/28673805/178212367-e90d5c62-eeed-4c31-a39a-740a9ef3a287.png">
-</p>
-<h1 align="center">Yle campus lunch lists</h1>
+# create-t3-turbo
 
-<p align="center">Find all Yleisradio campus lunch lists in one place.</p>
+> [!NOTE]
+>
+> create-t3-turbo now includes the option to use Tanstack Start for the web app!
 
-<p align="center">Huoltamo · Studio 10 · Iso Paja · Akseli · Båx · Dylan Böle · Dylan Luft</p>
+## Installation
 
-## Getting started
+> [!NOTE]
+>
+> Make sure to follow the system requirements specified in [`package.json#engines`](./package.json#L4) before proceeding.
 
-Clone repo:
+There are two ways of initializing an app using the `create-t3-turbo` starter. You can either use this repository as a template:
 
-```bash
-git clone git@github.com:joonasmkauppinen/yle-campus-lunch-list.git
-```
+![use-as-template](https://github.com/t3-oss/create-t3-turbo/assets/51714798/bb6c2e5d-d8b6-416e-aeb3-b3e50e2ca994)
 
-Open repo:
-
-```bash
-cd yle-campus-lunch-list
-```
-
-Install dependencies:
+or use Turbo's CLI to init your project (use PNPM as package manager):
 
 ```bash
-npm install
+npx create-turbo@latest -e https://github.com/t3-oss/create-t3-turbo
 ```
 
-Start local development server:
+## About
+
+Ever wondered how to migrate your T3 application into a monorepo? Stop right here! This is the perfect starter repo to get you running with the perfect stack!
+
+It uses [Turborepo](https://turborepo.com) and contains:
+
+```text
+.github
+  └─ workflows
+        └─ CI with pnpm cache setup
+.vscode
+  └─ Recommended extensions and settings for VSCode users
+apps
+  └─ nextjs
+      ├─ Next.js 15
+      ├─ React 19
+      ├─ Tailwind CSS v4
+      └─ E2E Typesafe API Server & Client
+packages
+  ├─ api
+  │   └─ tRPC v11 router definition
+  ├─ auth
+  │   └─ Authentication using better-auth.
+packages
+  ├─ api
+  │   └─ tRPC v11 router definition
+  ├─ auth
+  │   └─ Authentication using better-auth.
+  └─ ui
+      └─ Start of a UI package for the webapp using shadcn-ui
+tooling
+  ├─ eslint
+  │   └─ shared, fine-grained, eslint presets
+  ├─ prettier
+  │   └─ shared prettier configuration
+  ├─ tailwind
+  │   └─ shared tailwind theme and configuration
+  └─ typescript
+      └─ shared tsconfig you can extend from
+```
+
+> In this template, we use `@acme` as a placeholder for package names. As a user, you might want to replace it with your own organization or project name. You can use find-and-replace to change all the instances of `@acme` to something like `@my-company` or `@project-name`.
+
+## Quick Start
+
+To get it running, follow the steps below:
+
+### 1. Setup dependencies
 
 ```bash
-npm run dev
+# Install dependencies
+pnpm i
+
+# Configure environment variables
+# There is an `.env.example` in the root directory you can use for reference
+cp .env.example .env
 ```
 
-## Technologies
+### 2. When it's time to add a new UI component
 
-- TypeScript
-- React/Next.js for frontend/backend.
-- Tailwind CSS for styling.
-- Vercel for deployment, hosting.
-- Cheerio for web scraping.
-
-## Resources
-
-- App production url: [`https://yle-campus-lunch-list.vercel.app/`](https://yle-campus-lunch-list.vercel.app/)
-- [Vercel dashboard](https://vercel.com/joonasmkauppinen/yle-campus-lunch-list) (hobby account, only @joonasmkauppinen can access)
-- [Figma design layouts (view access)](https://www.figma.com/file/ckeATTSGr5adcHYNqHPORC/Yle-campus-lunch-menu?node-id=0%3A1)
-- [GH Actions](https://github.com/joonasmkauppinen/yle-campus-lunch-list/actions)
-
-## Production build
-
-Usually there is no need to build the project locally. But if you want to test the revalidate api endpoint, then the project needs to be built.
-
-Other than that, Vercel takes care of building the project during deployment.
-
-Create optimized production build:
+Run the `ui-add` script to add a new UI component using the interactive `shadcn/ui` CLI:
 
 ```bash
-npm run build
+pnpm ui-add
 ```
 
-Run production build locally:
+When the component(s) has been installed, you should be good to go and start using it in your app.
 
-```bash
-npm run start
-```
+### 4. When it's time to add a new package
 
-## Page revalidation
+To add a new package, simply run `pnpm turbo gen init` in the monorepo root. This will prompt you for a package name as well as if you want to install any dependencies to the new package (of course you can also do this yourself later).
 
-Revalidation is using [Next's on demand ISR feature](https://nextjs.org/docs/basic-features/data-fetching/incremental-static-regeneration#on-demand-revalidation-beta). The revalidation function is called in a custom api route. These are placed in the directory [`pages/api/revalidate/*`](./pages/api/revalidate).
+The generator sets up the `package.json`, `tsconfig.json` and a `index.ts`, as well as configures all the necessary configurations for tooling around your package such as formatting, linting and typechecking. When the package is created, you're ready to go build out the package.
 
-Pages are revalidated every morning using a GitHub Action workflow, that is running a cron job. More details in the workflow file [`.github/workflows/revalidate-current-day-menus-cron.yml`](https://github.com/joonasmkauppinen/yle-campus-lunch-list/blob/main/.github/workflows/cron-revalidate-current-day-menus.yml).
+## FAQ
 
-There's also a manual workflow that can be triggered by hand at any time. You'll find this workflow from the [actions tab in the repo](https://github.com/joonasmkauppinen/yle-campus-lunch-list/actions/workflows/manual-revalidate-current-day-menus.yml).
+### Does this pattern leak backend code to my client applications?
 
-## Lunch list data sources
+No, it does not. The `api` package should only be a production dependency in the Next.js application where it's served. Other client applications you may add in the future should only add the `api` package as a dev dependency. This lets you have full typesafety in your client applications, while keeping your backend code safe.
 
-### Huoltamo
+If you need to share runtime code between the client and server, such as input validation schemas, you can create a separate `shared` package for this and import it on both sides.
 
-Data is fetched from a JSON api.
+## Deployment
 
-Here's the url:
+### Next.js
 
-```
-https://script.googleusercontent.com/macros/echo?user_content_key=8_Hojcv_I_BlGjGda06PvU1KWuFi5qvjrSq-1bE7C871wg8R4fqOtT-bMW8OqwVTibBa--fpMCKhH0SpEkZzjKah5tV0LkAJOJmA1Yb3SEsKFZqtv3DaNYcMrmhZHmUMWojr9NvTBuBLhyHCd5hHa8bu5fFVouus5Uusevvd9ue_m99P9CRISwy5nwbG5arkJ72HagjQ2wtGw79pGckaDWOicyxNfte4jYDWplrerSAjPcvHkHgo4eLtr_JoMfb1e4HF6ZFtBovZOhVmZqbpbw&lib=Mj9QMBIRZJsNk6tjp-CZc2vk6ee82Q7eC
-```
+#### Deploy to Vercel
 
-### Studio 10
+Let's deploy the Next.js application to [Vercel](https://vercel.com). If you've never deployed a Turborepo app there, don't worry, the steps are quite straightforward. You can also read the [official Turborepo guide](https://vercel.com/docs/concepts/monorepos/turborepo) on deploying to Vercel.
 
-Data is scraped with Cheerio from url: https://gvcravintolat.fi/yle-studio10/
+1. Create a new project on Vercel, select the `apps/nextjs` folder as the root directory. Vercel's zero-config system should handle all configurations for you.
 
-### Iso Paja
+2. Done! Your app should successfully deploy.
 
-Data is scraped with Cheerio from url: https://www.hhravintolat.fi/iso-paja-lounaslista
+### Auth Proxy
 
-### Båx
+The auth proxy comes as a better-auth plugin. This is required for the Next.js app to be able to authenticate users in preview deployments. The auth proxy is not used for OAuth requests in production deployments. The easiest way to get it running is to deploy the Next.js app to vercel.
 
-Data is scraped with Cheerio from url: https://www.kanresta.fi/ravintola/ravintola-bax/
+## References
 
-### Dylan
+The stack originates from [create-t3-app](https://github.com/t3-oss/create-t3-app).
 
-Data is fetched from a JSON api.
-
-Here's the url:
-
-```
-https://europe-west1-luncher-7cf76.cloudfunctions.net/api/v1/widget/3aba0b64-0d43-41ea-b665-1d2d6c0f2d5e/t14n3kFql5hOkmcEsTVt
-```
+A [blog post](https://jumr.dev/blog/t3-turbo) where I wrote how to migrate a T3 app into this.

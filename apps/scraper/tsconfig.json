@@ -1,0 +1,10 @@
+{
+  "extends": "@acme/tsconfig/base.json",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "rootDir": "."
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"]
+}

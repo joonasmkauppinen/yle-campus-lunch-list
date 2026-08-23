@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+    <channel>
+        <title>Dylan Luft</title>
+        <link>https://lounastaja.app/api/v1/image/lunchlist/pdf/5843f3ec-6a2c-49ba-ba3e-b384f6c996f1/2026/34/week-fi</link>
+        <description>Dylan Luft Lounaslista</description>
+        <lastBuildDate>Fri, 21 Aug 2026 16:31:41 GMT</lastBuildDate>
+        <language>fi</language>
+        <item>
+            <title><![CDATA[Perjantai 21.8.]]></title>
+            <link>https://lounastaja.app/api/v1/image/lunchlist/pdf/5843f3ec-6a2c-49ba-ba3e-b384f6c996f1/2026/34/week-fi</link>
+            <guid isPermaLink="false">dylan-luft-2026-34-5</guid>
+            <pubDate>Fri, 21 Aug 2026 00:00:00 GMT</pubDate>
+            <description><![CDATA[Dylan Luftin buffetlounas sisältää runsaan salaattipöydän sekä vastapaistettua leipää. Kysy tarvittaessa vegaanista ja gluteenitonta vaihtoehtoa henkilökunnalta<br>Aamupuuro:Kaurapuuro (Veg)<br>Kesäkeittoa ja rakuunaöljyä (L, G)<br>Kasvisgyosat kookoscurrykastikkeessa (Veg)<br>Rapeaa kana Cordon bleuta ja srirachamajoneesia (L)<br>Ylikypsää porsaanniskaa Tamarind-kastikkeessa (M, G)<br>Paistettua riisiä (G, Veg)<br>Päivän makea jälkiruoka]]></description>
+        </item>
+    </channel>
+</rss>

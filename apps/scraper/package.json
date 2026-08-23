@@ -1,0 +1,32 @@
+{
+  "name": "@acme/scraper",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "dev": "tsx src/index.ts",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "lint": "eslint --flag unstable_native_nodejs_ts_config",
+    "start": "tsx src/index.ts",
+    "test": "tsx --test 'src/**/*.test.ts'",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@acme/shared-types": "workspace:*",
+    "cheerio": "^1.0.0",
+    "dotenv": "^16.4.7",
+    "googleapis": "^144.0.0"
+  },
+  "devDependencies": {
+    "@acme/eslint-config": "workspace:*",
+    "@acme/prettier-config": "workspace:*",
+    "@acme/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "tsx": "^4.19.3",
+    "typescript": "catalog:"
+  },
+  "prettier": "@acme/prettier-config"
+}

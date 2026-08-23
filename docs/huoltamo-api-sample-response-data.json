@@ -1,0 +1,166 @@
+{
+  "status": 200,
+  "items": [
+    {
+      "id": "id-q7cn91p9spf",
+      "date": "2026-08-14T21:00:00.000Z",
+      "restaurant": "Ravintola Huoltamo Palmia",
+      "restaurantId": "id-c93fsacrg4",
+      "menu": "[{\"diet\":\"G\",\"value\":\"Karkkipossua\"},{\"value\":\"Riisiä\",\"diet\":\"G,Veg\"},{\"value\":\"Paahdettuja kasvispyöryköitä\",\"diet\":\"G,Veg\"},{\"diet\":\"G,Veg\",\"value\":\"Chimichurria\"},{\"diet\":\"G,Veg\",\"value\":\"Parilakasviksia\"},{\"diet\":\"VL,G, Vegaaninen keittiöstä\",\"value\":\"Juustoista tomaattikeittoa\"},{\"value\":\"Kahvi / tee & jälkiruoka\"}]"
+    },
+    {
+      "id": "id-5cbjda5d2wb",
+      "date": "2026-08-15T21:00:00.000Z",
+      "restaurant": "Ravintola Huoltamo Palmia",
+      "restaurantId": "id-c93fsacrg4",
+      "menu": "[{\"value\":\"Kanagyrosta\",\"diet\":\"M,G\"},{\"diet\":\"L,G\",\"value\":\"Tzatzikia\"},{\"diet\":\"G,Veg\",\"value\":\"Ranskalaisia\"},{\"diet\":\"G,Veg\",\"value\":\"Tofua & kasviksia vindaloo\"},{\"diet\":\"G,Veg\",\"value\":\"Riisiä\"},{\"value\":\"Kermaista parsakeittoa\",\"diet\":\"L,G,Vegaaninen keittiöstä\"},{\"value\":\"Kahvi / tee & jälkiruoka\"}]"
+    },
+    {
+      "id": "id-g5h27v9w7ak",
+      "date": "2026-08-16T21:00:00.000Z",
+      "restaurant": "Studio 10",
+      "restaurantId": "id-ly6fib1i5pj",
+      "menu": "[{\"diet\":\"(L)\",\"value\":\"Gnocchi al gorgonzola - Gnocchia & gorgonzola-juustoa\"},{\"diet\":\"(M, G)\",\"value\":\"Pollo al peperoncino - Chilikanaa\"},{\"diet\":\"(L, G)\",\"value\":\"Polpette piccanti alla crema - Mausteisia lihapullia kermakastikkeessa\"},{\"value\":\"Barbabietola al bleu - Punajuurta & sinihomejuustoa\",\"diet\":\"(L, G)\"}]"
+    },
+    {
+      "id": "id-z1xjz54yoam",
+      "date": "2026-08-16T21:00:00.000Z",
+      "restaurant": "Ravintola Huoltamo Palmia",
+      "restaurantId": "id-c93fsacrg4",
+      "menu": "[{\"diet\":\"M,G\",\"value\":\"Seesami-soijakanaa Ala Mei\"},{\"diet\":\"G,Veg\",\"value\":\"Riisiä sekä kasviksia\"},{\"diet\":\"L\",\"value\":\"Kinkku-aurajuustopastaa\"},{\"diet\":\"L,G\",\"value\":\"Kikherne tandooria\"},{\"value\":\"Kukkakaali-porkkanasosekeittoa\",\"diet\":\"L,G,Vegaaninen keittiöstä\"},{\"value\":\"Kahvi / tee & banaani-suklaatorttua M\"}]"
+    },
+    {
+      "id": "id-yin2g1pqwkh",
+      "date": "2026-08-16T21:00:00.000Z",
+      "restaurant": "Piccolo",
+      "restaurantId": "id-akwa139wa",
+      "menu": "[{\"value\":\"Lohi-Ceasar salaattia\"},{\"value\":\"Tomaatti-mozzarellasalaattia\"},{\"diet\":\"L,G\",\"value\":\"Kukkakaali-porkkanasosekeittoa\"},{\"value\":\"Kahvi / tee & jälkiruoka\"}]"
+    },
+    {
+      "id": "id-2plnuxkerhk",
+      "date": "2026-08-17T21:00:00.000Z",
+      "restaurant": "Studio 10",
+      "restaurantId": "id-ly6fib1i5pj",
+      "menu": "[{\"diet\":\"(M)\",\"value\":\"Penne al ragù - Penne-pastaa & jauhelihakastiketta\"},{\"diet\":\"\",\"value\":\"Pesce del giorno - Päivän kalaa\"},{\"diet\":\"(L, G)\",\"value\":\"Bistecca tritata alla senape - Pannupihvejä sinappikastikkeella\"},{\"value\":\"Uova in ciambotta - Sipuli-tomaattikastiketta & kananmunia\",\"diet\":\"(L, G)\"}]"
+    },
+    {
+      "id": "id-vdifr1tkjle",
+      "date": "2026-08-17T21:00:00.000Z",
+      "restaurant": "Ravintola Huoltamo Palmia",
+      "restaurantId": "id-c93fsacrg4",
+      "menu": "[{\"value\":\"Kalaa lime-hollandaisekastikkeessa\"},{\"value\":\"Tilliperunoita\",\"diet\":\"G,Veg\"},{\"value\":\"Höyrytettyjä kasviksia\",\"diet\":\"G,Veg\"},{\"diet\":\"M,G\",\"value\":\"Chorizopyöryköitä tomaattikastikkeessa\"},{\"diet\":\"L\",\"value\":\"Mac & cheese\"},{\"diet\":\"L,G,Vegaaninen keittiöstä\",\"value\":\"Unkarilaista kasvis-kaalilaatikkoa\"},{\"value\":\"Juuressosekeittoa\",\"diet\":\"L,G,Vegaaninen keittiöstä\"},{\"value\":\"Kahvi / tee & mokkapaloja L\"},{\"diet\":\"16,00\",\"value\":\"POP UP 10.30-13.30: Lehtipihviä / quornfileetä, maustevoita & ranskalaisia\"}]"
+    },
+    {
+      "id": "id-decxqoljerj",
+      "date": "2026-08-17T21:00:00.000Z",
+      "restaurant": "Piccolo",
+      "restaurantId": "id-akwa139wa",
+      "menu": "[{\"value\":\"Chimichurri-kanasalaattia\"},{\"value\":\"Chimichurri-vegelastusalaattia\"},{\"diet\":\"L,G\",\"value\":\"Juuressosekeittoa\"},{\"value\":\"Kahvi / tee & jälkiruoka\"},{\"value\":\"Uuniperunoita katkarapu / fetatäytteellä, sivusalaatin, kahvin sekä jälkiruoan kera\",\"diet\":\"14,00\"}]"
+    },
+    {
+      "id": "id-0oldfr118ah",
+      "date": "2026-08-18T21:00:00.000Z",
+      "restaurant": "Studio 10",
+      "restaurantId": "id-ly6fib1i5pj",
+      "menu": "[{\"diet\":\"(V)\",\"value\":\"Fusilli con ciliegino - Kirsikkatomaattipastaa\"},{\"diet\":\"(L, G)\",\"value\":\"Salmone alla crema - Lohta kermakastikkeessa\"},{\"diet\":\"(L, G)\",\"value\":\"Pollo ai funghi - Kanaa sienikastikkeessa\"},{\"value\":\"Lenticchie & tofu - Linssejä & tofua\",\"diet\":\"(V, G)\"}]"
+    },
+    {
+      "id": "id-xvjwcb6c8eg",
+      "date": "2026-08-18T21:00:00.000Z",
+      "restaurant": "Ravintola Huoltamo Palmia",
+      "restaurantId": "id-c93fsacrg4",
+      "menu": "[{\"value\":\"Talon jauhelihapihvejä\",\"diet\":\"M,G\"},{\"diet\":\"L,G\",\"value\":\"Kermakastiketta\"},{\"value\":\"Perunasosetta\",\"diet\":\"L,G\"},{\"diet\":\"M\",\"value\":\"Tulista katkarapuwokkia Mein chiliöljyllä\"},{\"diet\":\"G,Veg\",\"value\":\"Paistettuja kasvispyöryköitä\"},{\"diet\":\"G\",\"value\":\"Pestolla maustettua perunavuokaa\"},{\"diet\":\"L,G,Vegaaninen keittiöstä\",\"value\":\"Kuohkeaa fenkolisosekeittoa\"},{\"value\":\"Kahvi / tee & jälkiruokavalikoima\"},{\"diet\":\"16,00\",\"value\":\"POP UP 10.30-13.30: Lehtipihviä / quornfileetä, maustevoita & ranskalaisia\"}]"
+    },
+    {
+      "id": "id-79k2tw936fl",
+      "date": "2026-08-18T21:00:00.000Z",
+      "restaurant": "Piccolo",
+      "restaurantId": "id-akwa139wa",
+      "menu": "[{\"value\":\"Hedelmäistä briejuustosalaattia\"},{\"value\":\"Tonnikalasalaattia\"},{\"value\":\"Kuohkeaa fenkolisosekeittoa\",\"diet\":\"L,G\"},{\"value\":\"Kahvi / tee & jälkiruoka\"},{\"diet\":\"14,00\",\"value\":\"Uuniperunoita katkarapu / fetatäytteellä, sivusalaatin, kahvin sekä jälkiruoan kera\"}]"
+    },
+    {
+      "id": "id-mm3bisxons9",
+      "date": "2026-08-19T21:00:00.000Z",
+      "restaurant": "Studio 10",
+      "restaurantId": "id-ly6fib1i5pj",
+      "menu": "[{\"diet\":\"(L)\",\"value\":\"Rigatoni ai formaggi - Rigatoni -pastaa juustokastikkeella\"},{\"diet\":\"(M, G)\",\"value\":\"Arrosto di maiale al rosmarino - Possua rosmariinikastikkeella\"},{\"diet\":\"(M)\",\"value\":\"Pesce impanato con maionnaise - Paneroitua kalaa & majoneesia\"},{\"diet\":\"(V, G)\",\"value\":\"Funghi trifolata - Herkkusieniä balsamico-kastikkeella\"}]"
+    },
+    {
+      "id": "id-03z2joqi7gz3",
+      "date": "2026-08-19T21:00:00.000Z",
+      "restaurant": "Ravintola Huoltamo Palmia",
+      "restaurantId": "id-c93fsacrg4",
+      "menu": "[{\"diet\":\"M,G\",\"value\":\"Kreikkalaista kanagyrosta\"},{\"value\":\"Tzatzikia\",\"diet\":\"L,G\"},{\"value\":\"Lohkoperunoita\",\"diet\":\"M,G\"},{\"diet\":\"M,G\",\"value\":\"Tex mex makkarapannua\"},{\"value\":\"Talon pinaattiohukaisia\",\"diet\":\"L, vegaaninen ruoka keittiöstä\"},{\"diet\":\"G,Veg\",\"value\":\"Punaherukka-puolukkasurvosta\"},{\"diet\":\"L,G, Vegaaninen keittiöstä\",\"value\":\"Kermaista hernesosekeittoa\"},{\"value\":\"Kahvi / tee & raejuustopannaria L\"},{\"diet\":\"16,00\",\"value\":\"POP UP 10.30-13.30: Lehtipihviä / quornfileetä, maustevoita & ranskalaisia\"}]"
+    },
+    {
+      "id": "id-xkvtmt8ovb",
+      "date": "2026-08-19T21:00:00.000Z",
+      "restaurant": "Piccolo",
+      "restaurantId": "id-akwa139wa",
+      "menu": "[{\"value\":\"Kylmäsavuhärkä-tapas salaattia\"},{\"value\":\"Paahdettua vegelastua & varsiparsakaalia salaattipedillä\"},{\"value\":\"Kermaista hernesosekeittoa\",\"diet\":\"L,G\"},{\"value\":\"Kahvi / tee & jälkiruoka\"},{\"diet\":\"14,000\",\"value\":\"Uuniperunoita katkarapu / fetatäytteellä, sivusalaatin, kahvin sekä jälkiruoan kera\"}]"
+    },
+    {
+      "id": "id-54q8qdvetc3",
+      "date": "2026-08-20T21:00:00.000Z",
+      "restaurant": "Studio 10",
+      "restaurantId": "id-ly6fib1i5pj",
+      "menu": "[{\"value\":\"Pasta alla pancetta e panna - Kermaista pekonipastaa\",\"diet\":\"(L)\"},{\"diet\":\"(L, G)\",\"value\":\"Scorfano al pesto - Puna-ahventa & pestoa\"},{\"diet\":\"(L)\",\"value\":\"Tacchino Cordon Bleu - Kalkkuna Cordon Bleu\"},{\"value\":\"Zucchini al forno - Kesäkurpitsaa uunissa\",\"diet\":\"(V, G)\"}]"
+    },
+    {
+      "id": "id-46pe84aqn0m",
+      "date": "2026-08-20T21:00:00.000Z",
+      "restaurant": "Ravintola Huoltamo Palmia",
+      "restaurantId": "id-c93fsacrg4",
+      "menu": "[{\"value\":\"Fish remoulade burger\",\"diet\":\"L\"},{\"value\":\"Ranskalaisia\",\"diet\":\"G,Veg\"},{\"value\":\"Ylikypsää possunniskaa tummassa omenakastikkeessa\",\"diet\":\"L,G\"},{\"diet\":\"L,G\",\"value\":\"Valkosipulikermaperunoita\"},{\"diet\":\"G,Veg\",\"value\":\"Vegaanista butter tofua\"},{\"diet\":\"G,Veg\",\"value\":\"Riisiä\"},{\"diet\":\"L,G, Vegaaninen keittiöstä\",\"value\":\"Punajuurisosekeittoa\"},{\"value\":\"Jäätelöbaari 🍦🍬\"},{\"value\":\"Kahvi / tee\"}]"
+    },
+    {
+      "id": "id-uwnd2ep7v0d",
+      "date": "2026-08-20T21:00:00.000Z",
+      "restaurant": "Piccolo",
+      "restaurantId": "id-akwa139wa",
+      "menu": "[{\"value\":\"Katkarapu-pastasalaattia\"},{\"value\":\"Raejuustosalaattia\"},{\"diet\":\"L,G\",\"value\":\"Punajuurisosekeittoa\"},{\"value\":\"Kahvi / tee & jälkiruoka\"}]"
+    },
+    {
+      "id": "id-oxigigw4yvl",
+      "date": "2026-08-21T21:00:00.000Z",
+      "restaurant": "Ravintola Huoltamo Palmia",
+      "restaurantId": "id-c93fsacrg4",
+      "menu": "[{\"diet\":\"M\",\"value\":\"Paistettua kalaa\"},{\"value\":\"Limemajoneesia\",\"diet\":\"M,G\"},{\"diet\":\"G,Veg\",\"value\":\"Keitettyjä perunoita\"},{\"value\":\"Talon kasvispihvejä\"},{\"diet\":\"G,Veg\",\"value\":\"Riisiä & parsakaalia\"},{\"diet\":\"L,G, Vegaaninen keittiöstä\",\"value\":\"Juuressosekeittoa\"},{\"value\":\"Kahvi / tee & jälkiruoka\"}]"
+    },
+    {
+      "id": "id-gp6q7n3y7zu",
+      "date": "2026-08-22T21:00:00.000Z",
+      "restaurant": "Ravintola Huoltamo Palmia",
+      "restaurantId": "id-c93fsacrg4",
+      "menu": "[{\"value\":\"Chorizopyöryköitä tomaattikastikkeessa\",\"diet\":\"M,G\"},{\"value\":\"Riisiä\",\"diet\":\"G,Veg\"},{\"diet\":\"M,G, vegaaninen keittiöstä\",\"value\":\"Kasvis-belmanninpannua vegelastuilla\"},{\"value\":\"Meksikolaista kasviskeittoa\",\"diet\":\"G,Veg\"},{\"value\":\"Kahvi / tee & jälkiruoka\"}]"
+    },
+    {
+      "id": "id-wcus7bchyye",
+      "date": "2026-08-23T21:00:00.000Z",
+      "restaurant": "Studio 10",
+      "restaurantId": "id-ly6fib1i5pj",
+      "menu": "[{\"diet\":\"L\",\"value\":\"Pasta con pancetta e panna - Kermaista pekonipastaa\"},{\"diet\":\"M\",\"value\":\"Scaloppa di maiale con ananas - Hawaijin leikkeitä\"},{\"value\":\"Pollo alle erbe fresche - Kanaa & tuoreita yrttejä\",\"diet\":\"M, G\"},{\"value\":\"Barbabietola con caprino - Punajuurta & vuohenjuustoa\",\"diet\":\"L, G\"}]"
+    },
+    {
+      "id": "id-2msbe6quqoc",
+      "date": "2026-08-24T21:00:00.000Z",
+      "restaurant": "Studio 10",
+      "restaurantId": "id-ly6fib1i5pj",
+      "menu": "[{\"value\":\"Spaghetti A.O.P - Spagettia valkosipulilla, oliiviöljyllä & chilillä\",\"diet\":\"V\"},{\"diet\":\"M, G\",\"value\":\"Polpette piccanti con pomodoro - Chorizopyöryköitä tomaattikastikkeessa\"},{\"value\":\"Scorfano al basilico - Puna-ahventa basilikakastikkeella\",\"diet\":\"L, G\"},{\"value\":\"Radici al cocco - Juureksia kookoskastikkeessa\",\"diet\":\"V, G\"},{\"value\":\"\"}]"
+    },
+    {
+      "id": "id-ds21fqpk20m",
+      "date": "2026-08-25T21:00:00.000Z",
+      "restaurant": "Studio 10",
+      "restaurantId": "id-ly6fib1i5pj",
+      "menu": "[{\"diet\":\"VL\",\"value\":\"Pasta alla pastora - Pinaatti-ricottapastaa\"},{\"diet\":\"M, G\",\"value\":\"Pollo al peperoncino - Chilikanaa\"},{\"value\":\"Pesce del giorno - Päivän kalaa\",\"diet\":\"\"},{\"value\":\"Polpette vegetariane alla mexico - Mexicolaisia kasvispihvejä\",\"diet\":\"V, G\"}]"
+    },
+    {
+      "id": "id-3n42wb69fyu",
+      "date": "2026-08-26T21:00:00.000Z",
+      "restaurant": "Studio 10",
+      "restaurantId": "id-ly6fib1i5pj",
+      "menu": "[{\"diet\":\"L\",\"value\":\"Fusilli con funghi e pancetta - Fusilli-pastaa sienillä ja pekonilla\"},{\"diet\":\"M, G\",\"value\":\"Bistecca tritata al rosmarino - Jauhelihapihvejä rosmariinikastikkella\"},{\"value\":\"Pollo Cordon Bleu - Kanaa Cordon Bleu\",\"diet\":\"VL\"},{\"value\":\"Caponata di verdure e fagioli - Kasvispataa pavuilla\",\"diet\":\"V, G\"}]"
+    }
+  ]
+}
