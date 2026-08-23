@@ -137,3 +137,33 @@ export function getSpreadsheetResolution(): SpreadsheetResolution {
 
   return { isDev };
 }
+
+export interface OpeningHoursSpreadsheetResolution {
+  spreadsheetId?: string;
+  source?: string;
+}
+
+/**
+ * Resolves the Google Sheets spreadsheet ID for Opening Hours.
+ * Uses GOOGLE_SHEETS_OPENING_HOURS_ID or GOOGLE_SHEETS_OPENING_HOURS_URL.
+ */
+export function getOpeningHoursSpreadsheetResolution(): OpeningHoursSpreadsheetResolution {
+  const urlOrId =
+    process.env.GOOGLE_SHEETS_OPENING_HOURS_ID ??
+    process.env.GOOGLE_SHEETS_OPENING_HOURS_URL;
+
+  if (urlOrId) {
+    const parsedId = extractSpreadsheetId(urlOrId);
+    if (parsedId) {
+      const sourceName = process.env.GOOGLE_SHEETS_OPENING_HOURS_ID
+        ? "GOOGLE_SHEETS_OPENING_HOURS_ID"
+        : "GOOGLE_SHEETS_OPENING_HOURS_URL";
+      return {
+        spreadsheetId: parsedId,
+        source: sourceName,
+      };
+    }
+  }
+
+  return {};
+}

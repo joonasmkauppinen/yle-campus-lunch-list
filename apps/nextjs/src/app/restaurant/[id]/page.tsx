@@ -10,6 +10,7 @@ import {
 } from "~/config/restaurants";
 import {
   formatDisplayDate,
+  getOpeningHoursForCurrentDay,
   getTodayFormattedString,
   isCurrentDate,
 } from "~/lib/dates";
@@ -151,6 +152,115 @@ export default async function RestaurantPage(props: RestaurantPageProps) {
                 </span>
               )}
             </div>
+            {(() => {
+              if (!restaurant.openingHours) return null;
+
+              const todayLunch = getOpeningHoursForCurrentDay(
+                restaurant.openingHours.lunchHours,
+              );
+              const todayOpen = getOpeningHoursForCurrentDay(
+                restaurant.openingHours.openHours,
+              );
+
+              if (!todayLunch && !todayOpen) return null;
+
+              let line1: { label?: string; value: string } | null = null;
+              let line2: { label?: string; value: string } | null = null;
+
+              if (todayLunch && todayLunch !== "Suljettu") {
+                line1 = { label: "Lounas", value: todayLunch };
+                if (
+                  todayOpen &&
+                  todayOpen !== "Suljettu" &&
+                  todayOpen !== todayLunch
+                ) {
+                  line2 = { label: "Avoinna", value: todayOpen };
+                }
+              } else if (todayOpen && todayOpen !== "Suljettu") {
+                line1 = { label: "Avoinna", value: todayOpen };
+                if (todayLunch === "Suljettu") {
+                  line2 = { label: "Lounas", value: "Suljettu" };
+                }
+              } else {
+                return (
+                  <div className="text-muted-foreground/80 mt-2.5 flex items-center gap-1.5 text-sm">
+                    <svg
+                      className="text-muted-foreground/60 h-4 w-4 shrink-0"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="2"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                      />
+                    </svg>
+                    <span>Suljettu tänään</span>
+                  </div>
+                );
+              }
+
+              return (
+                <div className="text-muted-foreground mt-2.5 flex flex-col gap-1.5 text-sm">
+                  <div className="flex items-center gap-1.5 font-medium">
+                    <svg
+                      className="text-muted-foreground/80 h-4 w-4 shrink-0"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="2"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                      />
+                    </svg>
+                    <span>
+                      {line1.label && (
+                        <span className="text-foreground font-semibold">
+                          {line1.label}:{" "}
+                        </span>
+                      )}
+                      {line1.value}
+                    </span>
+                  </div>
+                  {line2 && (
+                    <div className="flex items-center gap-1.5 opacity-90">
+                      <svg
+                        className="text-muted-foreground/60 h-4 w-4 shrink-0"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth="2"
+                        stroke="currentColor"
+                        aria-hidden="true"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M12 0v13a4 4 0 0 0 4 4h8"
+                        />
+                      </svg>
+                      <span>
+                        {line2.label && (
+                          <span className="text-foreground font-semibold">
+                            {line2.label}:{" "}
+                          </span>
+                        )}
+                        {line2.value}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
           </header>
 
           <div className="border-border bg-card flex flex-col rounded-md border p-6 shadow-sm">

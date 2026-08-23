@@ -6,7 +6,11 @@ import Link from "next/link";
 import type { Restaurant } from "@acme/shared-types";
 
 import { RestaurantMenuItem } from "~/components/restaurant-menu-item";
-import { formatDisplayDate, isCurrentDate } from "~/lib/dates";
+import {
+  formatDisplayDate,
+  getOpeningHoursForCurrentDay,
+  isCurrentDate,
+} from "~/lib/dates";
 import { cn } from "~/lib/utils";
 
 export interface RestaurantListItemProps {
@@ -73,22 +77,133 @@ export function RestaurantListItem({
       <div>
         <div
           className={cn(
-            "border-border flex items-center justify-between gap-2",
+            "border-border flex items-start justify-between gap-3",
             isOpen && "border-b pb-4",
           )}
         >
-          <h2 className="text-card-foreground text-xl font-bold">
-            <Link
-              href={`/restaurant/${restaurant.id}`}
-              className="focus-visible:ring-ring rounded-sm transition-colors hover:underline focus-visible:ring-2 focus-visible:outline-none"
-            >
-              {restaurant.name}
-            </Link>
-          </h2>
+          <div className="flex flex-col gap-1.5">
+            <h2 className="text-card-foreground text-xl font-bold">
+              <Link
+                href={`/restaurant/${restaurant.id}`}
+                className="focus-visible:ring-ring rounded-sm transition-colors hover:underline focus-visible:ring-2 focus-visible:outline-none"
+              >
+                {restaurant.name}
+              </Link>
+            </h2>
+            {(() => {
+              if (!restaurant.openingHours) return null;
+
+              const todayLunch = getOpeningHoursForCurrentDay(
+                restaurant.openingHours.lunchHours,
+              );
+              const todayOpen = getOpeningHoursForCurrentDay(
+                restaurant.openingHours.openHours,
+              );
+
+              if (!todayLunch && !todayOpen) return null;
+
+              let line1: { label?: string; value: string } | null = null;
+              let line2: { label?: string; value: string } | null = null;
+
+              if (todayLunch && todayLunch !== "Suljettu") {
+                line1 = { label: "Lounas", value: todayLunch };
+                if (
+                  todayOpen &&
+                  todayOpen !== "Suljettu" &&
+                  todayOpen !== todayLunch
+                ) {
+                  line2 = { label: "Avoinna", value: todayOpen };
+                }
+              } else if (todayOpen && todayOpen !== "Suljettu") {
+                line1 = { label: "Avoinna", value: todayOpen };
+                if (todayLunch === "Suljettu") {
+                  line2 = { label: "Lounas", value: "Suljettu" };
+                }
+              } else {
+                return (
+                  <div className="text-muted-foreground/80 flex items-center gap-1.5 text-xs sm:text-sm">
+                    <svg
+                      className="text-muted-foreground/60 h-3.5 w-3.5 shrink-0"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="2"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                      />
+                    </svg>
+                    <span>Suljettu tänään</span>
+                  </div>
+                );
+              }
+
+              return (
+                <div className="text-muted-foreground flex flex-col gap-1 text-xs sm:text-sm">
+                  <div className="flex items-center gap-1.5 font-medium">
+                    <svg
+                      className="text-muted-foreground/80 h-3.5 w-3.5 shrink-0"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="2"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                      />
+                    </svg>
+                    <span>
+                      {line1.label && (
+                        <span className="text-foreground font-medium">
+                          {line1.label}:{" "}
+                        </span>
+                      )}
+                      {line1.value}
+                    </span>
+                  </div>
+                  {line2 && (
+                    <div className="flex items-center gap-1.5 opacity-90">
+                      <svg
+                        className="text-muted-foreground/60 h-3.5 w-3.5 shrink-0"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth="2"
+                        stroke="currentColor"
+                        aria-hidden="true"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M12 0v13a4 4 0 0 0 4 4h8"
+                        />
+                      </svg>
+                      <span>
+                        {line2.label && (
+                          <span className="text-foreground font-medium">
+                            {line2.label}:{" "}
+                          </span>
+                        )}
+                        {line2.value}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+          </div>
           <button
             type="button"
             onClick={toggleOpen}
-            className="text-muted-foreground hover:text-foreground hover:bg-muted focus-visible:ring-ring inline-flex h-8 w-8 items-center justify-center rounded-md p-1.5 transition-colors focus-visible:ring-2 focus-visible:outline-none"
+            className="text-muted-foreground hover:text-foreground hover:bg-muted focus-visible:ring-ring inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md p-1.5 transition-colors focus-visible:ring-2 focus-visible:outline-none"
             aria-expanded={isOpen}
             aria-label={
               isOpen

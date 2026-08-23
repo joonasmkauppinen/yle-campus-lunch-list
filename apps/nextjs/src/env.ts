@@ -16,6 +16,8 @@ export const env = createEnv({
     DEV_GOOGLE_SHEETS_ID: z.string().optional(),
     GOOGLE_SHEETS_DEV_URL: z.string().optional(),
     GOOGLE_SHEETS_DEV_ID: z.string().optional(),
+    GOOGLE_SHEETS_OPENING_HOURS_ID: z.string().optional(),
+    GOOGLE_SHEETS_OPENING_HOURS_URL: z.string().optional(),
     GOOGLE_SERVICE_ACCOUNT_EMAIL: z.string().optional(),
     GOOGLE_PRIVATE_KEY: z.string().optional(),
   },

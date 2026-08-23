@@ -30,10 +30,20 @@ export interface DailyMenu {
   items: MenuItem[];
 }
 
+export interface RestaurantOpeningHours {
+  restaurantId: string;
+  restaurantName: string;
+  openHours?: string;
+  lunchHours?: string;
+  rawText?: string;
+  lastUpdated: string;
+}
+
 export interface Restaurant {
   id: string;
   name: string;
   websiteUrl?: string;
+  openingHours?: RestaurantOpeningHours;
   menus: DailyMenu[];
   lastUpdated: string; // ISO format
 }

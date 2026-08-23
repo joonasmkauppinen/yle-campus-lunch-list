@@ -27,6 +27,7 @@ import {
   ISO_PAJA_RESTAURANT_ID,
   ISO_PAJA_RESTAURANT_NAME,
 } from "./fetchers/iso-paja.js";
+import { fetchAllOpeningHours } from "./fetchers/opening-hours.js";
 import {
   fetchPaattariMenu,
   PAATTARI_RESTAURANT_ID,
@@ -37,7 +38,7 @@ import {
   PASILAN_LINKKI_RESTAURANT_ID,
   PASILAN_LINKKI_RESTAURANT_NAME,
 } from "./fetchers/pasilan-linkki.js";
-import { updateGoogleSheet } from "./sheets.js";
+import { updateGoogleSheet, updateGoogleSheetOpeningHours } from "./sheets.js";
 
 /**
  * Resolves the target scraping date (YYYY-MM-DD) from CLI flags, env variables, or today in Europe/Helsinki.
@@ -209,6 +210,18 @@ async function main() {
     );
   } catch (error) {
     console.error("Error processing Päättäri:", error);
+  }
+
+  // 8. Opening Hours (All restaurants)
+  console.log("\nProcessing target: Restaurant Opening Hours");
+  try {
+    const openingHours = await fetchAllOpeningHours();
+    await updateGoogleSheetOpeningHours(openingHours);
+    console.log(
+      `Successfully completed opening hours update for ${openingHours.length} restaurants`,
+    );
+  } catch (error) {
+    console.error("Error processing opening hours:", error);
   }
 
   console.log("\n=== Campus Lunch List Scraper Finished ===");
