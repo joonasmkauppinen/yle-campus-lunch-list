@@ -1,125 +1,155 @@
-# create-t3-turbo
+<p align="center">
+  <img width="200" src="https://user-images.githubusercontent.com/28673805/178212367-e90d5c62-eeed-4c31-a39a-740a9ef3a287.png">
+</p>
+<h1 align="center">Yle campus lunch lists</h1>
 
-> [!NOTE]
->
-> create-t3-turbo now includes the option to use Tanstack Start for the web app!
+<p align="center">Find all Yleisradio campus lunch lists in one place.</p>
 
-## Installation
+<p align="center">Huoltamo · Piccolo · Iso Paja · Studio 10 · Pasilan Linkki · Päättäri · Akseli · Dylan Luft · Dylan Böle</p>
 
-> [!NOTE]
->
-> Make sure to follow the system requirements specified in [`package.json#engines`](./package.json#L4) before proceeding.
+## Getting started
 
-There are two ways of initializing an app using the `create-t3-turbo` starter. You can either use this repository as a template:
-
-![use-as-template](https://github.com/t3-oss/create-t3-turbo/assets/51714798/bb6c2e5d-d8b6-416e-aeb3-b3e50e2ca994)
-
-or use Turbo's CLI to init your project (use PNPM as package manager):
+Clone repo:
 
 ```bash
-npx create-turbo@latest -e https://github.com/t3-oss/create-t3-turbo
+git clone git@github.com:joonasmkauppinen/yle-campus-lunch-list.git
 ```
 
-## About
-
-Ever wondered how to migrate your T3 application into a monorepo? Stop right here! This is the perfect starter repo to get you running with the perfect stack!
-
-It uses [Turborepo](https://turborepo.com) and contains:
-
-```text
-.github
-  └─ workflows
-        └─ CI with pnpm cache setup
-.vscode
-  └─ Recommended extensions and settings for VSCode users
-apps
-  └─ nextjs
-      ├─ Next.js 15
-      ├─ React 19
-      ├─ Tailwind CSS v4
-      └─ E2E Typesafe API Server & Client
-packages
-  ├─ api
-  │   └─ tRPC v11 router definition
-  ├─ auth
-  │   └─ Authentication using better-auth.
-packages
-  ├─ api
-  │   └─ tRPC v11 router definition
-  ├─ auth
-  │   └─ Authentication using better-auth.
-  └─ ui
-      └─ Start of a UI package for the webapp using shadcn-ui
-tooling
-  ├─ eslint
-  │   └─ shared, fine-grained, eslint presets
-  ├─ prettier
-  │   └─ shared prettier configuration
-  ├─ tailwind
-  │   └─ shared tailwind theme and configuration
-  └─ typescript
-      └─ shared tsconfig you can extend from
-```
-
-> In this template, we use `@acme` as a placeholder for package names. As a user, you might want to replace it with your own organization or project name. You can use find-and-replace to change all the instances of `@acme` to something like `@my-company` or `@project-name`.
-
-## Quick Start
-
-To get it running, follow the steps below:
-
-### 1. Setup dependencies
+Open repo:
 
 ```bash
-# Install dependencies
-pnpm i
+cd yle-campus-lunch-list
+```
 
-# Configure environment variables
-# There is an `.env.example` in the root directory you can use for reference
+Install dependencies:
+
+```bash
+pnpm install
+```
+
+Configure environment variables:
+
+```bash
 cp .env.example .env
 ```
 
-### 2. When it's time to add a new UI component
+> Fill in the Google Sheets API Service Account credentials and Spreadsheet ID in `.env`.
 
-Run the `ui-add` script to add a new UI component using the interactive `shadcn/ui` CLI:
+Start local development server:
 
 ```bash
-pnpm ui-add
+# Run both Next.js frontend and Scraper in watch mode
+pnpm dev
+
+# Or run only the Next.js app
+pnpm dev:next
+
+# Or run the Scraper pipeline once / with custom date
+pnpm dev:scraper
+pnpm --filter @acme/scraper dev -- --date 2026-08-23
 ```
 
-When the component(s) has been installed, you should be good to go and start using it in your app.
+## Technologies
 
-### 4. When it's time to add a new package
+- **Turborepo & pnpm**: High-performance monorepo workspace management.
+- **TypeScript**: End-to-end static typing across all packages.
+- **Next.js & React 19**: Modern App Router web application with ISR and server components.
+- **Tailwind CSS**: Modern, utility-first styling.
+- **Google Sheets API**: Cloud spreadsheet acting as the headless CMS and menu data store.
+- **Cheerio & RSS Parsers**: Automated web scraping and RSS feed ingestion.
+- **Vercel**: Production deployment, hosting, and edge network.
 
-To add a new package, simply run `pnpm turbo gen init` in the monorepo root. This will prompt you for a package name as well as if you want to install any dependencies to the new package (of course you can also do this yourself later).
+## Project Structure
 
-The generator sets up the `package.json`, `tsconfig.json` and a `index.ts`, as well as configures all the necessary configurations for tooling around your package such as formatting, linting and typechecking. When the package is created, you're ready to go build out the package.
+```text
+apps
+  ├─ nextjs         # Next.js App Router frontend & API routes
+  └─ scraper        # CLI & scraper pipeline to fetch menus and sync with Google Sheets
+packages
+  └─ shared-types   # Shared TypeScript types and interfaces (Restaurant, MenuItem, etc.)
+tooling
+  ├─ eslint         # Shared ESLint configurations
+  ├─ prettier       # Shared Prettier configurations
+  ├─ tailwind       # Shared Tailwind CSS theme presets
+  └─ typescript     # Shared tsconfig bases
+```
 
-## FAQ
+## Resources
 
-### Does this pattern leak backend code to my client applications?
+- App production url: [`https://yle-campus-lunch-list.vercel.app/`](https://yle-campus-lunch-list.vercel.app/)
+- [Vercel dashboard](https://vercel.com/joonasmkauppinen/yle-campus-lunch-list) (hobby account, only @joonasmkauppinen can access)
+- [Figma design layouts (view access)](https://www.figma.com/file/ckeATTSGr5adcHYNqHPORC/Yle-campus-lunch-menu?node-id=0%3A1)
+- [GH Actions](https://github.com/joonasmkauppinen/yle-campus-lunch-list/actions)
 
-No, it does not. The `api` package should only be a production dependency in the Next.js application where it's served. Other client applications you may add in the future should only add the `api` package as a dev dependency. This lets you have full typesafety in your client applications, while keeping your backend code safe.
+## Scraper App
 
-If you need to share runtime code between the client and server, such as input validation schemas, you can create a separate `shared` package for this and import it on both sides.
+The ingestion pipeline in [`apps/scraper`](./apps/scraper) is a standalone Node.js CLI tool responsible for fetching, parsing, and syncing daily restaurant menus to Google Sheets:
 
-## Deployment
+- **Data Ingestion**: Scrapes HTML web pages with Cheerio, parses RSS XML feeds, and fetches JSON APIs.
+- **Date Handling**: Defaults to the current date in `Europe/Helsinki` timezone, or accepts a target date via CLI flag (`--date YYYY-MM-DD` / `-d YYYY-MM-DD`) or `TARGET_DATE` environment variable.
+- **Google Sheets Sync**: Authenticates via Google Service Account JWT and batch-writes dishes, dietary flags, and metadata into restaurant-specific tabs.
+- **Docker Support**: Includes a [`Dockerfile`](./apps/scraper/Dockerfile) for scheduled execution on servers.
 
-### Next.js
+## Production build
 
-#### Deploy to Vercel
+Usually there is no need to build the project locally, as Vercel handles builds on deployment. To build and test locally:
 
-Let's deploy the Next.js application to [Vercel](https://vercel.com). If you've never deployed a Turborepo app there, don't worry, the steps are quite straightforward. You can also read the [official Turborepo guide](https://vercel.com/docs/concepts/monorepos/turborepo) on deploying to Vercel.
+Create optimized production build:
 
-1. Create a new project on Vercel, select the `apps/nextjs` folder as the root directory. Vercel's zero-config system should handle all configurations for you.
+```bash
+pnpm build
+```
 
-2. Done! Your app should successfully deploy.
+Run production build locally:
 
-### Auth Proxy
+```bash
+pnpm --filter @acme/nextjs start
+```
 
-The auth proxy comes as a better-auth plugin. This is required for the Next.js app to be able to authenticate users in preview deployments. The auth proxy is not used for OAuth requests in production deployments. The easiest way to get it running is to deploy the Next.js app to vercel.
+Run test suite:
 
-## References
+```bash
+pnpm test
+```
 
-The stack originates from [create-t3-app](https://github.com/t3-oss/create-t3-app).
+## Page revalidation & Data flow
 
-A [blog post](https://jumr.dev/blog/t3-turbo) where I wrote how to migrate a T3 app into this.
+1. **Scraping & Storage**: The scraper fetches menu data daily (or manually) from diverse sources and writes the formatted dishes to individual restaurant sheets in Google Sheets.
+2. **Next.js Caching**: The Next.js frontend reads menu data from Google Sheets using the Google Sheets API, cached with time-based ISR (`export const revalidate = 300`, revalidating every 5 minutes).
+
+## Lunch list data sources
+
+### Huoltamo, Piccolo & Studio 10 (Intra)
+
+Data is fetched from the Yle Intra Google Apps Script JSON API endpoint configured via `HUOLTAMO_API_URL`.
+
+### Iso Paja
+
+Data is scraped with Cheerio from: [`https://www.hhravintolat.fi/iso-paja/`](https://www.hhravintolat.fi/iso-paja/)
+
+### Studio 10 (Website fallback)
+
+Direct website: [`https://nordrest.fi/restaurang/yle-studio10/#ruokalista`](https://nordrest.fi/restaurang/yle-studio10/#ruokalista)
+
+### Akseli
+
+Data is scraped with Cheerio from: [`https://www.ninankeittio.fi/helsinki-ilmala-akseli/#lounaslista`](https://www.ninankeittio.fi/helsinki-ilmala-akseli/#lounaslista)
+
+### Päättäri (formerly Båx)
+
+Data is scraped with Cheerio from: [`https://nordrest.fi/restaurang/ravintola-paattari/#ruokalista`](https://nordrest.fi/restaurang/ravintola-paattari/#ruokalista)
+
+### Dylan Luft
+
+Data is fetched from the Lounastaja RSS feed:
+`https://lounastaja.app/api/v1/rss/week/5843f3ec-6a2c-49ba-ba3e-b384f6c996f1/current?days=current&language=fi`
+
+### Dylan Böle
+
+Data is fetched from the Lounastaja RSS feed:
+`https://lounastaja.app/api/v1/rss/week/3aba0b64-0d43-41ea-b665-1d2d6c0f2d5e/current?days=current&language=fi`
+
+### Pasilan Linkki
+
+Data is fetched from the Compass Group RSS feed:
+`https://www.compass-group.fi/menuapi/feed/rss/current-day?costNumber=3642&language=fi`
