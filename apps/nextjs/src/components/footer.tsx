@@ -121,7 +121,7 @@ export function Footer() {
 
       <div className="border-border/60 mt-10 flex flex-col items-center justify-between gap-2 border-t pt-6 text-sm sm:flex-row">
         <span
-          className="order-1 inline-block h-6 w-6 shrink-0 bg-current sm:order-2"
+          className="order-1 inline-block h-6 w-6 shrink-0 bg-current opacity-60 sm:order-2"
           style={{
             maskImage: "url(/chef-hat.png)",
             WebkitMaskImage: "url(/chef-hat.png)",
