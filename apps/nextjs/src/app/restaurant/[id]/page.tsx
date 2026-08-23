@@ -183,22 +183,7 @@ export default async function RestaurantPage(props: RestaurantPageProps) {
                 }
               } else {
                 return (
-                  <div className="text-muted-foreground/80 mt-2.5 flex items-center gap-1.5 text-sm">
-                    <svg
-                      className="text-muted-foreground/60 h-4 w-4 shrink-0"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth="2"
-                      stroke="currentColor"
-                      aria-hidden="true"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                      />
-                    </svg>
+                  <div className="text-muted-foreground/80 mt-2.5 text-sm">
                     <span>Suljettu tänään</span>
                   </div>
                 );
@@ -206,22 +191,7 @@ export default async function RestaurantPage(props: RestaurantPageProps) {
 
               return (
                 <div className="text-muted-foreground mt-2.5 flex flex-col gap-1.5 text-sm">
-                  <div className="flex items-center gap-1.5 font-medium">
-                    <svg
-                      className="text-muted-foreground/80 h-4 w-4 shrink-0"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth="2"
-                      stroke="currentColor"
-                      aria-hidden="true"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                      />
-                    </svg>
+                  <div className="font-medium">
                     <span>
                       {line1.label && (
                         <span className="text-foreground font-semibold">
@@ -232,22 +202,7 @@ export default async function RestaurantPage(props: RestaurantPageProps) {
                     </span>
                   </div>
                   {line2 && (
-                    <div className="flex items-center gap-1.5 opacity-90">
-                      <svg
-                        className="text-muted-foreground/60 h-4 w-4 shrink-0"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2"
-                        stroke="currentColor"
-                        aria-hidden="true"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M12 0v13a4 4 0 0 0 4 4h8"
-                        />
-                      </svg>
+                    <div className="opacity-90">
                       <span>
                         {line2.label && (
                           <span className="text-foreground font-semibold">

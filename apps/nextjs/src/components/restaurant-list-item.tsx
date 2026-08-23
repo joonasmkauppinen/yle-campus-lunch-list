@@ -121,22 +121,7 @@ export function RestaurantListItem({
                 }
               } else {
                 return (
-                  <div className="text-muted-foreground/80 flex items-center gap-1.5 text-xs sm:text-sm">
-                    <svg
-                      className="text-muted-foreground/60 h-3.5 w-3.5 shrink-0"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth="2"
-                      stroke="currentColor"
-                      aria-hidden="true"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                      />
-                    </svg>
+                  <div className="text-muted-foreground/80 text-xs sm:text-sm">
                     <span>Suljettu tänään</span>
                   </div>
                 );
@@ -144,22 +129,7 @@ export function RestaurantListItem({
 
               return (
                 <div className="text-muted-foreground flex flex-col gap-1 text-xs sm:text-sm">
-                  <div className="flex items-center gap-1.5 font-medium">
-                    <svg
-                      className="text-muted-foreground/80 h-3.5 w-3.5 shrink-0"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth="2"
-                      stroke="currentColor"
-                      aria-hidden="true"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                      />
-                    </svg>
+                  <div className="font-medium">
                     <span>
                       {line1.label && (
                         <span className="text-foreground font-medium">
@@ -170,22 +140,7 @@ export function RestaurantListItem({
                     </span>
                   </div>
                   {line2 && (
-                    <div className="flex items-center gap-1.5 opacity-90">
-                      <svg
-                        className="text-muted-foreground/60 h-3.5 w-3.5 shrink-0"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2"
-                        stroke="currentColor"
-                        aria-hidden="true"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M12 0v13a4 4 0 0 0 4 4h8"
-                        />
-                      </svg>
+                    <div className="opacity-90">
                       <span>
                         {line2.label && (
                           <span className="text-foreground font-medium">
