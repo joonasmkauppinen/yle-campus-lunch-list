@@ -120,8 +120,24 @@ export function Footer() {
       </div>
 
       <div className="border-border/60 mt-10 flex flex-col items-center justify-between gap-2 border-t pt-6 text-sm sm:flex-row">
-        <p>© {currentYear} Joonas Kauppinen</p>
-        <p className="text-sm">Pasilan ja Ilmalan alueen lounaat</p>
+        <span
+          className="order-1 inline-block h-6 w-6 shrink-0 bg-current opacity-60 sm:order-2"
+          style={{
+            maskImage: "url(/chef-hat.png)",
+            WebkitMaskImage: "url(/chef-hat.png)",
+            maskSize: "contain",
+            WebkitMaskSize: "contain",
+            maskRepeat: "no-repeat",
+            WebkitMaskRepeat: "no-repeat",
+            maskPosition: "center",
+            WebkitMaskPosition: "center",
+          }}
+          aria-hidden="true"
+        />
+        <p className="order-2 sm:order-1">© {currentYear} Joonas Kauppinen</p>
+        <p className="order-3 text-sm sm:order-3">
+          Pasilan ja Ilmalan alueen lounaat
+        </p>
       </div>
     </footer>
   );
