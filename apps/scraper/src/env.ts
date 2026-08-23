@@ -167,3 +167,58 @@ export function getOpeningHoursSpreadsheetResolution(): OpeningHoursSpreadsheetR
 
   return {};
 }
+
+/**
+ * Resolves the Google Sheets spreadsheet ID for Category Suggestions based on environment:
+ * In development mode (NODE_ENV !== "production"), DEV_GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_URL / DEV_GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_ID takes precedence.
+ */
+export function getCategorySpreadsheetResolution(): SpreadsheetResolution {
+  const isDev = process.env.NODE_ENV !== "production";
+
+  if (isDev) {
+    const devUrlOrId =
+      process.env.DEV_GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_URL ??
+      process.env.GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_DEV_URL ??
+      process.env.DEV_GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_ID ??
+      process.env.GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_DEV_ID;
+
+    if (devUrlOrId) {
+      const parsedId = extractSpreadsheetId(devUrlOrId);
+      if (parsedId) {
+        const sourceName = process.env
+          .DEV_GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_URL
+          ? "DEV_GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_URL"
+          : process.env.GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_DEV_URL
+            ? "GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_DEV_URL"
+            : process.env.DEV_GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_ID
+              ? "DEV_GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_ID"
+              : "GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_DEV_ID";
+        return {
+          spreadsheetId: parsedId,
+          source: sourceName,
+          isDev: true,
+        };
+      }
+    }
+  }
+
+  const defaultUrlOrId =
+    process.env.GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_ID ??
+    process.env.GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_URL;
+
+  if (defaultUrlOrId) {
+    const parsedId = extractSpreadsheetId(defaultUrlOrId);
+    if (parsedId) {
+      const sourceName = process.env.GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_ID
+        ? "GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_ID"
+        : "GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_URL";
+      return {
+        spreadsheetId: parsedId,
+        source: sourceName,
+        isDev,
+      };
+    }
+  }
+
+  return { isDev };
+}

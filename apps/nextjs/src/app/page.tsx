@@ -2,18 +2,27 @@ import { Footer } from "~/components/footer";
 import { RestaurantView } from "~/components/restaurant-view";
 import { getSortedRestaurantsWithMetadata } from "~/config/restaurants";
 import { getTodayFormattedString } from "~/lib/dates";
-import { fetchRestaurantsFromGoogleSheets } from "~/lib/sheets";
+import {
+  fetchCategorySuggestionsFromGoogleSheets,
+  fetchRestaurantsFromGoogleSheets,
+} from "~/lib/sheets";
 
 // Configure Next.js ISR revalidation interval (5 minutes)
 export const revalidate = 300;
 
 export default async function HomePage() {
+  const [restaurantsResult, categoriesResult] = await Promise.all([
+    fetchRestaurantsFromGoogleSheets(),
+    fetchCategorySuggestionsFromGoogleSheets(),
+  ]);
+
   const {
     restaurants: rawRestaurants,
     error,
     isDev,
     source,
-  } = await fetchRestaurantsFromGoogleSheets();
+  } = restaurantsResult;
+  const dailyCategories = categoriesResult.dailyCategories;
 
   const restaurants = getSortedRestaurantsWithMetadata(rawRestaurants);
   const todayStr = getTodayFormattedString();
@@ -61,6 +70,7 @@ export default async function HomePage() {
         <RestaurantView
           restaurants={restaurants}
           todayStr={todayStr}
+          dailyCategories={dailyCategories}
           isDev={isDev}
           source={source}
         />

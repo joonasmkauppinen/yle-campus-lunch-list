@@ -1,11 +1,13 @@
 import { google } from "googleapis";
 
 import type {
+  LunchCategory,
   ParsedMenuItem,
   RestaurantOpeningHours,
 } from "@acme/shared-types";
 
 import {
+  getCategorySpreadsheetResolution,
   getOpeningHoursSpreadsheetResolution,
   getSpreadsheetResolution,
 } from "./env.js";
@@ -330,4 +332,156 @@ export async function updateGoogleSheetOpeningHours(
   } catch (err) {
     console.error(`[Google Sheets Opening Hours] Error updating sheet:`, err);
   }
+}
+
+/**
+ * Formats lunch categories into 2D table row arrays for the category suggestions Google Sheet.
+ */
+export function formatCategoryRows(
+  categories: LunchCategory[],
+  targetDate: string,
+  lastUpdated: string = new Date().toISOString(),
+): string[][] {
+  const rows: string[][] = [];
+
+  for (const category of categories) {
+    for (const match of category.items) {
+      rows.push([
+        category.id,
+        category.label,
+        targetDate,
+        match.restaurantId,
+        match.restaurantName,
+        match.item,
+        (match.dietaryFlags ?? []).join(", "),
+        lastUpdated,
+      ]);
+    }
+  }
+
+  return rows;
+}
+
+export async function updateCategorySuggestionsGoogleSheet(
+  categories: LunchCategory[],
+  targetDate: string = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Helsinki",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date()),
+): Promise<void> {
+  const { spreadsheetId, source, isDev } = getCategorySpreadsheetResolution();
+  const clientEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL?.trim();
+  let privateKey = process.env.GOOGLE_PRIVATE_KEY;
+  if (privateKey) {
+    privateKey = privateKey.trim();
+    if (
+      (privateKey.startsWith('"') && privateKey.endsWith('"')) ||
+      (privateKey.startsWith("'") && privateKey.endsWith("'"))
+    ) {
+      privateKey = privateKey.slice(1, -1);
+    }
+    privateKey = privateKey.replace(/\\n/g, "\n");
+  }
+
+  if (!spreadsheetId || !clientEmail || !privateKey) {
+    console.warn(
+      `[Google Sheets Categories] Credentials missing (spreadsheetId: ${spreadsheetId ? "present" : "missing"}, clientEmail: ${clientEmail ? "present" : "missing"}, privateKey: ${privateKey ? "present" : "missing"}). Skipping category sheet update and logging output to console instead.`,
+    );
+    console.log(
+      `[Google Sheets Category Payload] (${targetDate}):`,
+      JSON.stringify(categories, null, 2),
+    );
+    return;
+  }
+
+  console.log(
+    `[Google Sheets Categories] Updating ${isDev ? "DEV" : "PROD"} spreadsheet: ${spreadsheetId} (resolved from ${source})`,
+  );
+  console.log(
+    `[Google Sheets Categories] Authenticating service account: ${clientEmail}`,
+  );
+  const auth = new google.auth.JWT({
+    email: clientEmail,
+    key: privateKey,
+    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+  });
+
+  const sheets = google.sheets({ version: "v4", auth });
+
+  let tabName = "Sheet1";
+  try {
+    const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
+    const firstSheetTitle =
+      spreadsheet.data.sheets?.[0]?.properties?.title ?? "Sheet1";
+    tabName = firstSheetTitle;
+
+    // Ensure header row is set
+    await sheets.spreadsheets.values.update({
+      spreadsheetId,
+      range: `'${tabName}'!A1:H1`,
+      valueInputOption: "USER_ENTERED",
+      requestBody: {
+        values: [
+          [
+            "categoryId",
+            "categoryLabel",
+            "date",
+            "restaurantId",
+            "restaurantName",
+            "item",
+            "dietaryFlags",
+            "lastUpdated",
+          ],
+        ],
+      },
+    });
+  } catch (err) {
+    console.warn(
+      `[Google Sheets Categories] Could not inspect/update header for '${tabName}':`,
+      err,
+    );
+  }
+
+  const lastUpdated = new Date().toISOString();
+  const rows = formatCategoryRows(categories, targetDate, lastUpdated);
+  const clearRange = `'${tabName}'!A2:Z`;
+
+  console.log(
+    `[Google Sheets Categories] Clearing existing range ${clearRange}...`,
+  );
+  try {
+    await sheets.spreadsheets.values.clear({
+      spreadsheetId,
+      range: clearRange,
+    });
+  } catch {
+    console.log(
+      `[Google Sheets Categories] Sheet range clear skipped or tab standard update.`,
+    );
+  }
+
+  if (rows.length === 0) {
+    console.log(
+      `[Google Sheets Categories] No categories found for ${targetDate}. Sheet range cleared.`,
+    );
+    return;
+  }
+
+  console.log(
+    `[Google Sheets Categories] Writing ${rows.length} rows starting at A2...`,
+  );
+  await sheets.spreadsheets.values.update({
+    spreadsheetId,
+    range: `'${tabName}'!A2`,
+    valueInputOption: "USER_ENTERED",
+    requestBody: {
+      values: rows,
+    },
+  });
+
+  console.log(
+    `[Google Sheets Categories] Successfully updated category suggestions sheet.`,
+  );
 }

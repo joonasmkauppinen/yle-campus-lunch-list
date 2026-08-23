@@ -69,8 +69,9 @@ export function RestaurantListItem({
 
   return (
     <div
+      id={`restaurant-${restaurant.id}`}
       className={cn(
-        "border-border bg-card animate-fade-in flex flex-col rounded-md border p-6 shadow-sm transition-shadow hover:shadow-md",
+        "border-border bg-card animate-fade-in flex scroll-mt-6 flex-col rounded-md border p-6 shadow-sm transition-shadow hover:shadow-md",
         className,
       )}
     >

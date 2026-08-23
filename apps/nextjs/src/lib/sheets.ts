@@ -1,12 +1,15 @@
 import { google } from "googleapis";
 
 import type {
+  DailyCategories,
+  LunchCategory,
   MenuItem,
   Restaurant,
   RestaurantOpeningHours,
 } from "@acme/shared-types";
 
 import { env } from "~/env";
+import { isCurrentDate } from "~/lib/dates";
 
 /**
  * Safely extracts a string from unknown cell data and trims whitespace.
@@ -121,6 +124,56 @@ export function getOpeningHoursSpreadsheetResolution(): OpeningHoursSpreadsheetR
   }
 
   return {};
+}
+
+export function getCategorySpreadsheetResolution(): SpreadsheetResolution {
+  const isDev = env.NODE_ENV !== "production";
+
+  if (isDev) {
+    const devUrlOrId =
+      env.DEV_GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_URL ??
+      env.GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_DEV_URL ??
+      env.DEV_GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_ID ??
+      env.GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_DEV_ID;
+
+    if (devUrlOrId) {
+      const parsedId = extractSpreadsheetId(devUrlOrId);
+      if (parsedId) {
+        const sourceName = env.DEV_GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_URL
+          ? "DEV_GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_URL"
+          : env.GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_DEV_URL
+            ? "GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_DEV_URL"
+            : env.DEV_GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_ID
+              ? "DEV_GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_ID"
+              : "GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_DEV_ID";
+        return {
+          spreadsheetId: parsedId,
+          source: sourceName,
+          isDev: true,
+        };
+      }
+    }
+  }
+
+  const defaultUrlOrId =
+    env.GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_ID ??
+    env.GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_URL;
+
+  if (defaultUrlOrId) {
+    const parsedId = extractSpreadsheetId(defaultUrlOrId);
+    if (parsedId) {
+      const sourceName = env.GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_ID
+        ? "GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_ID"
+        : "GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_URL";
+      return {
+        spreadsheetId: parsedId,
+        source: sourceName,
+        isDev,
+      };
+    }
+  }
+
+  return { isDev };
 }
 
 function formatRestaurantTitle(id: string): string {
@@ -269,7 +322,12 @@ export async function fetchRestaurantsFromGoogleSheets(): Promise<FetchResult> {
 
     const sheetTitles = (spreadsheet.data.sheets ?? [])
       .map((s) => s.properties?.title)
-      .filter((t): t is string => typeof t === "string" && t.length > 0);
+      .filter(
+        (t): t is string =>
+          typeof t === "string" &&
+          t.length > 0 &&
+          t.toLowerCase() !== "categories",
+      );
 
     if (sheetTitles.length === 0) {
       return {
@@ -388,6 +446,184 @@ export async function fetchRestaurantsFromGoogleSheets(): Promise<FetchResult> {
     return {
       restaurants: [],
       error: errorMessage,
+      resolvedSpreadsheetId: spreadsheetId,
+      source,
+      isDev,
+    };
+  }
+}
+
+export interface FetchCategoriesResult {
+  dailyCategories: DailyCategories | null;
+  error?: string;
+  resolvedSpreadsheetId?: string;
+  source?: string;
+  isDev: boolean;
+}
+
+const CATEGORY_ICON_MAP: Record<string, string> = {
+  liha: "meat",
+  kala: "fish",
+  kana: "chicken",
+  vege: "vegan",
+  kasvis: "vege",
+  burgeri: "burger",
+  pizza: "pizza",
+  aasialainen: "asian",
+  "tex-mex": "texmex",
+};
+
+export async function fetchCategorySuggestionsFromGoogleSheets(): Promise<FetchCategoriesResult> {
+  const { spreadsheetId, source, isDev } = getCategorySpreadsheetResolution();
+  const clientEmail = env.GOOGLE_SERVICE_ACCOUNT_EMAIL?.trim();
+  let privateKey = env.GOOGLE_PRIVATE_KEY;
+
+  if (privateKey) {
+    privateKey = privateKey.trim();
+    if (
+      (privateKey.startsWith('"') && privateKey.endsWith('"')) ||
+      (privateKey.startsWith("'") && privateKey.endsWith("'"))
+    ) {
+      privateKey = privateKey.slice(1, -1);
+    }
+    privateKey = privateKey.replace(/\\n/g, "\n");
+  }
+
+  if (!spreadsheetId) {
+    return {
+      dailyCategories: null,
+      isDev,
+    };
+  }
+
+  if (!clientEmail || !privateKey) {
+    return {
+      dailyCategories: null,
+      error: "Google Service Account credentials missing.",
+      resolvedSpreadsheetId: spreadsheetId,
+      source,
+      isDev,
+    };
+  }
+
+  try {
+    const auth = new google.auth.JWT({
+      email: clientEmail,
+      key: privateKey,
+      scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"],
+    });
+
+    const sheets = google.sheets({ version: "v4", auth });
+    const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
+    const firstSheetTitle =
+      spreadsheet.data.sheets?.[0]?.properties?.title ?? "Sheet1";
+
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: `'${firstSheetTitle}'!A2:H`,
+    });
+
+    const rows = response.data.values ?? [];
+    if (rows.length === 0) {
+      return {
+        dailyCategories: null,
+        resolvedSpreadsheetId: spreadsheetId,
+        source,
+        isDev,
+      };
+    }
+
+    const firstRowDate = safeString(rows[0]?.[2]);
+    const firstRowLastUpdated =
+      safeString(rows[0]?.[7]) || new Date().toISOString();
+
+    // Check date staleness
+    if (!firstRowDate || !isCurrentDate(firstRowDate)) {
+      console.log(
+        `[Category Suggestions] Categories data date '${firstRowDate}' is stale. Omitting suggestions.`,
+      );
+      return {
+        dailyCategories: null,
+        resolvedSpreadsheetId: spreadsheetId,
+        source,
+        isDev,
+      };
+    }
+
+    const categoriesMap = new Map<string, LunchCategory>();
+
+    for (const row of rows) {
+      const categoryId = safeString(row[0]);
+      const categoryLabel = safeString(row[1]) || categoryId;
+      const rowDate = safeString(row[2]);
+      const restaurantId = safeString(row[3]);
+      const restaurantName = safeString(row[4]);
+      const item = safeString(row[5]);
+      const dietaryRaw = safeString(row[6]);
+
+      if (!categoryId || !item || rowDate !== firstRowDate) continue;
+
+      const dietaryFlags =
+        dietaryRaw.length > 0
+          ? dietaryRaw
+              .split(",")
+              .map((f) => f.trim())
+              .filter((f) => f.length > 0)
+          : [];
+
+      let category = categoriesMap.get(categoryId);
+      if (!category) {
+        category = {
+          id: categoryId,
+          label: categoryLabel,
+          icon: CATEGORY_ICON_MAP[categoryId] ?? categoryId,
+          items: [],
+        };
+        categoriesMap.set(categoryId, category);
+      }
+
+      category.items.push({
+        restaurantId,
+        restaurantName,
+        item,
+        dietaryFlags,
+      });
+    }
+
+    const categories = Array.from(categoriesMap.values()).filter(
+      (c) => c.items.length > 0,
+    );
+
+    if (categories.length === 0) {
+      return {
+        dailyCategories: null,
+        resolvedSpreadsheetId: spreadsheetId,
+        source,
+        isDev,
+      };
+    }
+
+    return {
+      dailyCategories: {
+        date: firstRowDate,
+        lastUpdated: firstRowLastUpdated,
+        categories,
+      },
+      resolvedSpreadsheetId: spreadsheetId,
+      source,
+      isDev,
+    };
+  } catch (error) {
+    console.error(
+      "[Google Sheets Categories] Error fetching category suggestions:",
+      error,
+    );
+    return {
+      dailyCategories: null,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch category suggestions.",
       resolvedSpreadsheetId: spreadsheetId,
       source,
       isDev,
