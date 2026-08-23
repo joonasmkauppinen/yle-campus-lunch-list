@@ -38,6 +38,7 @@ import {
   PASILAN_LINKKI_RESTAURANT_ID,
   PASILAN_LINKKI_RESTAURANT_NAME,
 } from "./fetchers/pasilan-linkki.js";
+import { triggerRevalidation } from "./revalidate.js";
 import { updateGoogleSheet, updateGoogleSheetOpeningHours } from "./sheets.js";
 
 /**
@@ -223,6 +224,10 @@ async function main() {
   } catch (error) {
     console.error("Error processing opening hours:", error);
   }
+
+  // 9. Revalidate frontend cache (in production)
+  console.log("\nTriggering on-demand frontend revalidation...");
+  await triggerRevalidation();
 
   console.log("\n=== Campus Lunch List Scraper Finished ===");
 }
