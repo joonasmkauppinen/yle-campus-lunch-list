@@ -1,6 +1,10 @@
 import { google } from "googleapis";
 
-import type { MenuItem, Restaurant } from "@acme/shared-types";
+import type {
+  MenuItem,
+  Restaurant,
+  RestaurantOpeningHours,
+} from "@acme/shared-types";
 
 import { env } from "~/env";
 
@@ -94,11 +98,114 @@ export function getSpreadsheetResolution(): SpreadsheetResolution {
   return { isDev };
 }
 
+export interface OpeningHoursSpreadsheetResolution {
+  spreadsheetId?: string;
+  source?: string;
+}
+
+export function getOpeningHoursSpreadsheetResolution(): OpeningHoursSpreadsheetResolution {
+  const urlOrId =
+    env.GOOGLE_SHEETS_OPENING_HOURS_ID ?? env.GOOGLE_SHEETS_OPENING_HOURS_URL;
+
+  if (urlOrId) {
+    const parsedId = extractSpreadsheetId(urlOrId);
+    if (parsedId) {
+      const sourceName = env.GOOGLE_SHEETS_OPENING_HOURS_ID
+        ? "GOOGLE_SHEETS_OPENING_HOURS_ID"
+        : "GOOGLE_SHEETS_OPENING_HOURS_URL";
+      return {
+        spreadsheetId: parsedId,
+        source: sourceName,
+      };
+    }
+  }
+
+  return {};
+}
+
 function formatRestaurantTitle(id: string): string {
   return id
     .split(/[-_]+/)
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
+}
+
+export async function fetchOpeningHoursFromGoogleSheets(): Promise<
+  Record<string, RestaurantOpeningHours>
+> {
+  const { spreadsheetId } = getOpeningHoursSpreadsheetResolution();
+  const clientEmail = env.GOOGLE_SERVICE_ACCOUNT_EMAIL?.trim();
+  let privateKey = env.GOOGLE_PRIVATE_KEY;
+
+  if (privateKey) {
+    privateKey = privateKey.trim();
+    if (
+      (privateKey.startsWith('"') && privateKey.endsWith('"')) ||
+      (privateKey.startsWith("'") && privateKey.endsWith("'"))
+    ) {
+      privateKey = privateKey.slice(1, -1);
+    }
+    privateKey = privateKey.replace(/\\n/g, "\n");
+  }
+
+  if (!spreadsheetId || !clientEmail || !privateKey) {
+    return {};
+  }
+
+  try {
+    const auth = new google.auth.JWT({
+      email: clientEmail,
+      key: privateKey,
+      scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"],
+    });
+
+    const sheets = google.sheets({ version: "v4", auth });
+    const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
+    const sheetTitles = (spreadsheet.data.sheets ?? [])
+      .map((s) => s.properties?.title)
+      .filter((t): t is string => typeof t === "string" && t.length > 0);
+
+    const targetTab = sheetTitles.includes("opening-hours")
+      ? "opening-hours"
+      : sheetTitles[0];
+
+    if (!targetTab) {
+      return {};
+    }
+
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: `'${targetTab}'!A2:F`,
+    });
+
+    const rows = response.data.values ?? [];
+    const mapping: Record<string, RestaurantOpeningHours> = {};
+
+    for (const row of rows) {
+      const restaurantId = safeString(row[0]);
+      if (!restaurantId) continue;
+
+      const restaurantName = safeString(row[1]);
+      const openHours = safeString(row[2]);
+      const lunchHours = safeString(row[3]);
+      const rawText = safeString(row[4]);
+      const lastUpdated = safeString(row[5]) || new Date().toISOString();
+
+      mapping[restaurantId] = {
+        restaurantId,
+        restaurantName,
+        openHours: openHours || undefined,
+        lunchHours: lunchHours || undefined,
+        rawText: rawText || undefined,
+        lastUpdated,
+      };
+    }
+
+    return mapping;
+  } catch (error) {
+    console.error("[Google Sheets] Error fetching opening hours data:", error);
+    return {};
+  }
 }
 
 export interface FetchResult {
@@ -153,7 +260,13 @@ export async function fetchRestaurantsFromGoogleSheets(): Promise<FetchResult> {
     });
 
     const sheets = google.sheets({ version: "v4", auth });
-    const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
+
+    // Concurrently fetch menu metadata and opening hours
+    const [spreadsheet, openingHoursMap] = await Promise.all([
+      sheets.spreadsheets.get({ spreadsheetId }),
+      fetchOpeningHoursFromGoogleSheets(),
+    ]);
+
     const sheetTitles = (spreadsheet.data.sheets ?? [])
       .map((s) => s.properties?.title)
       .filter((t): t is string => typeof t === "string" && t.length > 0);
@@ -196,6 +309,7 @@ export async function fetchRestaurantsFromGoogleSheets(): Promise<FetchResult> {
         restaurants.push({
           id: tabTitle,
           name: formatRestaurantTitle(tabTitle),
+          openingHours: openingHoursMap[tabTitle],
           lastUpdated: new Date().toISOString(),
           menus: [
             {
@@ -247,6 +361,8 @@ export async function fetchRestaurantsFromGoogleSheets(): Promise<FetchResult> {
       restaurants.push({
         id: restaurantId,
         name: restaurantName,
+        openingHours:
+          openingHoursMap[restaurantId] ?? openingHoursMap[tabTitle],
         lastUpdated,
         menus: [
           {

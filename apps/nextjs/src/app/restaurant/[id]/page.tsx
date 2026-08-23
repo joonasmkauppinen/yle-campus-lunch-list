@@ -10,6 +10,7 @@ import {
 } from "~/config/restaurants";
 import {
   formatDisplayDate,
+  getOpeningHoursForCurrentDay,
   getTodayFormattedString,
   isCurrentDate,
 } from "~/lib/dates";
@@ -151,6 +152,70 @@ export default async function RestaurantPage(props: RestaurantPageProps) {
                 </span>
               )}
             </div>
+            {(() => {
+              if (!restaurant.openingHours) return null;
+
+              const todayLunch = getOpeningHoursForCurrentDay(
+                restaurant.openingHours.lunchHours,
+              );
+              const todayOpen = getOpeningHoursForCurrentDay(
+                restaurant.openingHours.openHours,
+              );
+
+              if (!todayLunch && !todayOpen) return null;
+
+              let line1: { label?: string; value: string } | null = null;
+              let line2: { label?: string; value: string } | null = null;
+
+              if (todayLunch && todayLunch !== "Suljettu") {
+                line1 = { label: "Lounas", value: todayLunch };
+                if (
+                  todayOpen &&
+                  todayOpen !== "Suljettu" &&
+                  todayOpen !== todayLunch
+                ) {
+                  line2 = { label: "Avoinna", value: todayOpen };
+                }
+              } else if (todayOpen && todayOpen !== "Suljettu") {
+                line1 = { label: "Avoinna", value: todayOpen };
+                if (todayLunch === "Suljettu") {
+                  line2 = { label: "Lounas", value: "Suljettu" };
+                }
+              } else {
+                return (
+                  <div className="text-muted-foreground/80 mt-2.5 text-sm">
+                    <span>Suljettu tänään</span>
+                  </div>
+                );
+              }
+
+              return (
+                <div className="text-muted-foreground mt-2.5 flex flex-col gap-1.5 text-sm">
+                  <div className="font-medium">
+                    <span>
+                      {line1.label && (
+                        <span className="text-foreground font-semibold">
+                          {line1.label}:{" "}
+                        </span>
+                      )}
+                      {line1.value}
+                    </span>
+                  </div>
+                  {line2 && (
+                    <div className="opacity-90">
+                      <span>
+                        {line2.label && (
+                          <span className="text-foreground font-semibold">
+                            {line2.label}:{" "}
+                          </span>
+                        )}
+                        {line2.value}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
           </header>
 
           <div className="border-border bg-card flex flex-col rounded-md border p-6 shadow-sm">

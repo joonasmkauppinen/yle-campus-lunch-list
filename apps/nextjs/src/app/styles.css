@@ -16,7 +16,7 @@
 }
 
 @utility animate-fade-in {
-  animation: fadeIn 300ms ease-out 600ms both;
+  animation: fadeIn 300ms ease-out 300ms both;
 }
 
 @utility container {
