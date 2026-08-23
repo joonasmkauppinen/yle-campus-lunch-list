@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss xmlns:a10="http://www.w3.org/2005/Atom" version="2.0">
+  <channel>
+    <title>Linkki</title>
+    <link>https://www.compass-group.fi/menuapi/feed/rss/current-day?costNumber=3642&amp;language=fi</link>
+    <description>Linkki</description>
+    <a10:id>https://www.compass-group.fi/menuapi/feed/rss/current-day?costNumber=3642&amp;language=fi</a10:id>
+    <item>
+      <guid isPermaLink="false">https://www.compass-group.fi/ravintolat-ja-ruokalistat/foodco/kaupungit/helsinki/linkki/#21-08-2026</guid>
+      <link>https://www.compass-group.fi/ravintolat-ja-ruokalistat/foodco/kaupungit/helsinki/linkki/</link>
+      <title>Perjantai, 21-08-2026</title>
+      <description>&lt;p&gt;Lounas buffet 10&amp;euro;&lt;/p&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;p&gt;Bataattikeittoa (*, A, G, L)&lt;/p&gt;
+&lt;p&gt;Halloumi-kukkakaalikormaa (A, G, VS) ja Riisi&amp;auml; (G, L, M, Veg)&lt;/p&gt;
+&lt;p&gt;Uuniperunaa ja kylm&amp;auml;savukirjolohit&amp;auml;ytett&amp;auml; (A, L, G)&lt;/p&gt;
+&lt;p&gt;Kanaa Kiovan tapaan (A, L, VS) ja Chilimajoneesia (A, L, M, G)&lt;/p&gt;
+&lt;p&gt;Jogurttipannacottaa (A, G, L) ja Mustaherukkahilloketta (G, L, M, Veg)&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

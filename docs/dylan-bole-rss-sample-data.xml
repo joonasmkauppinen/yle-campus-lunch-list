@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+    <channel>
+        <title>Dylan Böle</title>
+        <link>https://lounastaja.app/api/v1/image/lunchlist/pdf/3aba0b64-0d43-41ea-b665-1d2d6c0f2d5e/2026/34/week-fi</link>
+        <description>Dylan Böle Lounaslista</description>
+        <lastBuildDate>Fri, 21 Aug 2026 16:33:00 GMT</lastBuildDate>
+        <language>fi</language>
+        <item>
+            <title><![CDATA[Perjantai 21.8.]]></title>
+            <link>https://lounastaja.app/api/v1/image/lunchlist/pdf/3aba0b64-0d43-41ea-b665-1d2d6c0f2d5e/2026/34/week-fi</link>
+            <guid isPermaLink="false">dylan-bole-2026-34-5</guid>
+            <pubDate>Fri, 21 Aug 2026 00:00:00 GMT</pubDate>
+            <description><![CDATA[Maapähkinävoilla höystetty kanakeitto M, G<br>Meksikolainen kasvis pihvi & lime-hummus V, G<br>Naudan sisäfileetä punaviinikastikkeella M, G<br>Kermaista savulohi perunalaatikkoa ja kevätsipulia (L, G)<br>Paahdettuja uunijuureksia & perunaa V, G<br>🧡Talon porkkanakakku L]]></description>
+        </item>
+    </channel>
+</rss>

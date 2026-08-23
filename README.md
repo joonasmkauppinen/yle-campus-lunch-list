@@ -5,7 +5,7 @@
 
 <p align="center">Find all Yleisradio campus lunch lists in one place.</p>
 
-<p align="center">Huoltamo · Studio 10 · Iso Paja · Akseli · Båx · Dylan Böle · Dylan Luft</p>
+<p align="center">Huoltamo · Piccolo · Iso Paja · Studio 10 · Pasilan Linkki · Päättäri · Akseli · Dylan Luft · Dylan Böle</p>
 
 ## Getting started
 
@@ -24,22 +24,55 @@ cd yle-campus-lunch-list
 Install dependencies:
 
 ```bash
-npm install
+pnpm install
 ```
+
+Configure environment variables:
+
+```bash
+cp .env.example .env
+```
+
+> Fill in the Google Sheets API Service Account credentials and Spreadsheet ID in `.env`.
 
 Start local development server:
 
 ```bash
-npm run dev
+# Run both Next.js frontend and Scraper in watch mode
+pnpm dev
+
+# Or run only the Next.js app
+pnpm dev:next
+
+# Or run the Scraper pipeline once / with custom date
+pnpm dev:scraper
+pnpm --filter @acme/scraper dev -- --date 2026-08-23
 ```
 
 ## Technologies
 
-- TypeScript
-- React/Next.js for frontend/backend.
-- Tailwind CSS for styling.
-- Vercel for deployment, hosting.
-- Cheerio for web scraping.
+- **Turborepo & pnpm**: High-performance monorepo workspace management.
+- **TypeScript**: End-to-end static typing across all packages.
+- **Next.js & React 19**: Modern App Router web application with ISR and server components.
+- **Tailwind CSS**: Modern, utility-first styling.
+- **Google Sheets API**: Cloud spreadsheet acting as the headless CMS and menu data store.
+- **Cheerio & RSS Parsers**: Automated web scraping and RSS feed ingestion.
+- **Vercel**: Production deployment, hosting, and edge network.
+
+## Project Structure
+
+```text
+apps
+  ├─ nextjs         # Next.js App Router frontend & API routes
+  └─ scraper        # CLI & scraper pipeline to fetch menus and sync with Google Sheets
+packages
+  └─ shared-types   # Shared TypeScript types and interfaces (Restaurant, MenuItem, etc.)
+tooling
+  ├─ eslint         # Shared ESLint configurations
+  ├─ prettier       # Shared Prettier configurations
+  ├─ tailwind       # Shared Tailwind CSS theme presets
+  └─ typescript     # Shared tsconfig bases
+```
 
 ## Resources
 
@@ -48,62 +81,75 @@ npm run dev
 - [Figma design layouts (view access)](https://www.figma.com/file/ckeATTSGr5adcHYNqHPORC/Yle-campus-lunch-menu?node-id=0%3A1)
 - [GH Actions](https://github.com/joonasmkauppinen/yle-campus-lunch-list/actions)
 
+## Scraper App
+
+The ingestion pipeline in [`apps/scraper`](./apps/scraper) is a standalone Node.js CLI tool responsible for fetching, parsing, and syncing daily restaurant menus to Google Sheets:
+
+- **Data Ingestion**: Scrapes HTML web pages with Cheerio, parses RSS XML feeds, and fetches JSON APIs.
+- **Date Handling**: Defaults to the current date in `Europe/Helsinki` timezone, or accepts a target date via CLI flag (`--date YYYY-MM-DD` / `-d YYYY-MM-DD`) or `TARGET_DATE` environment variable.
+- **Google Sheets Sync**: Authenticates via Google Service Account JWT and batch-writes dishes, dietary flags, and metadata into restaurant-specific tabs.
+- **Docker Support**: Includes a [`Dockerfile`](./apps/scraper/Dockerfile) for scheduled execution on servers.
+
 ## Production build
 
-Usually there is no need to build the project locally. But if you want to test the revalidate api endpoint, then the project needs to be built.
-
-Other than that, Vercel takes care of building the project during deployment.
+Usually there is no need to build the project locally, as Vercel handles builds on deployment. To build and test locally:
 
 Create optimized production build:
 
 ```bash
-npm run build
+pnpm build
 ```
 
 Run production build locally:
 
 ```bash
-npm run start
+pnpm --filter @acme/nextjs start
 ```
 
-## Page revalidation
+Run test suite:
 
-Revalidation is using [Next's on demand ISR feature](https://nextjs.org/docs/basic-features/data-fetching/incremental-static-regeneration#on-demand-revalidation-beta). The revalidation function is called in a custom api route. These are placed in the directory [`pages/api/revalidate/*`](./pages/api/revalidate).
+```bash
+pnpm test
+```
 
-Pages are revalidated every morning using a GitHub Action workflow, that is running a cron job. More details in the workflow file [`.github/workflows/revalidate-current-day-menus-cron.yml`](https://github.com/joonasmkauppinen/yle-campus-lunch-list/blob/main/.github/workflows/cron-revalidate-current-day-menus.yml).
+## Page revalidation & Data flow
 
-There's also a manual workflow that can be triggered by hand at any time. You'll find this workflow from the [actions tab in the repo](https://github.com/joonasmkauppinen/yle-campus-lunch-list/actions/workflows/manual-revalidate-current-day-menus.yml).
+1. **Scraping & Storage**: The scraper fetches menu data daily (or manually) from diverse sources and writes the formatted dishes to individual restaurant sheets in Google Sheets.
+2. **Next.js Caching**: The Next.js frontend reads menu data from Google Sheets using the Google Sheets API, cached with time-based ISR (`export const revalidate = 300`, revalidating every 5 minutes).
 
 ## Lunch list data sources
 
-### Huoltamo
+### Huoltamo, Piccolo & Studio 10 (Intra)
 
-Data is fetched from a JSON api.
-
-Here's the url:
-
-```
-https://script.googleusercontent.com/macros/echo?user_content_key=8_Hojcv_I_BlGjGda06PvU1KWuFi5qvjrSq-1bE7C871wg8R4fqOtT-bMW8OqwVTibBa--fpMCKhH0SpEkZzjKah5tV0LkAJOJmA1Yb3SEsKFZqtv3DaNYcMrmhZHmUMWojr9NvTBuBLhyHCd5hHa8bu5fFVouus5Uusevvd9ue_m99P9CRISwy5nwbG5arkJ72HagjQ2wtGw79pGckaDWOicyxNfte4jYDWplrerSAjPcvHkHgo4eLtr_JoMfb1e4HF6ZFtBovZOhVmZqbpbw&lib=Mj9QMBIRZJsNk6tjp-CZc2vk6ee82Q7eC
-```
-
-### Studio 10
-
-Data is scraped with Cheerio from url: https://gvcravintolat.fi/yle-studio10/
+Data is fetched from the Yle Intra Google Apps Script JSON API endpoint configured via `HUOLTAMO_API_URL`.
 
 ### Iso Paja
 
-Data is scraped with Cheerio from url: https://www.hhravintolat.fi/iso-paja-lounaslista
+Data is scraped with Cheerio from: [`https://www.hhravintolat.fi/iso-paja/`](https://www.hhravintolat.fi/iso-paja/)
 
-### Båx
+### Studio 10 (Website fallback)
 
-Data is scraped with Cheerio from url: https://www.kanresta.fi/ravintola/ravintola-bax/
+Direct website: [`https://nordrest.fi/restaurang/yle-studio10/#ruokalista`](https://nordrest.fi/restaurang/yle-studio10/#ruokalista)
 
-### Dylan
+### Akseli
 
-Data is fetched from a JSON api.
+Data is scraped with Cheerio from: [`https://www.ninankeittio.fi/helsinki-ilmala-akseli/#lounaslista`](https://www.ninankeittio.fi/helsinki-ilmala-akseli/#lounaslista)
 
-Here's the url:
+### Päättäri (formerly Båx)
 
-```
-https://europe-west1-luncher-7cf76.cloudfunctions.net/api/v1/widget/3aba0b64-0d43-41ea-b665-1d2d6c0f2d5e/t14n3kFql5hOkmcEsTVt
-```
+Data is scraped with Cheerio from: [`https://nordrest.fi/restaurang/ravintola-paattari/#ruokalista`](https://nordrest.fi/restaurang/ravintola-paattari/#ruokalista)
+
+### Dylan Luft
+
+Data is fetched from the Lounastaja RSS feed:
+`https://lounastaja.app/api/v1/rss/week/5843f3ec-6a2c-49ba-ba3e-b384f6c996f1/current?days=current&language=fi`
+
+### Dylan Böle
+
+Data is fetched from the Lounastaja RSS feed:
+`https://lounastaja.app/api/v1/rss/week/3aba0b64-0d43-41ea-b665-1d2d6c0f2d5e/current?days=current&language=fi`
+
+### Pasilan Linkki
+
+Data is fetched from the Compass Group RSS feed:
+`https://www.compass-group.fi/menuapi/feed/rss/current-day?costNumber=3642&language=fi`

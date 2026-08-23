@@ -1,0 +1,81 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "ui": "tui",
+  "tasks": {
+    "topo": {
+      "dependsOn": ["^topo"]
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [".cache/tsbuildinfo.json", "dist/**"]
+    },
+    "dev": {
+      "dependsOn": ["^dev"],
+      "cache": false,
+      "persistent": false
+    },
+    "format": {
+      "outputs": [".cache/.prettiercache"],
+      "outputLogs": "new-only"
+    },
+    "lint": {
+      "dependsOn": ["^topo", "^build"],
+      "outputs": [".cache/.eslintcache"]
+    },
+    "typecheck": {
+      "dependsOn": ["^topo", "^build"],
+      "outputs": [".cache/tsbuildinfo.json"]
+    },
+    "clean": {
+      "cache": false
+    },
+    "//#clean": {
+      "cache": false
+    },
+    "ui-add": {
+      "cache": false,
+      "interactive": true
+    }
+  },
+  "globalEnv": [
+    "DEV_GOOGLE_SHEETS_URL",
+    "GOOGLE_SHEETS_DEV_URL",
+    "DEV_GOOGLE_SHEETS_ID",
+    "GOOGLE_SHEETS_DEV_ID",
+    "GOOGLE_SHEETS_URL",
+    "GOOGLE_SHEETS_ID",
+    "GOOGLE_SERVICE_ACCOUNT_EMAIL",
+    "GOOGLE_PRIVATE_KEY",
+    "OLLAMA_API_URL",
+    "OLLAMA_MODEL",
+    "HUOLTAMO_API_URL",
+    "INTRA_API_URL",
+    "DYLAN_LUFT_RSS_URL",
+    "DYLAN_LUFT_URL",
+    "DYLAN_BOLE_RSS_URL",
+    "DYLAN_BOLE_URL",
+    "PASILAN_LINKKI_RSS_URL",
+    "PASILAN_LINKKI_URL",
+    "LINKKI_RSS_URL",
+    "ISO_PAJA_URL",
+    "ISO_PAJA_WEBSITE_URL",
+    "AKSELI_URL",
+    "AKSELI_WEBSITE_URL",
+    "PAATTARI_URL",
+    "PAATTARI_WEBSITE_URL",
+    "TARGET_DATE",
+    "DATE",
+    "SCRAPE_DATE",
+    "CAMPUS_BISTRO_URL",
+    "STUDENT_CANTEEN_URL",
+    "PORT"
+  ],
+  "globalPassThroughEnv": [
+    "NODE_ENV",
+    "CI",
+    "VERCEL",
+    "VERCEL_ENV",
+    "VERCEL_URL",
+    "npm_lifecycle_event"
+  ]
+}
