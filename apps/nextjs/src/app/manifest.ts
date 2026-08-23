@@ -6,7 +6,10 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: "Lounaslistat",
     description: "Päivittäiset lounaslistat Ylen kampusalueen ravintoloista.",
     start_url: "/",
+    id: "/",
+    scope: "/",
     display: "standalone",
+    orientation: "portrait",
     background_color: "#ffffff",
     theme_color: "#ffffff",
     icons: [

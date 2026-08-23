@@ -56,9 +56,16 @@ export const metadata: Metadata = {
   formatDetection: {
     telephone: false,
   },
+  other: {
+    "apple-mobile-web-app-capable": "yes",
+    "apple-touch-fullscreen": "yes",
+  },
   icons: {
     icon: "/favicon.ico",
     apple: [
+      {
+        url: "/icons/touch-icon-iphone-retina_180x180.png",
+      },
       {
         url: "/icons/touch-icon-iphone-retina_180x180.png",
         sizes: "180x180",
