@@ -58,7 +58,6 @@ export const metadata: Metadata = {
   },
   other: {
     "apple-mobile-web-app-capable": "yes",
-    "apple-touch-fullscreen": "yes",
   },
   icons: {
     icon: "/favicon.ico",
