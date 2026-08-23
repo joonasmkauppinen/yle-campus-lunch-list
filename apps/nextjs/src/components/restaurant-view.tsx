@@ -2,9 +2,10 @@
 
 import { useState, useSyncExternalStore } from "react";
 
-import type { Restaurant } from "@acme/shared-types";
+import type { DailyCategories, Restaurant } from "@acme/shared-types";
 
 import type { RestaurantPreferences } from "~/lib/preferences";
+import { CategorySuggestions } from "~/components/category-suggestions";
 import { EditRestaurantsModal } from "~/components/edit-restaurants-modal";
 import { RestaurantListItem } from "~/components/restaurant-list-item";
 import { Button } from "~/components/ui/button";
@@ -17,6 +18,7 @@ import {
 export interface RestaurantViewProps {
   restaurants: Restaurant[];
   todayStr: string;
+  dailyCategories?: DailyCategories | null;
   isDev?: boolean;
   source?: string | null;
 }
@@ -24,6 +26,7 @@ export interface RestaurantViewProps {
 export function RestaurantView({
   restaurants,
   todayStr,
+  dailyCategories,
   isDev,
   source,
 }: RestaurantViewProps) {
@@ -89,6 +92,11 @@ export function RestaurantView({
           )}
         </div>
       </header>
+
+      {/* Lunch category suggestions */}
+      {dailyCategories && (
+        <CategorySuggestions dailyCategories={dailyCategories} />
+      )}
 
       {/* Visible restaurants */}
       {visibleRestaurants.length === 0 && hiddenRestaurants.length > 0 ? (

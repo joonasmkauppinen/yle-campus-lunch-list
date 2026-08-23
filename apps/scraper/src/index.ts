@@ -2,6 +2,10 @@ import "./env.js";
 
 import { fileURLToPath } from "node:url";
 
+import type { ParsedMenuItem } from "@acme/shared-types";
+
+import type { RestaurantMenuAggregation } from "./categorizer/index.js";
+import { categorizeLunchMenus } from "./categorizer/index.js";
 import {
   AKSELI_RESTAURANT_ID,
   AKSELI_RESTAURANT_NAME,
@@ -39,7 +43,11 @@ import {
   PASILAN_LINKKI_RESTAURANT_NAME,
 } from "./fetchers/pasilan-linkki.js";
 import { triggerRevalidation } from "./revalidate.js";
-import { updateGoogleSheet, updateGoogleSheetOpeningHours } from "./sheets.js";
+import {
+  updateCategorySuggestionsGoogleSheet,
+  updateGoogleSheet,
+  updateGoogleSheetOpeningHours,
+} from "./sheets.js";
 
 /**
  * Resolves the target scraping date (YYYY-MM-DD) from CLI flags, env variables, or today in Europe/Helsinki.
@@ -89,6 +97,8 @@ async function main() {
     `=== Campus Lunch List Scraper Starting (Target Date: ${targetDate}) ===`,
   );
 
+  const aggregatedRestaurantMenus: RestaurantMenuAggregation[] = [];
+
   // 1. Intra Restaurants: Huoltamo, Studio 10, Piccolo (JSON API)
   console.log(
     "\nProcessing target: Intra Restaurants (Huoltamo, Studio 10, Piccolo)",
@@ -96,7 +106,12 @@ async function main() {
   try {
     const intraMenus = await fetchIntraMenus(targetDate);
     for (const restaurant of INTRA_RESTAURANTS) {
-      const menus = intraMenus[restaurant.id];
+      const menus: ParsedMenuItem[] = intraMenus[restaurant.id];
+      aggregatedRestaurantMenus.push({
+        restaurantId: restaurant.id,
+        restaurantName: restaurant.name,
+        menus,
+      });
       await updateGoogleSheet(
         restaurant.id,
         restaurant.name,
@@ -115,6 +130,11 @@ async function main() {
   console.log("\nProcessing target: Dylan Luft (RSS Feed)");
   try {
     const dylanLuftMenus = await fetchDylanLuftMenu(targetDate);
+    aggregatedRestaurantMenus.push({
+      restaurantId: DYLAN_LUFT_RESTAURANT_ID,
+      restaurantName: DYLAN_LUFT_RESTAURANT_NAME,
+      menus: dylanLuftMenus,
+    });
     await updateGoogleSheet(
       DYLAN_LUFT_RESTAURANT_ID,
       DYLAN_LUFT_RESTAURANT_NAME,
@@ -132,6 +152,11 @@ async function main() {
   console.log("\nProcessing target: Dylan Böle (RSS Feed)");
   try {
     const dylanBoleMenus = await fetchDylanBoleMenu(targetDate);
+    aggregatedRestaurantMenus.push({
+      restaurantId: DYLAN_BOLE_RESTAURANT_ID,
+      restaurantName: DYLAN_BOLE_RESTAURANT_NAME,
+      menus: dylanBoleMenus,
+    });
     await updateGoogleSheet(
       DYLAN_BOLE_RESTAURANT_ID,
       DYLAN_BOLE_RESTAURANT_NAME,
@@ -149,6 +174,11 @@ async function main() {
   console.log("\nProcessing target: Pasilan Linkki (RSS Feed)");
   try {
     const linkkiMenus = await fetchPasilanLinkkiMenu(targetDate);
+    aggregatedRestaurantMenus.push({
+      restaurantId: PASILAN_LINKKI_RESTAURANT_ID,
+      restaurantName: PASILAN_LINKKI_RESTAURANT_NAME,
+      menus: linkkiMenus,
+    });
     await updateGoogleSheet(
       PASILAN_LINKKI_RESTAURANT_ID,
       PASILAN_LINKKI_RESTAURANT_NAME,
@@ -166,6 +196,11 @@ async function main() {
   console.log("\nProcessing target: Iso Paja (Website Cheerio)");
   try {
     const isoPajaMenus = await fetchIsoPajaMenu(targetDate);
+    aggregatedRestaurantMenus.push({
+      restaurantId: ISO_PAJA_RESTAURANT_ID,
+      restaurantName: ISO_PAJA_RESTAURANT_NAME,
+      menus: isoPajaMenus,
+    });
     await updateGoogleSheet(
       ISO_PAJA_RESTAURANT_ID,
       ISO_PAJA_RESTAURANT_NAME,
@@ -183,6 +218,11 @@ async function main() {
   console.log("\nProcessing target: Akseli (Website Cheerio)");
   try {
     const akseliMenus = await fetchAkseliMenu(targetDate);
+    aggregatedRestaurantMenus.push({
+      restaurantId: AKSELI_RESTAURANT_ID,
+      restaurantName: AKSELI_RESTAURANT_NAME,
+      menus: akseliMenus,
+    });
     await updateGoogleSheet(
       AKSELI_RESTAURANT_ID,
       AKSELI_RESTAURANT_NAME,
@@ -200,6 +240,11 @@ async function main() {
   console.log("\nProcessing target: Päättäri (Website Cheerio)");
   try {
     const paattariMenus = await fetchPaattariMenu(targetDate);
+    aggregatedRestaurantMenus.push({
+      restaurantId: PAATTARI_RESTAURANT_ID,
+      restaurantName: PAATTARI_RESTAURANT_NAME,
+      menus: paattariMenus,
+    });
     await updateGoogleSheet(
       PAATTARI_RESTAURANT_ID,
       PAATTARI_RESTAURANT_NAME,
@@ -225,10 +270,31 @@ async function main() {
     console.error("Error processing opening hours:", error);
   }
 
-  // 9. Revalidate frontend cache (in production)
+  // 9. Lunch Category Suggestions Processing
+  console.log("\nProcessing target: Lunch Category Suggestions");
+  try {
+    const dailyCategories = await categorizeLunchMenus(
+      aggregatedRestaurantMenus,
+      targetDate,
+    );
+    console.log(
+      `Identified ${dailyCategories.categories.length} active categories for ${targetDate}:`,
+      dailyCategories.categories
+        .map((c) => `${c.label} (${c.items.length})`)
+        .join(", "),
+    );
+    await updateCategorySuggestionsGoogleSheet(
+      dailyCategories.categories,
+      targetDate,
+    );
+    console.log("Successfully updated Lunch Category Suggestions.");
+  } catch (error) {
+    console.error("Error processing Lunch Category Suggestions:", error);
+  }
+
+  // 10. Revalidate frontend cache (in production)
   console.log("\nTriggering on-demand frontend revalidation...");
   await triggerRevalidation();
-
   console.log("\n=== Campus Lunch List Scraper Finished ===");
 }
 

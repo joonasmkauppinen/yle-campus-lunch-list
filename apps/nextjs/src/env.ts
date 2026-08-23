@@ -21,6 +21,12 @@ export const env = createEnv({
     GOOGLE_SERVICE_ACCOUNT_EMAIL: z.string().optional(),
     GOOGLE_PRIVATE_KEY: z.string().optional(),
     REVALIDATION_SECRET: z.string().optional(),
+    GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_ID: z.string().optional(),
+    GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_URL: z.string().optional(),
+    DEV_GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_ID: z.string().optional(),
+    DEV_GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_URL: z.string().optional(),
+    GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_DEV_ID: z.string().optional(),
+    GOOGLE_SHEETS_CATEGORY_SUGGESTIONS_DEV_URL: z.string().optional(),
   },
   client: {
     // Client environment variables if needed

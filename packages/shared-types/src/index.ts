@@ -61,3 +61,37 @@ export type LegacyRestaurantMenus = Record<string, LegacyMenuItem[]>;
 export interface LegacyCurrentDayMenusResponse {
   restaurant: LegacyRestaurantMenus;
 }
+
+/**
+ * Category suggestions types for Issue #49
+ */
+export interface CategoryMatchItem {
+  restaurantId: string;
+  restaurantName: string;
+  item: string;
+  dietaryFlags?: string[];
+}
+
+export interface LunchCategory {
+  id: string; // e.g., "liha", "kala", "kana", "vege", "kasvis", "burgeri", "pizza", "aasialainen", "tex-mex"
+  label: string; // e.g., "Liha", "Kala", "Kana", "Vege", "Kasvis", "Burgeri", "Pizza", "Aasialainen", "Tex Mex"
+  icon: string; // e.g., "meat", "fish", "chicken", "vegan", "vege", "burger", "pizza", "asian", "texmex"
+  items: CategoryMatchItem[];
+}
+
+export interface DailyCategories {
+  date: string; // ISO format YYYY-MM-DD
+  lastUpdated: string; // ISO timestamp
+  categories: LunchCategory[];
+}
+
+export interface CategorySheetRow {
+  categoryId: string;
+  categoryLabel: string;
+  date: string;
+  restaurantId: string;
+  restaurantName: string;
+  item: string;
+  dietaryFlags: string;
+  lastUpdated: string;
+}
