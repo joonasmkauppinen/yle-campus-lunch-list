@@ -91,7 +91,7 @@ export function Footer() {
             </li>
             <li>
               <a
-                href="https://github.com/joonasmkauppinen/yle-campus-lunch-list-monorepo"
+                href="https://github.com/joonasmkauppinen/yle-campus-lunch-list"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-foreground inline-flex items-center gap-2 transition-colors hover:underline"
