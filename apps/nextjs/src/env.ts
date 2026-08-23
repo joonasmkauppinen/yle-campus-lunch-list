@@ -20,6 +20,7 @@ export const env = createEnv({
     GOOGLE_SHEETS_OPENING_HOURS_URL: z.string().optional(),
     GOOGLE_SERVICE_ACCOUNT_EMAIL: z.string().optional(),
     GOOGLE_PRIVATE_KEY: z.string().optional(),
+    REVALIDATION_SECRET: z.string().optional(),
   },
   client: {
     // Client environment variables if needed

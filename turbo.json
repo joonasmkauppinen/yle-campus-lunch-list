@@ -72,7 +72,10 @@
     "SCRAPE_DATE",
     "CAMPUS_BISTRO_URL",
     "STUDENT_CANTEEN_URL",
-    "PORT"
+    "PORT",
+    "REVALIDATION_SECRET",
+    "FRONTEND_URL",
+    "REVALIDATE_URL"
   ],
   "globalPassThroughEnv": [
     "NODE_ENV",
