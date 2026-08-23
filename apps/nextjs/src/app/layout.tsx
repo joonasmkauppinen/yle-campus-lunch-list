@@ -10,6 +10,72 @@ import "~/app/styles.css";
 export const metadata: Metadata = {
   title: "Lounaslistat",
   description: "Päivittäiset lounaslistat Ylen kampusalueen ravintoloista.",
+  applicationName: "Lounaslistat",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Lounaslistat",
+    startupImage: [
+      {
+        url: "/icons/apple_splash_2048.png",
+        media:
+          "(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)",
+      },
+      {
+        url: "/icons/apple_splash_1668.png",
+        media:
+          "(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2)",
+      },
+      {
+        url: "/icons/apple_splash_1536.png",
+        media:
+          "(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)",
+      },
+      {
+        url: "/icons/apple_splash_1242.png",
+        media:
+          "(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)",
+      },
+      {
+        url: "/icons/apple_splash_1125.png",
+        media:
+          "(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)",
+      },
+      {
+        url: "/icons/apple_splash_750.png",
+        media:
+          "(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)",
+      },
+      {
+        url: "/icons/apple_splash_640.png",
+        media:
+          "(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)",
+      },
+    ],
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  icons: {
+    icon: "/favicon.ico",
+    apple: [
+      {
+        url: "/icons/touch-icon-iphone-retina_180x180.png",
+        sizes: "180x180",
+        type: "image/png",
+      },
+      {
+        url: "/icons/touch-icon-ipad_152x152.png",
+        sizes: "152x152",
+        type: "image/png",
+      },
+      {
+        url: "/icons/touch-icon-ipad-retina_167x167.png",
+        sizes: "167x167",
+        type: "image/png",
+      },
+    ],
+  },
 };
 
 export const viewport: Viewport = {
