@@ -10,8 +10,8 @@ import { RESTAURANT_CONFIGS } from "~/config/restaurants";
 import { isCurrentDate } from "~/lib/dates";
 import { fetchRestaurantsFromGoogleSheets } from "~/lib/sheets";
 
-// Revalidation interval (5 minutes)
-export const revalidate = 300;
+// Revalidation interval (1 hour)
+export const revalidate = 3600;
 
 /**
  * Converts a kebab-case restaurant ID to camelCase (e.g. "iso-paja" -> "isoPaja", "studio-10" -> "studio10").
@@ -101,7 +101,7 @@ export async function GET() {
       status: 200,
       headers: {
         "Content-Type": "application/json",
-        "Cache-Control": "s-maxage=300, stale-while-revalidate=600",
+        "Cache-Control": "s-maxage=3600, stale-while-revalidate=7200",
       },
     });
   } catch (err) {

@@ -16,8 +16,8 @@ import {
 } from "~/lib/dates";
 import { fetchRestaurantsFromGoogleSheets } from "~/lib/sheets";
 
-// Configure Next.js ISR revalidation interval (5 minutes)
-export const revalidate = 300;
+// Configure Next.js ISR revalidation interval (1 hour)
+export const revalidate = 3600;
 
 interface RestaurantPageProps {
   params: Promise<{ id: string }>;
