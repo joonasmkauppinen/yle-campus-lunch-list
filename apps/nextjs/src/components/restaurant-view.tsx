@@ -111,38 +111,7 @@ export function RestaurantView({
           </Button>
         </div>
       ) : (
-        <>
-          {/* Mobile view: single column */}
-          <div className="flex flex-col gap-6 md:hidden">
-            {visibleRestaurants.map((restaurant) => (
-              <RestaurantListItem key={restaurant.id} restaurant={restaurant} />
-            ))}
-          </div>
-
-          {/* Desktop view: two-column masonry with alternating items */}
-          <div className="hidden gap-6 md:flex md:flex-row md:items-start">
-            <div className="flex flex-1 flex-col gap-6">
-              {visibleRestaurants
-                .filter((_, idx) => idx % 2 === 0)
-                .map((restaurant) => (
-                  <RestaurantListItem
-                    key={restaurant.id}
-                    restaurant={restaurant}
-                  />
-                ))}
-            </div>
-            <div className="flex flex-1 flex-col gap-6">
-              {visibleRestaurants
-                .filter((_, idx) => idx % 2 === 1)
-                .map((restaurant) => (
-                  <RestaurantListItem
-                    key={restaurant.id}
-                    restaurant={restaurant}
-                  />
-                ))}
-            </div>
-          </div>
-        </>
+        <RestaurantListMasonry restaurants={visibleRestaurants} />
       )}
 
       {/* Hidden restaurants section */}
@@ -164,36 +133,7 @@ export function RestaurantView({
             </span>
           </div>
 
-          {/* Mobile view: single column */}
-          <div className="flex flex-col gap-6 md:hidden">
-            {hiddenRestaurants.map((restaurant) => (
-              <RestaurantListItem key={restaurant.id} restaurant={restaurant} />
-            ))}
-          </div>
-
-          {/* Desktop view: two-column masonry with alternating items */}
-          <div className="hidden gap-6 md:flex md:flex-row md:items-start">
-            <div className="flex flex-1 flex-col gap-6">
-              {hiddenRestaurants
-                .filter((_, idx) => idx % 2 === 0)
-                .map((restaurant) => (
-                  <RestaurantListItem
-                    key={restaurant.id}
-                    restaurant={restaurant}
-                  />
-                ))}
-            </div>
-            <div className="flex flex-1 flex-col gap-6">
-              {hiddenRestaurants
-                .filter((_, idx) => idx % 2 === 1)
-                .map((restaurant) => (
-                  <RestaurantListItem
-                    key={restaurant.id}
-                    restaurant={restaurant}
-                  />
-                ))}
-            </div>
-          </div>
+          <RestaurantListMasonry restaurants={hiddenRestaurants} />
         </section>
       )}
 
@@ -204,6 +144,66 @@ export function RestaurantView({
           restaurants={restaurants}
         />
       )}
+    </>
+  );
+}
+
+interface RestaurantListMasonryProps {
+  restaurants: Restaurant[];
+}
+
+function RestaurantListMasonry({ restaurants }: RestaurantListMasonryProps) {
+  return (
+    <>
+      {/* Mobile view: single column */}
+      <div className="flex flex-col gap-6 md:hidden">
+        {restaurants.map((restaurant) => (
+          <RestaurantListItem key={restaurant.id} restaurant={restaurant} />
+        ))}
+      </div>
+
+      {/* Tablet / Medium view: two-column masonry with alternating items */}
+      <div className="hidden gap-6 md:flex md:flex-row md:items-start lg:hidden">
+        <div className="flex flex-1 flex-col gap-6">
+          {restaurants
+            .filter((_, idx) => idx % 2 === 0)
+            .map((restaurant) => (
+              <RestaurantListItem key={restaurant.id} restaurant={restaurant} />
+            ))}
+        </div>
+        <div className="flex flex-1 flex-col gap-6">
+          {restaurants
+            .filter((_, idx) => idx % 2 === 1)
+            .map((restaurant) => (
+              <RestaurantListItem key={restaurant.id} restaurant={restaurant} />
+            ))}
+        </div>
+      </div>
+
+      {/* Large desktop view: three-column masonry with alternating items */}
+      <div className="hidden gap-6 lg:flex lg:flex-row lg:items-start">
+        <div className="flex flex-1 flex-col gap-6">
+          {restaurants
+            .filter((_, idx) => idx % 3 === 0)
+            .map((restaurant) => (
+              <RestaurantListItem key={restaurant.id} restaurant={restaurant} />
+            ))}
+        </div>
+        <div className="flex flex-1 flex-col gap-6">
+          {restaurants
+            .filter((_, idx) => idx % 3 === 1)
+            .map((restaurant) => (
+              <RestaurantListItem key={restaurant.id} restaurant={restaurant} />
+            ))}
+        </div>
+        <div className="flex flex-1 flex-col gap-6">
+          {restaurants
+            .filter((_, idx) => idx % 3 === 2)
+            .map((restaurant) => (
+              <RestaurantListItem key={restaurant.id} restaurant={restaurant} />
+            ))}
+        </div>
+      </div>
     </>
   );
 }
