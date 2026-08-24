@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { google } from "googleapis";
 
 import type {
@@ -130,83 +131,88 @@ function formatRestaurantTitle(id: string): string {
     .join(" ");
 }
 
-export async function fetchOpeningHoursFromGoogleSheets(): Promise<
-  Record<string, RestaurantOpeningHours>
-> {
-  const { spreadsheetId } = getOpeningHoursSpreadsheetResolution();
-  const clientEmail = env.GOOGLE_SERVICE_ACCOUNT_EMAIL?.trim();
-  let privateKey = env.GOOGLE_PRIVATE_KEY;
+export const fetchOpeningHoursFromGoogleSheets = cache(
+  async function fetchOpeningHoursFromGoogleSheets(): Promise<
+    Record<string, RestaurantOpeningHours>
+  > {
+    const { spreadsheetId } = getOpeningHoursSpreadsheetResolution();
+    const clientEmail = env.GOOGLE_SERVICE_ACCOUNT_EMAIL?.trim();
+    let privateKey = env.GOOGLE_PRIVATE_KEY;
 
-  if (privateKey) {
-    privateKey = privateKey.trim();
-    if (
-      (privateKey.startsWith('"') && privateKey.endsWith('"')) ||
-      (privateKey.startsWith("'") && privateKey.endsWith("'"))
-    ) {
-      privateKey = privateKey.slice(1, -1);
+    if (privateKey) {
+      privateKey = privateKey.trim();
+      if (
+        (privateKey.startsWith('"') && privateKey.endsWith('"')) ||
+        (privateKey.startsWith("'") && privateKey.endsWith("'"))
+      ) {
+        privateKey = privateKey.slice(1, -1);
+      }
+      privateKey = privateKey.replace(/\\n/g, "\n");
     }
-    privateKey = privateKey.replace(/\\n/g, "\n");
-  }
 
-  if (!spreadsheetId || !clientEmail || !privateKey) {
-    return {};
-  }
-
-  try {
-    const auth = new google.auth.JWT({
-      email: clientEmail,
-      key: privateKey,
-      scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"],
-    });
-
-    const sheets = google.sheets({ version: "v4", auth });
-    const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
-    const sheetTitles = (spreadsheet.data.sheets ?? [])
-      .map((s) => s.properties?.title)
-      .filter((t): t is string => typeof t === "string" && t.length > 0);
-
-    const targetTab = sheetTitles.includes("opening-hours")
-      ? "opening-hours"
-      : sheetTitles[0];
-
-    if (!targetTab) {
+    if (!spreadsheetId || !clientEmail || !privateKey) {
       return {};
     }
 
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: `'${targetTab}'!A2:F`,
-    });
+    try {
+      const auth = new google.auth.JWT({
+        email: clientEmail,
+        key: privateKey,
+        scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"],
+      });
 
-    const rows = response.data.values ?? [];
-    const mapping: Record<string, RestaurantOpeningHours> = {};
+      const sheets = google.sheets({ version: "v4", auth });
+      const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
+      const sheetTitles = (spreadsheet.data.sheets ?? [])
+        .map((s) => s.properties?.title)
+        .filter((t): t is string => typeof t === "string" && t.length > 0);
 
-    for (const row of rows) {
-      const restaurantId = safeString(row[0]);
-      if (!restaurantId) continue;
+      const targetTab = sheetTitles.includes("opening-hours")
+        ? "opening-hours"
+        : sheetTitles[0];
 
-      const restaurantName = safeString(row[1]);
-      const openHours = safeString(row[2]);
-      const lunchHours = safeString(row[3]);
-      const rawText = safeString(row[4]);
-      const lastUpdated = safeString(row[5]) || new Date().toISOString();
+      if (!targetTab) {
+        return {};
+      }
 
-      mapping[restaurantId] = {
-        restaurantId,
-        restaurantName,
-        openHours: openHours || undefined,
-        lunchHours: lunchHours || undefined,
-        rawText: rawText || undefined,
-        lastUpdated,
-      };
+      const response = await sheets.spreadsheets.values.get({
+        spreadsheetId,
+        range: `'${targetTab}'!A2:F`,
+      });
+
+      const rows = response.data.values ?? [];
+      const mapping: Record<string, RestaurantOpeningHours> = {};
+
+      for (const row of rows) {
+        const restaurantId = safeString(row[0]);
+        if (!restaurantId) continue;
+
+        const restaurantName = safeString(row[1]);
+        const openHours = safeString(row[2]);
+        const lunchHours = safeString(row[3]);
+        const rawText = safeString(row[4]);
+        const lastUpdated = safeString(row[5]) || new Date().toISOString();
+
+        mapping[restaurantId] = {
+          restaurantId,
+          restaurantName,
+          openHours: openHours || undefined,
+          lunchHours: lunchHours || undefined,
+          rawText: rawText || undefined,
+          lastUpdated,
+        };
+      }
+
+      return mapping;
+    } catch (error) {
+      console.error(
+        "[Google Sheets] Error fetching opening hours data:",
+        error,
+      );
+      return {};
     }
-
-    return mapping;
-  } catch (error) {
-    console.error("[Google Sheets] Error fetching opening hours data:", error);
-    return {};
-  }
-}
+  },
+);
 
 export interface FetchResult {
   restaurants: Restaurant[];
@@ -216,181 +222,183 @@ export interface FetchResult {
   isDev: boolean;
 }
 
-export async function fetchRestaurantsFromGoogleSheets(): Promise<FetchResult> {
-  const { spreadsheetId, source, isDev } = getSpreadsheetResolution();
-  const clientEmail = env.GOOGLE_SERVICE_ACCOUNT_EMAIL?.trim();
-  let privateKey = env.GOOGLE_PRIVATE_KEY;
+export const fetchRestaurantsFromGoogleSheets = cache(
+  async function fetchRestaurantsFromGoogleSheets(): Promise<FetchResult> {
+    const { spreadsheetId, source, isDev } = getSpreadsheetResolution();
+    const clientEmail = env.GOOGLE_SERVICE_ACCOUNT_EMAIL?.trim();
+    let privateKey = env.GOOGLE_PRIVATE_KEY;
 
-  if (privateKey) {
-    privateKey = privateKey.trim();
-    if (
-      (privateKey.startsWith('"') && privateKey.endsWith('"')) ||
-      (privateKey.startsWith("'") && privateKey.endsWith("'"))
-    ) {
-      privateKey = privateKey.slice(1, -1);
+    if (privateKey) {
+      privateKey = privateKey.trim();
+      if (
+        (privateKey.startsWith('"') && privateKey.endsWith('"')) ||
+        (privateKey.startsWith("'") && privateKey.endsWith("'"))
+      ) {
+        privateKey = privateKey.slice(1, -1);
+      }
+      privateKey = privateKey.replace(/\\n/g, "\n");
     }
-    privateKey = privateKey.replace(/\\n/g, "\n");
-  }
 
-  if (!spreadsheetId) {
-    return {
-      restaurants: [],
-      error:
-        "Google Sheets ID is not configured. Please set GOOGLE_SHEETS_ID or DEV_GOOGLE_SHEETS_URL.",
-      isDev,
-    };
-  }
-
-  if (!clientEmail || !privateKey) {
-    return {
-      restaurants: [],
-      error:
-        "Google Service Account credentials (GOOGLE_SERVICE_ACCOUNT_EMAIL or GOOGLE_PRIVATE_KEY) are missing.",
-      resolvedSpreadsheetId: spreadsheetId,
-      source,
-      isDev,
-    };
-  }
-
-  try {
-    const auth = new google.auth.JWT({
-      email: clientEmail,
-      key: privateKey,
-      scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"],
-    });
-
-    const sheets = google.sheets({ version: "v4", auth });
-
-    // Concurrently fetch menu metadata and opening hours
-    const [spreadsheet, openingHoursMap] = await Promise.all([
-      sheets.spreadsheets.get({ spreadsheetId }),
-      fetchOpeningHoursFromGoogleSheets(),
-    ]);
-
-    const sheetTitles = (spreadsheet.data.sheets ?? [])
-      .map((s) => s.properties?.title)
-      .filter((t): t is string => typeof t === "string" && t.length > 0);
-
-    if (sheetTitles.length === 0) {
+    if (!spreadsheetId) {
       return {
         restaurants: [],
-        error: "Spreadsheet contains no sheet tabs.",
+        error:
+          "Google Sheets ID is not configured. Please set GOOGLE_SHEETS_ID or DEV_GOOGLE_SHEETS_URL.",
+        isDev,
+      };
+    }
+
+    if (!clientEmail || !privateKey) {
+      return {
+        restaurants: [],
+        error:
+          "Google Service Account credentials (GOOGLE_SERVICE_ACCOUNT_EMAIL or GOOGLE_PRIVATE_KEY) are missing.",
         resolvedSpreadsheetId: spreadsheetId,
         source,
         isDev,
       };
     }
 
-    const ranges = sheetTitles.map((title) => `'${title}'!A2:F`);
-    const batchResponse = await sheets.spreadsheets.values.batchGet({
-      spreadsheetId,
-      ranges,
-    });
+    try {
+      const auth = new google.auth.JWT({
+        email: clientEmail,
+        key: privateKey,
+        scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"],
+      });
 
-    const todayIsoDate = new Intl.DateTimeFormat("en-CA", {
-      timeZone: "Europe/Helsinki",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(new Date());
+      const sheets = google.sheets({ version: "v4", auth });
 
-    const restaurants: Restaurant[] = [];
-    const valueRanges = batchResponse.data.valueRanges ?? [];
+      // Concurrently fetch menu metadata and opening hours
+      const [spreadsheet, openingHoursMap] = await Promise.all([
+        sheets.spreadsheets.get({ spreadsheetId }),
+        fetchOpeningHoursFromGoogleSheets(),
+      ]);
 
-    for (let i = 0; i < sheetTitles.length; i++) {
-      const tabTitle = sheetTitles[i];
-      if (!tabTitle) continue;
+      const sheetTitles = (spreadsheet.data.sheets ?? [])
+        .map((s) => s.properties?.title)
+        .filter((t): t is string => typeof t === "string" && t.length > 0);
 
-      const valRange = valueRanges[i];
-      const rawRows = valRange?.values ?? [];
+      if (sheetTitles.length === 0) {
+        return {
+          restaurants: [],
+          error: "Spreadsheet contains no sheet tabs.",
+          resolvedSpreadsheetId: spreadsheetId,
+          source,
+          isDev,
+        };
+      }
 
-      if (rawRows.length === 0) {
-        // Tab exists but has no rows currently published
+      const ranges = sheetTitles.map((title) => `'${title}'!A2:F`);
+      const batchResponse = await sheets.spreadsheets.values.batchGet({
+        spreadsheetId,
+        ranges,
+      });
+
+      const todayIsoDate = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Europe/Helsinki",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }).format(new Date());
+
+      const restaurants: Restaurant[] = [];
+      const valueRanges = batchResponse.data.valueRanges ?? [];
+
+      for (let i = 0; i < sheetTitles.length; i++) {
+        const tabTitle = sheetTitles[i];
+        if (!tabTitle) continue;
+
+        const valRange = valueRanges[i];
+        const rawRows = valRange?.values ?? [];
+
+        if (rawRows.length === 0) {
+          // Tab exists but has no rows currently published
+          restaurants.push({
+            id: tabTitle,
+            name: formatRestaurantTitle(tabTitle),
+            openingHours: openingHoursMap[tabTitle],
+            lastUpdated: new Date().toISOString(),
+            menus: [
+              {
+                date: todayIsoDate,
+                items: [],
+              },
+            ],
+          });
+          continue;
+        }
+
+        // First valid row gives restaurant metadata
+        const firstRow = rawRows[0];
+        const rowRestaurantId = safeString(firstRow?.[0]);
+        const rowRestaurantName = safeString(firstRow?.[1]);
+        const rowMenuDate = safeString(firstRow?.[2]);
+        const rowLastUpdated = safeString(firstRow?.[5]);
+
+        const restaurantId =
+          rowRestaurantId.length > 0 ? rowRestaurantId : tabTitle;
+        const restaurantName =
+          rowRestaurantName.length > 0
+            ? rowRestaurantName
+            : formatRestaurantTitle(tabTitle);
+        const menuDate = rowMenuDate.length > 0 ? rowMenuDate : todayIsoDate;
+        const lastUpdated =
+          rowLastUpdated.length > 0 ? rowLastUpdated : new Date().toISOString();
+
+        const items: MenuItem[] = [];
+        for (const row of rawRows) {
+          const itemText = safeString(row[3]);
+          if (!itemText) continue;
+
+          const dietaryRaw = safeString(row[4]);
+          const dietaryFlags =
+            dietaryRaw.length > 0
+              ? dietaryRaw
+                  .split(",")
+                  .map((f) => f.trim())
+                  .filter((f) => f.length > 0)
+              : [];
+
+          items.push({
+            name: itemText,
+            dietaryFlags,
+          });
+        }
+
         restaurants.push({
-          id: tabTitle,
-          name: formatRestaurantTitle(tabTitle),
-          openingHours: openingHoursMap[tabTitle],
-          lastUpdated: new Date().toISOString(),
+          id: restaurantId,
+          name: restaurantName,
+          openingHours:
+            openingHoursMap[restaurantId] ?? openingHoursMap[tabTitle],
+          lastUpdated,
           menus: [
             {
-              date: todayIsoDate,
-              items: [],
+              date: menuDate,
+              items,
             },
           ],
         });
-        continue;
       }
 
-      // First valid row gives restaurant metadata
-      const firstRow = rawRows[0];
-      const rowRestaurantId = safeString(firstRow?.[0]);
-      const rowRestaurantName = safeString(firstRow?.[1]);
-      const rowMenuDate = safeString(firstRow?.[2]);
-      const rowLastUpdated = safeString(firstRow?.[5]);
-
-      const restaurantId =
-        rowRestaurantId.length > 0 ? rowRestaurantId : tabTitle;
-      const restaurantName =
-        rowRestaurantName.length > 0
-          ? rowRestaurantName
-          : formatRestaurantTitle(tabTitle);
-      const menuDate = rowMenuDate.length > 0 ? rowMenuDate : todayIsoDate;
-      const lastUpdated =
-        rowLastUpdated.length > 0 ? rowLastUpdated : new Date().toISOString();
-
-      const items: MenuItem[] = [];
-      for (const row of rawRows) {
-        const itemText = safeString(row[3]);
-        if (!itemText) continue;
-
-        const dietaryRaw = safeString(row[4]);
-        const dietaryFlags =
-          dietaryRaw.length > 0
-            ? dietaryRaw
-                .split(",")
-                .map((f) => f.trim())
-                .filter((f) => f.length > 0)
-            : [];
-
-        items.push({
-          name: itemText,
-          dietaryFlags,
-        });
-      }
-
-      restaurants.push({
-        id: restaurantId,
-        name: restaurantName,
-        openingHours:
-          openingHoursMap[restaurantId] ?? openingHoursMap[tabTitle],
-        lastUpdated,
-        menus: [
-          {
-            date: menuDate,
-            items,
-          },
-        ],
-      });
+      return {
+        restaurants,
+        resolvedSpreadsheetId: spreadsheetId,
+        source,
+        isDev,
+      };
+    } catch (error) {
+      console.error("[Google Sheets] Error fetching sheet data:", error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch menu data from Google Sheets.";
+      return {
+        restaurants: [],
+        error: errorMessage,
+        resolvedSpreadsheetId: spreadsheetId,
+        source,
+        isDev,
+      };
     }
-
-    return {
-      restaurants,
-      resolvedSpreadsheetId: spreadsheetId,
-      source,
-      isDev,
-    };
-  } catch (error) {
-    console.error("[Google Sheets] Error fetching sheet data:", error);
-    const errorMessage =
-      error instanceof Error
-        ? error.message
-        : "Failed to fetch menu data from Google Sheets.";
-    return {
-      restaurants: [],
-      error: errorMessage,
-      resolvedSpreadsheetId: spreadsheetId,
-      source,
-      isDev,
-    };
-  }
-}
+  },
+);

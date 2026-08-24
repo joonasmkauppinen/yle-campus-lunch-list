@@ -59,7 +59,7 @@ Other key directories:
 flowchart LR
     A[Restaurant Sources: API / RSS / HTML] -->|Scraper fetchers| B[apps/scraper CLI]
     B -->|JWT Auth & Batch Write| C[(Google Sheets CMS)]
-    C -->|JWT Auth & batchGet / ISR 300s| D[apps/nextjs App]
+    C -->|JWT Auth & batchGet / ISR 3600s| D[apps/nextjs App]
     D -->|Render UI / JSON API| E[End User / API Clients]
 ```
 

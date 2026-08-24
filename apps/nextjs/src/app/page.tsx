@@ -4,8 +4,8 @@ import { getSortedRestaurantsWithMetadata } from "~/config/restaurants";
 import { getTodayFormattedString } from "~/lib/dates";
 import { fetchRestaurantsFromGoogleSheets } from "~/lib/sheets";
 
-// Configure Next.js ISR revalidation interval (5 minutes)
-export const revalidate = 300;
+// Configure Next.js ISR revalidation interval (1 hour)
+export const revalidate = 3600;
 
 export default async function HomePage() {
   const {

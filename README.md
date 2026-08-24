@@ -115,7 +115,7 @@ pnpm test
 ## Page revalidation & Data flow
 
 1. **Scraping & Storage**: The scraper fetches menu data daily (or manually) from diverse sources and writes the formatted dishes to individual restaurant sheets in Google Sheets.
-2. **Next.js Caching**: The Next.js frontend reads menu data from Google Sheets using the Google Sheets API, cached with time-based ISR (`export const revalidate = 300`, revalidating every 5 minutes).
+2. **Next.js Caching**: The Next.js frontend reads menu data from Google Sheets using the Google Sheets API, cached with time-based ISR (`export const revalidate = 3600`, revalidating every 1 hour).
 
 ## Lunch list data sources
 
