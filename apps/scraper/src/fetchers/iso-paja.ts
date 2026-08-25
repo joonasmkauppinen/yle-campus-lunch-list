@@ -9,10 +9,27 @@ export const ISO_PAJA_RESTAURANT_NAME = "Iso Paja";
 export const ISO_PAJA_DEFAULT_URL = "https://www.hhravintolat.fi/iso-paja/";
 
 /**
+ * Regex for matching Iso Paja menu category subtitles.
+ */
+export const ISO_PAJA_SUBTITLE_REGEX =
+  /^(buffet\s*menu|vege\s*menu|kasvis\s*menu|street\s*kitchen|aamupuuro|puuroaamiainen)$/i;
+
+/**
  * Regex for filtering out general category headings or boilerplate in HH-ravintolat (Iso Paja) pages.
  */
 export const ISO_PAJA_BOILERPLATE_REGEX =
-  /^(buffet\s*menu|vege\s*menu|kasvis\s*menu|street\s*kitchen|aamupuuro|puuroaamiainen|lounas\s*buffet|lounas|salaatti-?deli|h[äa]vikkimyynti)$/i;
+  /^(lounas\s*buffet|lounas|salaatti-?deli|h[äa]vikkimyynti)$/i;
+
+/**
+ * Normalizes subtitle heading strings to standardized uppercase display titles.
+ */
+export function normalizeIsoPajaSubtitle(text: string): string {
+  if (/^buffet\s*menu$/i.test(text)) return "BUFFET MENU";
+  if (/^(vege\s*menu|kasvis\s*menu)$/i.test(text)) return "VEGE MENU";
+  if (/^street\s*kitchen$/i.test(text)) return "STREET KITCHEN";
+  if (/^(aamupuuro|puuroaamiainen)$/i.test(text)) return "AAMUPUURO";
+  return text.toUpperCase();
+}
 
 /**
  * Decodes HTML entities commonly found in Iso Paja web pages.
@@ -36,18 +53,27 @@ export function decodeHtmlEntities(str: string): string {
 }
 
 /**
- * Parses an individual dish line from Iso Paja menu content.
+ * Parses an individual dish line or subtitle from Iso Paja menu content.
  */
 export function parseIsoPajaLine(
   rawLine: string,
   targetDate: string,
-  currentCategory = "",
+  _currentCategory = "",
 ): ParsedMenuItem | null {
   const cleaned = decodeHtmlEntities(rawLine)
     .replace(/\u00a0/g, " ")
     .trim();
   if (!cleaned || ISO_PAJA_BOILERPLATE_REGEX.test(cleaned)) {
     return null;
+  }
+
+  // If this line is a category subtitle (Buffet Menu, Vege Menu, Street Kitchen, Aamupuuro), return it as a menu item
+  if (ISO_PAJA_SUBTITLE_REGEX.test(cleaned)) {
+    return {
+      date: targetDate,
+      item: normalizeIsoPajaSubtitle(cleaned),
+      dietaryFlags: [],
+    };
   }
 
   // Extract parenthesized dietary flags: e.g. (L, G), (Ve), (VL), (M, G)
@@ -80,14 +106,6 @@ export function parseIsoPajaLine(
     .trim();
 
   if (!itemName) return null;
-
-  // If this item is under the Aamupuuro / porridge section, prefix it for clarity
-  if (
-    currentCategory.toLowerCase().includes("puuro") &&
-    !itemName.toLowerCase().startsWith("aamupuuro")
-  ) {
-    itemName = `Aamupuuro: ${itemName}`;
-  }
 
   return {
     date: targetDate,
@@ -157,8 +175,11 @@ export function parseIsoPajaHtml(
         if (!lineText) continue;
 
         if (ISO_PAJA_BOILERPLATE_REGEX.test(lineText)) {
-          currentCategory = lineText;
           continue;
+        }
+
+        if (ISO_PAJA_SUBTITLE_REGEX.test(lineText)) {
+          currentCategory = lineText;
         }
 
         const parsed = parseIsoPajaLine(lineText, dayIso, currentCategory);
