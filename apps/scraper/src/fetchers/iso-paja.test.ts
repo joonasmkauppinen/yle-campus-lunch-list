@@ -54,12 +54,39 @@ void describe("iso-paja fetcher", () => {
     assert.equal(extractIsoPajaHeadingDate("Ravintola Iso Paja"), null);
   });
 
-  void it("parseIsoPajaLine handles dishes, dietary flags, and boilerplate", () => {
-    // Boilerplate headers should return null
-    assert.equal(parseIsoPajaLine("Buffet Menu", "2026-08-24"), null);
-    assert.equal(parseIsoPajaLine("Vege Menu", "2026-08-24"), null);
-    assert.equal(parseIsoPajaLine("Street Kitchen", "2026-08-24"), null);
-    assert.equal(parseIsoPajaLine("Aamupuuro", "2026-08-24"), null);
+  void it("parseIsoPajaLine handles dishes, dietary flags, subtitles, and boilerplate", () => {
+    // Category subtitles should return menu items with empty dietary flags and uppercase text
+    assert.deepEqual(parseIsoPajaLine("Buffet Menu", "2026-08-24"), {
+      date: "2026-08-24",
+      item: "BUFFET MENU",
+      dietaryFlags: [],
+    });
+    assert.deepEqual(parseIsoPajaLine("Vege Menu", "2026-08-24"), {
+      date: "2026-08-24",
+      item: "VEGE MENU",
+      dietaryFlags: [],
+    });
+    assert.deepEqual(parseIsoPajaLine("Kasvis Menu", "2026-08-24"), {
+      date: "2026-08-24",
+      item: "VEGE MENU",
+      dietaryFlags: [],
+    });
+    assert.deepEqual(parseIsoPajaLine("Street Kitchen", "2026-08-24"), {
+      date: "2026-08-24",
+      item: "STREET KITCHEN",
+      dietaryFlags: [],
+    });
+    assert.deepEqual(parseIsoPajaLine("Aamupuuro", "2026-08-24"), {
+      date: "2026-08-24",
+      item: "AAMUPUURO",
+      dietaryFlags: [],
+    });
+
+    // Actual boilerplate should return null
+    assert.equal(parseIsoPajaLine("Lounas buffet", "2026-08-24"), null);
+    assert.equal(parseIsoPajaLine("Lounas", "2026-08-24"), null);
+    assert.equal(parseIsoPajaLine("Salaatti-deli", "2026-08-24"), null);
+    assert.equal(parseIsoPajaLine("Hävikkimyynti", "2026-08-24"), null);
     assert.equal(parseIsoPajaLine("&nbsp;", "2026-08-24"), null);
 
     // Parenthesized dietary flags with extra note
@@ -95,7 +122,7 @@ void describe("iso-paja fetcher", () => {
       dietaryFlags: ["Ve", "G"],
     });
 
-    // Porridge with category prefix
+    // Porridge line under Aamupuuro section
     const item4 = parseIsoPajaLine(
       "Kaurapuuro (Ve, G)",
       "2026-08-24",
@@ -103,50 +130,72 @@ void describe("iso-paja fetcher", () => {
     );
     assert.deepEqual(item4, {
       date: "2026-08-24",
-      item: "Aamupuuro: Kaurapuuro",
+      item: "Kaurapuuro",
       dietaryFlags: ["Ve", "G"],
     });
   });
 
-  void it("parseIsoPajaHtml extracts all items for Monday 2026-08-24", () => {
+  void it("parseIsoPajaHtml extracts all items and uppercase subtitles for Monday 2026-08-24", () => {
     const items = parseIsoPajaHtml(SAMPLE_HTML, "2026-08-24");
-    assert.equal(items.length, 10);
+    assert.equal(items.length, 13);
     assert.deepEqual(items[0], {
+      date: "2026-08-24",
+      item: "BUFFET MENU",
+      dietaryFlags: [],
+    });
+    assert.deepEqual(items[1], {
       date: "2026-08-24",
       item: "Pekoninen jauhelihapihvi – gluteeniton saatavilla",
       dietaryFlags: ["L"],
     });
-    assert.deepEqual(items[1], {
+    assert.deepEqual(items[2], {
       date: "2026-08-24",
       item: "Kanttarellikastiketta",
       dietaryFlags: ["L", "G"],
     });
-    assert.deepEqual(items[9], {
+    assert.deepEqual(items[6], {
       date: "2026-08-24",
-      item: "Aamupuuro: Kaurapuuro",
+      item: "VEGE MENU",
+      dietaryFlags: [],
+    });
+    assert.deepEqual(items[11], {
+      date: "2026-08-24",
+      item: "AAMUPUURO",
+      dietaryFlags: [],
+    });
+    assert.deepEqual(items[12], {
+      date: "2026-08-24",
+      item: "Kaurapuuro",
       dietaryFlags: ["Ve", "G"],
     });
   });
 
-  void it("parseIsoPajaHtml extracts all items for Tuesday 2026-08-25", () => {
+  void it("parseIsoPajaHtml extracts all items including uppercase Street Kitchen for Tuesday 2026-08-25", () => {
     const items = parseIsoPajaHtml(SAMPLE_HTML, "2026-08-25");
-    assert.ok(items.length >= 7);
+    assert.ok(items.length >= 10);
     const dishNames = items.map((i) => i.item);
+    assert.ok(dishNames.includes("BUFFET MENU"));
     assert.ok(dishNames.includes("Tandoorikanaa"));
     assert.ok(dishNames.includes("Paahdettua Naanleipää"));
+    assert.ok(dishNames.includes("VEGE MENU"));
+    assert.ok(dishNames.includes("STREET KITCHEN"));
     assert.ok(dishNames.includes("Italian burgeri"));
     assert.ok(dishNames.includes("Ranskalaiset"));
-    assert.ok(dishNames.includes("Aamupuuro: Mannapuuro"));
+    assert.ok(dishNames.includes("AAMUPUURO"));
+    assert.ok(dishNames.includes("Mannapuuro"));
   });
 
   void it("parseIsoPajaHtml extracts all items for Friday 2026-08-28", () => {
     const items = parseIsoPajaHtml(SAMPLE_HTML, "2026-08-28");
-    assert.ok(items.length >= 8);
+    assert.ok(items.length >= 10);
     const dishNames = items.map((i) => i.item);
+    assert.ok(dishNames.includes("BUFFET MENU"));
     assert.ok(dishNames.includes("Chorizopyöryköitä"));
     assert.ok(dishNames.includes("Broilerin koipinuijat"));
+    assert.ok(dishNames.includes("VEGE MENU"));
     assert.ok(dishNames.includes("Jäätelö"));
-    assert.ok(dishNames.includes("Aamupuuro: Neljänviljanpuuro"));
+    assert.ok(dishNames.includes("AAMUPUURO"));
+    assert.ok(dishNames.includes("Neljänviljanpuuro"));
   });
 
   void it("handles non-matching dates and malformed HTML gracefully", () => {
