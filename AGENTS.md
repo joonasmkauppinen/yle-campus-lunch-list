@@ -97,6 +97,15 @@ The project reads variables from root `.env` (or `.env.local` / `.env.developmen
 
 > **Dev vs. Prod Sheet Resolution**: In non-production environments (`NODE_ENV !== "production"`), both the frontend and scraper automatically prioritize `DEV_GOOGLE_SHEETS_URL` / `DEV_GOOGLE_SHEETS_ID` if defined.
 
+### Working in Git Worktrees
+When working inside a separate Git worktree (e.g., created under `.gemini/antigravity/worktrees/...`), Git does not automatically copy untracked files like `.env` or `.env.local`.
+- When an agent or developer starts work in a new worktree, verify whether `.env` exists in the worktree root.
+- If missing, find the main repository path via `git worktree list` and copy the environment files over:
+  ```bash
+  # Example: Find main repo path from `git worktree list` and copy .env files
+  cp <main-repo-path>/.env* .
+  ```
+
 ---
 
 ## 6. Development Commands & Workflows
