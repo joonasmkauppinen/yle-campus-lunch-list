@@ -44,7 +44,11 @@ pnpm dev
 # Or run only the Next.js app
 pnpm dev:next
 
-# Or run the Scraper pipeline once / with custom date
+# Or run the Scraper in dry-run mode (safe for testing — skips Google Sheets writes)
+pnpm dev:scraper:dry-run
+pnpm --filter @acme/scraper dev -- --dry-run --date 2026-08-23
+
+# Or run the Scraper pipeline against Google Sheets
 pnpm dev:scraper
 pnpm --filter @acme/scraper dev -- --date 2026-08-23
 ```
@@ -87,6 +91,7 @@ The ingestion pipeline in [`apps/scraper`](./apps/scraper) is a standalone Node.
 
 - **Data Ingestion**: Scrapes HTML web pages with Cheerio, parses RSS XML feeds, and fetches JSON APIs.
 - **Date Handling**: Defaults to the current date in `Europe/Helsinki` timezone, or accepts a target date via CLI flag (`--date YYYY-MM-DD` / `-d YYYY-MM-DD`) or `TARGET_DATE` environment variable.
+- **Dry Run Mode**: Accepts `--dry-run` (or `-n` / `DRY_RUN=true`) to parse all menus and output payloads to console without updating Google Sheets or consuming Google Cloud quota.
 - **Google Sheets Sync**: Authenticates via Google Service Account JWT and batch-writes dishes, dietary flags, and metadata into restaurant-specific tabs.
 - **Docker Support**: Includes a [`Dockerfile`](./apps/scraper/Dockerfile) for scheduled execution on servers.
 
