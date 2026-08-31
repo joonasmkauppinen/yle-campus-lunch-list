@@ -7,8 +7,10 @@
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "dev": "tsx src/index.ts",
     "dev:dry-run": "tsx src/index.ts --dry-run",
-    "format": "prettier --check . --ignore-path ../../.gitignore",
-    "lint": "eslint --flag unstable_native_nodejs_ts_config",
+    "format": "oxfmt --check .",
+    "format:fix": "oxfmt .",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
     "start": "tsx src/index.ts",
     "test": "tsx --test 'src/**/*.test.ts'",
     "typecheck": "tsc --noEmit"
@@ -25,6 +27,8 @@
     "@acme/tsconfig": "workspace:*",
     "@types/node": "catalog:",
     "eslint": "catalog:",
+    "oxfmt": "catalog:",
+    "oxlint": "catalog:",
     "prettier": "catalog:",
     "tsx": "catalog:",
     "typescript": "catalog:"

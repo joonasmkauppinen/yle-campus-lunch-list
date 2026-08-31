@@ -41,7 +41,7 @@ Other key directories:
 
 | Layer | Technologies / Libraries |
 | --- | --- |
-| **Package Manager** | `pnpm` 10.19.0 (with pnpm catalogs for React 19, TS, ESLint, Tailwind) |
+| **Package Manager** | `pnpm` 10.19.0 (with pnpm catalogs for React 19, TS, ESLint, Tailwind, Oxlint/Oxfmt) |
 | **Monorepo Engine** | `turbo` 2.5.8 |
 | **Language & Runtime**| Node.js `24.x` (ESM modules), TypeScript `^5.9.3` |
 | **Frontend Framework**| `next` ^16.0.9, `react` 19.1.4, `react-dom` 19.1.4 |
@@ -49,7 +49,7 @@ Other key directories:
 | **Env Validation** | `@t3-oss/env-nextjs`, `zod` |
 | **Data Ingestion** | `googleapis` ^144.0.0, `cheerio` ^1.0.0, native `fetch` |
 | **Test Runner** | Node.js native test runner via `tsx --test` |
-| **Linting & Formatting**| ESLint 9 (flat config), Prettier with sort-imports and tailwindcss plugins, Sherif monorepo linter |
+| **Linting & Formatting**| Oxlint (ultra-fast Rust linter) & ESLint 9, Oxfmt (Rust formatter with Tailwind sorting) & Prettier, Sherif monorepo linter |
 
 ---
 
@@ -142,19 +142,19 @@ pnpm --filter @acme/scraper dev -- --date 2026-08-24
 # Type check all packages
 pnpm typecheck
 
-# Lint with ESLint
+# Lint with Oxlint
 pnpm lint
 
-# Fix ESLint issues
+# Fix Oxlint issues
 pnpm lint:fix
 
 # Check monorepo dependencies consistency (Sherif)
 pnpm lint:ws
 
-# Check code formatting with Prettier
+# Check code formatting with Oxfmt
 pnpm format
 
-# Auto-format all code
+# Auto-format all code with Oxfmt
 pnpm format:fix
 
 # Run scraper unit tests
@@ -277,7 +277,7 @@ Structure UI components following Atomic Design principles to maintain modularit
 6. **No Secret Leaks**:
    - Never commit raw private keys, service account JSON files, or production `.env` files. Ensure secrets are referenced only via environment variables.
 7. **Code Style**:
-   - Use Prettier and ESLint presets provided by `@acme/prettier-config` and `@acme/eslint-config`.
+   - Use Oxfmt and Oxlint presets configured in `.oxfmtrc.json` and `.oxlintrc.json` (with Prettier and ESLint as secondary tooling).
    - Run `pnpm format:fix` and `pnpm lint:fix` if formatting or linting checks fail.
 
 ---
