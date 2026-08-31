@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 
 import type { Restaurant } from "@acme/shared-types";
 
+import robots from "../app/robots";
 import {
   generateHomeJsonLd,
   generateRestaurantJsonLd,
@@ -91,5 +92,14 @@ void describe("SEO utilities", () => {
     assert.equal(schemas.length, 2);
     assert.equal(schemas[0]?.["@type"], "WebSite");
     assert.equal(schemas[1]?.["@type"], "ItemList");
+  });
+
+  void it("robots disallows /radiator and /api/ paths", () => {
+    const robotsResult = robots();
+    assert.deepEqual(robotsResult.rules, {
+      userAgent: "*",
+      allow: "/",
+      disallow: ["/api/", "/radiator"],
+    });
   });
 });

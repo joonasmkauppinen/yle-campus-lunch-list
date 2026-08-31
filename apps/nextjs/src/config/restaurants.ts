@@ -120,11 +120,6 @@ export const RESTAURANT_CONFIGS: RestaurantConfig[] = [
       street: "Ilmalanrinne 1 A",
     },
   },
-  {
-    id: "dylan-la-ilma",
-    name: "Dylan La Ilma",
-    websiteUrl: "https://www.dylan.fi/lailma",
-  },
 ];
 
 /**
