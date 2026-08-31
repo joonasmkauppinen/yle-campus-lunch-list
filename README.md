@@ -5,7 +5,7 @@
 
 <p align="center">Find all Yleisradio campus lunch lists in one place.</p>
 
-<p align="center">Huoltamo · Piccolo · Iso Paja · Studio 10 · Pasilan Linkki · Päättäri · Akseli · Dylan Luft · Dylan Böle</p>
+<p align="center">Huoltamo · Piccolo · Iso Paja · Studio 10 · Pasilan Linkki · Päättäri · Akseli · Dylan Luft · Dylan Böle · Dylan La Ilma</p>
 
 ## Getting started
 
@@ -154,7 +154,13 @@ Data is fetched from the Lounastaja RSS feed:
 Data is fetched from the Lounastaja RSS feed:
 `https://lounastaja.app/api/v1/rss/week/3aba0b64-0d43-41ea-b665-1d2d6c0f2d5e/current?days=current&language=fi`
 
+### Dylan La Ilma
+
+Data is fetched from the Lounastaja RSS feed:
+`https://lounastaja.app/api/v1/rss/week/70835b81-ec1f-443f-92bb-9832d21fb3af/current?days=current&language=fi`
+
 ### Pasilan Linkki
 
 Data is fetched from the Compass Group RSS feed:
 `https://www.compass-group.fi/menuapi/feed/rss/current-day?costNumber=3642&language=fi`
+

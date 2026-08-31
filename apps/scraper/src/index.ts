@@ -13,6 +13,11 @@ import {
   fetchDylanBoleMenu,
 } from "./fetchers/dylan-bole.js";
 import {
+  DYLAN_LA_ILMA_RESTAURANT_ID,
+  DYLAN_LA_ILMA_RESTAURANT_NAME,
+  fetchDylanLaIlmaMenu,
+} from "./fetchers/dylan-la-ilma.js";
+import {
   DYLAN_LUFT_RESTAURANT_ID,
   DYLAN_LUFT_RESTAURANT_NAME,
   fetchDylanLuftMenu,
@@ -184,7 +189,25 @@ async function main() {
     console.error("Error processing Dylan Böle:", error);
   }
 
-  // 4. Pasilan Linkki (RSS Feed)
+  // 4. Dylan La Ilma (RSS Feed)
+  console.log("\nProcessing target: Dylan La Ilma (RSS Feed)");
+  try {
+    const dylanLaIlmaMenus = await fetchDylanLaIlmaMenu(targetDate);
+    await updateGoogleSheet(
+      DYLAN_LA_ILMA_RESTAURANT_ID,
+      DYLAN_LA_ILMA_RESTAURANT_NAME,
+      dylanLaIlmaMenus,
+      targetDate,
+      { dryRun: isDryRun },
+    );
+    console.log(
+      `Successfully completed scraping for ${DYLAN_LA_ILMA_RESTAURANT_NAME} (${DYLAN_LA_ILMA_RESTAURANT_ID})`,
+    );
+  } catch (error) {
+    console.error("Error processing Dylan La Ilma:", error);
+  }
+
+  // 5. Pasilan Linkki (RSS Feed)
   console.log("\nProcessing target: Pasilan Linkki (RSS Feed)");
   try {
     const linkkiMenus = await fetchPasilanLinkkiMenu(targetDate);
@@ -202,7 +225,7 @@ async function main() {
     console.error("Error processing Pasilan Linkki:", error);
   }
 
-  // 5. Iso Paja (Website Cheerio)
+  // 6. Iso Paja (Website Cheerio)
   console.log("\nProcessing target: Iso Paja (Website Cheerio)");
   try {
     const isoPajaMenus = await fetchIsoPajaMenu(targetDate);
@@ -220,7 +243,7 @@ async function main() {
     console.error("Error processing Iso Paja:", error);
   }
 
-  // 6. Akseli (Website Cheerio)
+  // 7. Akseli (Website Cheerio)
   console.log("\nProcessing target: Akseli (Website Cheerio)");
   try {
     const akseliMenus = await fetchAkseliMenu(targetDate);
@@ -238,7 +261,7 @@ async function main() {
     console.error("Error processing Akseli:", error);
   }
 
-  // 7. Päättäri (Website Cheerio)
+  // 8. Päättäri (Website Cheerio)
   console.log("\nProcessing target: Päättäri (Website Cheerio)");
   try {
     const paattariMenus = await fetchPaattariMenu(targetDate);
@@ -256,7 +279,7 @@ async function main() {
     console.error("Error processing Päättäri:", error);
   }
 
-  // 8. Opening Hours (All restaurants)
+  // 9. Opening Hours (All restaurants)
   console.log("\nProcessing target: Restaurant Opening Hours");
   try {
     const openingHours = await fetchAllOpeningHours();

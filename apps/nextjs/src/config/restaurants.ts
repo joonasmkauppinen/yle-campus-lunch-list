@@ -63,6 +63,11 @@ export const RESTAURANT_CONFIGS: RestaurantConfig[] = [
     name: "Dylan Böle",
     websiteUrl: "https://www.dylan.fi/bole",
   },
+  {
+    id: "dylan-la-ilma",
+    name: "Dylan La Ilma",
+    websiteUrl: "https://www.dylan.fi/lailma",
+  },
 ];
 
 /**

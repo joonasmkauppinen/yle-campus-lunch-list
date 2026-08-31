@@ -6,7 +6,7 @@ This document provides context, architecture details, conventions, and operation
 
 ## 1. Project Overview
 
-**Yle Campus Lunch List** (`yle-campus-lunch-list`) is a monorepo application that aggregates, normalizes, and displays daily lunch menus from campus restaurants around Yleisradio (Huoltamo, Piccolo, Iso Paja, Studio 10, Pasilan Linkki, Päättäri, Akseli, Dylan Luft, Dylan Böle) in Helsinki, Finland.
+**Yle Campus Lunch List** (`yle-campus-lunch-list`) is a monorepo application that aggregates, normalizes, and displays daily lunch menus from campus restaurants around Yleisradio (Huoltamo, Piccolo, Iso Paja, Studio 10, Pasilan Linkki, Päättäri, Akseli, Dylan Luft, Dylan Böle, Dylan La Ilma) in Helsinki, Finland.
 
 ### Key Characteristics
 - **Headless CMS / Data Store**: Google Sheets API acts as the data store.
