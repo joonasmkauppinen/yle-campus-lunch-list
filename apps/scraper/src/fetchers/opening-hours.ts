@@ -362,6 +362,47 @@ export function parseDylanBoleOpeningHours(
 }
 
 /**
+ * Parses Dylan La Ilma opening and lunch hours from Dylan website.
+ */
+export function parseDylanLaIlmaOpeningHours(
+  html: string,
+): RestaurantOpeningHours {
+  const lastUpdated = new Date().toISOString();
+  let lunchHours = "Ma–pe 10.30–14.00";
+  let openHours = "Ma–pe 8.00–14.00";
+
+  if (html) {
+    const $ = cheerio.load(html);
+    const text = $(
+      "section:contains('AUKIOLOAJAT'), div:contains('AUKIOLOAJAT'), body",
+    )
+      .text()
+      .replace(/\s+/g, " ");
+    const openMatch =
+      /MA\s*[-–]\s*PE\s*(?:klo\s*)?(\d{1,2}[.:]\d{2}\s*[-–]\s*\d{1,2}[.:]\d{2})/i.exec(
+        text,
+      );
+    if (openMatch?.[1]) {
+      openHours = `Ma–pe ${normalizeTimeRange(openMatch[1])}`;
+    }
+    const lunchMatch =
+      /(?:lounas\s*(?:klo\s*)?|klo\s*)(10[.:]30\s*[-–]\s*14[.:]00)/i.exec(text);
+    if (lunchMatch?.[1]) {
+      lunchHours = `Ma–pe ${normalizeTimeRange(lunchMatch[1])}`;
+    }
+  }
+
+  return {
+    restaurantId: "dylan-la-ilma",
+    restaurantName: "Dylan La Ilma",
+    openHours,
+    lunchHours,
+    rawText: `Avoinna ${openHours}, Lounas ${lunchHours}`,
+    lastUpdated,
+  };
+}
+
+/**
  * Fetches all restaurant opening hours across endpoints and websites.
  */
 export async function fetchAllOpeningHours(): Promise<
@@ -520,6 +561,21 @@ export async function fetchAllOpeningHours(): Promise<
   } catch (err) {
     console.error("[Opening Hours] Error fetching Dylan Böle:", err);
     results.push(parseDylanBoleOpeningHours(""));
+  }
+
+  // 10. Dylan La Ilma (Website)
+  try {
+    const url = "https://www.dylan.fi/lailma";
+    const res = await fetch(url, {
+      headers: { "User-Agent": "Mozilla/5.0" },
+      signal: AbortSignal.timeout(15000),
+    });
+    const html = res.ok ? await res.text() : "";
+    results.push(parseDylanLaIlmaOpeningHours(html));
+    console.log(`[Opening Hours] Fetched Dylan La Ilma`);
+  } catch (err) {
+    console.error("[Opening Hours] Error fetching Dylan La Ilma:", err);
+    results.push(parseDylanLaIlmaOpeningHours(""));
   }
 
   return results;

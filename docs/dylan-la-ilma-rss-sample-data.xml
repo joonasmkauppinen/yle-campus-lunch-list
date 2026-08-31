@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+    <channel>
+        <title>Dylan La Ilma</title>
+        <link>https://lounastaja.app/api/v1/image/lunchlist/pdf/70835b81-ec1f-443f-92bb-9832d21fb3af/2026/36/week-fi</link>
+        <description>Dylan La Ilma Lounaslista</description>
+        <lastBuildDate>Mon, 31 Aug 2026 07:35:58 GMT</lastBuildDate>
+        <language>fi</language>
+        <item>
+            <title><![CDATA[Maanantai 31.8.]]></title>
+            <link>https://lounastaja.app/api/v1/image/lunchlist/pdf/70835b81-ec1f-443f-92bb-9832d21fb3af/2026/36/week-fi</link>
+            <guid isPermaLink="false">dylan-la-ilma-2026-36-1</guid>
+            <pubDate>Mon, 31 Aug 2026 00:00:00 GMT</pubDate>
+            <description><![CDATA[Aamiaisella: Puurobaari<br>Pinaattikeittoa (L, G) ja keitettyjä kananmunia (M, G)<br>Kana vindaloo - kanaa ja kasviksia maukkaassa currykastikkeessa (M, G)<br>Jasmiiniriisiä (Veg, G)<br>Täyteläisen kermainen lohipastavuoka (L)<br>Tofu vindaloo - tofua ja kasviksia maukkaassa currykastikkeessa (V, G)<br>Persikkarahka (L, G)<br>CLASSIC BURGER - Naudan täyslihapihvi, cheddarjuustoa, chilimajoneesia, marinoitua punasipulia, tomaattia suolakurkkua ja salaattia. Lisäksi maalaisranskalaiset. (L, G*)<br>CLASSIG VEGE BURGER - Beyond- pihvi, cheddaria, chilimajoneesia, marinoitua punasipulia, tomaattia, suolakurkkua ja salaattia. Lisäksi maalaisranskalaiset. (L, G*)<br>CLASSIC VEGAN BURGER - Beyond -pihvi, vegaanista "cheddaria", chilimajoneesia, marinoitua punasipulia, tomaattia, suolakurkkua ja salaattia. Lisäksi maalaisranskalaiset (G*, Veg)]]></description>
+        </item>
+    </channel>
+</rss>

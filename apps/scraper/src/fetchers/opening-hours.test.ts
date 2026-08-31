@@ -5,6 +5,7 @@ import {
   normalizeTimeRange,
   parseAkseliOpeningHours,
   parseDylanBoleOpeningHours,
+  parseDylanLaIlmaOpeningHours,
   parseDylanLuftOpeningHours,
   parseHuoltamoOpeningHours,
   parseIsoPajaOpeningHours,
@@ -123,5 +124,20 @@ void describe("opening-hours fetcher", () => {
     assert.equal(parsed.restaurantId, "dylan-bole");
     assert.equal(parsed.lunchHours, "Ma–pe 10.30–14.00");
     assert.equal(parsed.openHours, "Ma–pe 8.00–15.45");
+  });
+
+  void it("parseDylanLaIlmaOpeningHours extracts lunch and open hours from HTML", () => {
+    const html = `
+      <div>
+        <p>AUKIOLOAJAT</p>
+        <p>MA-PE klo 8:00-14:00</p>
+        <p>MA-PE Lounas klo 10:30-14:00</p>
+      </div>
+    `;
+    const parsed = parseDylanLaIlmaOpeningHours(html);
+    assert.equal(parsed.restaurantId, "dylan-la-ilma");
+    assert.equal(parsed.restaurantName, "Dylan La Ilma");
+    assert.equal(parsed.lunchHours, "Ma–pe 10.30–14.00");
+    assert.equal(parsed.openHours, "Ma–pe 8.00–14.00");
   });
 });
