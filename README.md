@@ -56,6 +56,7 @@ pnpm --filter @acme/scraper dev -- --date 2026-08-23
 ## Technologies
 
 - **Turborepo & pnpm**: High-performance monorepo workspace management.
+- **Oxlint & Oxfmt**: Ultra-fast Rust-based linting and code formatting.
 - **TypeScript**: End-to-end static typing across all packages.
 - **Next.js & React 19**: Modern App Router web application with ISR and server components.
 - **Tailwind CSS**: Modern, utility-first styling.

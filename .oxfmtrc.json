@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "printWidth": 80,
+  "sortTailwindcss": {
+    "functions": ["cn", "cva"]
+  },
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/.next/**",
+    "**/dist/**",
+    "**/.turbo/**",
+    "**/.cache/**",
+    "**/docs/**",
+    "**/*.hbs",
+    "**/turbo/generators/templates/**"
+  ]
+}
