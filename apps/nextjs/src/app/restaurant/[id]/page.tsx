@@ -14,6 +14,7 @@ import {
   getTodayFormattedString,
   isCurrentDate,
 } from "~/lib/dates";
+import { generateRestaurantJsonLd } from "~/lib/seo";
 import { fetchRestaurantsFromGoogleSheets } from "~/lib/sheets";
 
 // Configure Next.js ISR revalidation interval (1 hour)
@@ -40,20 +41,37 @@ export async function generateMetadata(
     (r) => r.id.toLowerCase() === id.toLowerCase(),
   );
 
-  if (!restaurant) {
-    const config = RESTAURANT_CONFIGS.find(
-      (c) => c.id.toLowerCase() === id.toLowerCase(),
-    );
-    const name = config?.name ?? id;
-    return {
-      title: `${name} - Lounaslista`,
-      description: `Päivän lounaslista ravintolalle ${name}.`,
-    };
-  }
+  const config = RESTAURANT_CONFIGS.find(
+    (c) => c.id.toLowerCase() === id.toLowerCase(),
+  );
+  const name = restaurant?.name ?? config?.name ?? id;
+  const address = restaurant?.address ?? config?.address;
+  const locationSuffix = address
+    ? `${address.street}, Pasila`
+    : "Pasila, Helsinki";
+
+  const title = `${name} – Lounaslista`;
+  const description = `Päivän lounaslista ja aukioloajat ravintolalle ${name} (${locationSuffix}). Katso lounasvaihtoehdot ja ruokalista.`;
+  const canonicalUrl = `/restaurant/${id}`;
 
   return {
-    title: `${restaurant.name} - Lounaslista`,
-    description: `Päivän lounaslista ravintolalle ${restaurant.name}.`,
+    title,
+    description,
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title: `${name} – Lounaslista`,
+      description,
+      url: canonicalUrl,
+      type: "website",
+      locale: "fi_FI",
+    },
+    twitter: {
+      card: "summary",
+      title: `${name} – Lounaslista`,
+      description,
+    },
   };
 }
 
@@ -81,42 +99,27 @@ export default async function RestaurantPage(props: RestaurantPageProps) {
   const isOutdated = currentMenu?.date
     ? !isCurrentDate(currentMenu.date)
     : false;
+  const jsonLd = restaurant
+    ? generateRestaurantJsonLd(restaurant, currentMenu)
+    : null;
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-      {/* Back button */}
-      <div className="mb-6">
-        <Link
-          href="/"
-          className="text-muted-foreground hover:text-foreground group inline-flex items-center gap-2 text-sm font-medium transition-colors"
-        >
-          <svg
-            className="h-4 w-4 transition-transform group-hover:-translate-x-0.5"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="2"
-            stroke="currentColor"
-            aria-hidden="true"
+    <>
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
+      <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+        {/* Back button */}
+        <div className="mb-6">
+          <Link
+            href="/"
+            className="text-muted-foreground hover:text-foreground group inline-flex items-center gap-2 text-sm font-medium transition-colors"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
-            />
-          </svg>
-          <span>Kaikki lounaslistat</span>
-        </Link>
-      </div>
-
-      {error ? (
-        <div
-          role="alert"
-          className="border-destructive/50 bg-destructive/10 text-destructive rounded-xl border p-6 shadow-sm"
-        >
-          <div className="flex items-start gap-3">
             <svg
-              className="text-destructive mt-0.5 h-5 w-5 shrink-0"
+              className="h-4 w-4 transition-transform group-hover:-translate-x-0.5"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -127,140 +130,233 @@ export default async function RestaurantPage(props: RestaurantPageProps) {
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 8.25h.008v.008H12v-.008Z"
+                d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
               />
             </svg>
-            <div className="space-y-1">
-              <h2 className="text-base font-semibold">
-                Unable to load lunch menu
-              </h2>
-              <p className="text-sm opacity-90">{error}</p>
+            <span>Kaikki lounaslistat</span>
+          </Link>
+        </div>
+
+        {error ? (
+          <div
+            role="alert"
+            className="border-destructive/50 bg-destructive/10 text-destructive rounded-xl border p-6 shadow-sm"
+          >
+            <div className="flex items-start gap-3">
+              <svg
+                className="text-destructive mt-0.5 h-5 w-5 shrink-0"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="2"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 8.25h.008v.008H12v-.008Z"
+                />
+              </svg>
+              <div className="space-y-1">
+                <h2 className="text-base font-semibold">
+                  Unable to load lunch menu
+                </h2>
+                <p className="text-sm opacity-90">{error}</p>
+              </div>
             </div>
           </div>
-        </div>
-      ) : restaurant ? (
-        <div className="space-y-6">
-          <header className="text-left">
-            <p className="text-muted-foreground font-bold">{todayStr}</p>
-            <div className="mt-1 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
-              <h1 className="text-foreground text-3xl font-extrabold tracking-tight sm:text-4xl">
-                {restaurant.name}
-              </h1>
-              {isDev && source && (
-                <span className="text-muted-foreground self-start rounded-full border border-dashed px-2.5 py-0.5 text-xs font-medium sm:self-auto">
-                  Dev Mode ({source})
-                </span>
+        ) : restaurant ? (
+          <div className="space-y-6">
+            <header className="text-left">
+              <p className="text-muted-foreground font-bold">{todayStr}</p>
+              <div className="mt-1 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
+                <h1 className="text-foreground text-3xl font-extrabold tracking-tight sm:text-4xl">
+                  {restaurant.name}
+                </h1>
+                {isDev && source && (
+                  <span className="text-muted-foreground self-start rounded-full border border-dashed px-2.5 py-0.5 text-xs font-medium sm:self-auto">
+                    Dev Mode ({source})
+                  </span>
+                )}
+              </div>
+              {restaurant.address && (
+                <div className="text-muted-foreground mt-1.5 flex items-center gap-1.5 text-sm">
+                  <svg
+                    className="text-muted-foreground/80 h-4 w-4 shrink-0"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="2"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"
+                    />
+                  </svg>
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                      `${restaurant.name}, ${restaurant.address.street}, ${restaurant.address.postalCode} ${restaurant.address.city}`,
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-foreground focus-visible:ring-ring rounded-sm transition-colors hover:underline focus-visible:ring-2 focus-visible:outline-none"
+                    title="Avaa osoite Google Mapsissa"
+                  >
+                    {restaurant.address.street}, {restaurant.address.postalCode}{" "}
+                    {restaurant.address.city}
+                  </a>
+                </div>
               )}
-            </div>
-            {(() => {
-              if (!restaurant.openingHours) return null;
+              {(() => {
+                if (!restaurant.openingHours) return null;
 
-              const todayLunch = getOpeningHoursForCurrentDay(
-                restaurant.openingHours.lunchHours,
-              );
-              const todayOpen = getOpeningHoursForCurrentDay(
-                restaurant.openingHours.openHours,
-              );
-
-              if (!todayLunch && !todayOpen) return null;
-
-              let line1: { label?: string; value: string } | null = null;
-              let line2: { label?: string; value: string } | null = null;
-
-              if (todayLunch && todayLunch !== "Suljettu") {
-                line1 = { label: "Lounas", value: todayLunch };
-                if (
-                  todayOpen &&
-                  todayOpen !== "Suljettu" &&
-                  todayOpen !== todayLunch
-                ) {
-                  line2 = { label: "Avoinna", value: todayOpen };
-                }
-              } else if (todayOpen && todayOpen !== "Suljettu") {
-                line1 = { label: "Avoinna", value: todayOpen };
-                if (todayLunch === "Suljettu") {
-                  line2 = { label: "Lounas", value: "Suljettu" };
-                }
-              } else {
-                return (
-                  <div className="text-muted-foreground/80 mt-2.5 text-sm">
-                    <span>Suljettu tänään</span>
-                  </div>
+                const todayLunch = getOpeningHoursForCurrentDay(
+                  restaurant.openingHours.lunchHours,
                 );
-              }
+                const todayOpen = getOpeningHoursForCurrentDay(
+                  restaurant.openingHours.openHours,
+                );
 
-              return (
-                <div className="text-muted-foreground mt-2.5 flex flex-col gap-1.5 text-sm">
-                  <div className="font-medium">
-                    <span>
-                      {line1.label && (
-                        <span className="text-foreground font-semibold">
-                          {line1.label}:{" "}
-                        </span>
-                      )}
-                      {line1.value}
-                    </span>
-                  </div>
-                  {line2 && (
-                    <div className="opacity-90">
+                if (!todayLunch && !todayOpen) return null;
+
+                let line1: { label?: string; value: string } | null = null;
+                let line2: { label?: string; value: string } | null = null;
+
+                if (todayLunch && todayLunch !== "Suljettu") {
+                  line1 = { label: "Lounas", value: todayLunch };
+                  if (
+                    todayOpen &&
+                    todayOpen !== "Suljettu" &&
+                    todayOpen !== todayLunch
+                  ) {
+                    line2 = { label: "Avoinna", value: todayOpen };
+                  }
+                } else if (todayOpen && todayOpen !== "Suljettu") {
+                  line1 = { label: "Avoinna", value: todayOpen };
+                  if (todayLunch === "Suljettu") {
+                    line2 = { label: "Lounas", value: "Suljettu" };
+                  }
+                } else {
+                  return (
+                    <div className="text-muted-foreground/80 mt-2.5 text-sm">
+                      <span>Suljettu tänään</span>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="text-muted-foreground mt-2.5 flex flex-col gap-1.5 text-sm">
+                    <div className="font-medium">
                       <span>
-                        {line2.label && (
+                        {line1.label && (
                           <span className="text-foreground font-semibold">
-                            {line2.label}:{" "}
+                            {line1.label}:{" "}
                           </span>
                         )}
-                        {line2.value}
+                        {line1.value}
+                      </span>
+                    </div>
+                    {line2 && (
+                      <div className="opacity-90">
+                        <span>
+                          {line2.label && (
+                            <span className="text-foreground font-semibold">
+                              {line2.label}:{" "}
+                            </span>
+                          )}
+                          {line2.value}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+            </header>
+
+            <div className="border-border bg-card flex flex-col rounded-md border p-6 shadow-sm">
+              {hasItems && currentMenu ? (
+                <>
+                  {isOutdated && currentMenu.date && (
+                    <div className="mb-4">
+                      <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 py-0.5 pr-2 pl-1.5 text-xs font-semibold text-amber-700 dark:text-amber-400">
+                        <svg
+                          className="h-3.5 w-3.5 shrink-0"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth="2"
+                          stroke="currentColor"
+                          aria-hidden="true"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
+                          />
+                        </svg>
+                        <span>
+                          Vanha lista ({formatDisplayDate(currentMenu.date)})
+                        </span>
                       </span>
                     </div>
                   )}
-                </div>
-              );
-            })()}
-          </header>
-
-          <div className="border-border bg-card flex flex-col rounded-md border p-6 shadow-sm">
-            {hasItems && currentMenu ? (
-              <>
-                {isOutdated && currentMenu.date && (
-                  <div className="mb-4">
-                    <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 py-0.5 pr-2 pl-1.5 text-xs font-semibold text-amber-700 dark:text-amber-400">
-                      <svg
-                        className="h-3.5 w-3.5 shrink-0"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2"
-                        stroke="currentColor"
-                        aria-hidden="true"
+                  <ul className="space-y-2">
+                    {currentMenu.items.map((item, idx) => (
+                      <RestaurantMenuItem
+                        key={idx}
+                        item={item}
+                        disabled={isOutdated}
+                      />
+                    ))}
+                  </ul>
+                  {restaurant.websiteUrl && (
+                    <div className="border-border/60 mt-6 border-t pt-4">
+                      <a
+                        href={restaurant.websiteUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:underline dark:text-blue-400"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
-                        />
-                      </svg>
-                      <span>
-                        Vanha lista ({formatDisplayDate(currentMenu.date)})
-                      </span>
-                    </span>
-                  </div>
-                )}
-                <ul className="space-y-2">
-                  {currentMenu.items.map((item, idx) => (
-                    <RestaurantMenuItem
-                      key={idx}
-                      item={item}
-                      disabled={isOutdated}
-                    />
-                  ))}
-                </ul>
-                {restaurant.websiteUrl && (
-                  <div className="border-border/60 mt-6 border-t pt-4">
+                        <span>Avaa ravintolan kotisivut</span>
+                        <svg
+                          className="h-3.5 w-3.5 shrink-0"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth="2"
+                          stroke="currentColor"
+                          aria-hidden="true"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+                          />
+                        </svg>
+                      </a>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="py-4">
+                  <p className="text-muted-foreground text-sm">
+                    Listaa ei löytynyt tälle päivälle.
+                  </p>
+                  {restaurant.websiteUrl && (
                     <a
                       href={restaurant.websiteUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:underline dark:text-blue-400"
+                      className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:underline dark:text-blue-400"
                     >
                       <span>Avaa ravintolan kotisivut</span>
                       <svg
@@ -279,46 +375,15 @@ export default async function RestaurantPage(props: RestaurantPageProps) {
                         />
                       </svg>
                     </a>
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="py-4">
-                <p className="text-muted-foreground text-sm">
-                  Listaa ei löytynyt tälle päivälle.
-                </p>
-                {restaurant.websiteUrl && (
-                  <a
-                    href={restaurant.websiteUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:underline dark:text-blue-400"
-                  >
-                    <span>Avaa ravintolan kotisivut</span>
-                    <svg
-                      className="h-3.5 w-3.5 shrink-0"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth="2"
-                      stroke="currentColor"
-                      aria-hidden="true"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
-                      />
-                    </svg>
-                  </a>
-                )}
-              </div>
-            )}
+                  )}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      ) : null}
+        ) : null}
 
-      <Footer />
-    </main>
+        <Footer />
+      </main>
+    </>
   );
 }

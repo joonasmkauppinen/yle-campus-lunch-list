@@ -11,6 +11,7 @@ catalog:
   eslint: ^9.38.0
   prettier: ^3.6.2
   tailwindcss: ^4.1.16
+  tsx: ^4.19.3
   typescript: ^5.9.3
   zod: ^4.1.12
 

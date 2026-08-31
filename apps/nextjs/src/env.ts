@@ -23,10 +23,11 @@ export const env = createEnv({
     REVALIDATION_SECRET: z.string().optional(),
   },
   client: {
-    // Client environment variables if needed
+    NEXT_PUBLIC_SITE_URL: z.string().url().optional(),
   },
   experimental__runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
+    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
   },
   skipValidation:
     !!process.env.CI ||

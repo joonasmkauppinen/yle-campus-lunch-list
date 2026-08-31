@@ -82,14 +82,21 @@ export function RestaurantListItem({
           )}
         >
           <div className="flex flex-col gap-1.5">
-            <h2 className="text-card-foreground text-xl font-bold">
-              <Link
-                href={`/restaurant/${restaurant.id}`}
-                className="focus-visible:ring-ring rounded-sm transition-colors hover:underline focus-visible:ring-2 focus-visible:outline-none"
-              >
-                {restaurant.name}
-              </Link>
-            </h2>
+            <div>
+              <h2 className="text-card-foreground text-xl font-bold">
+                <Link
+                  href={`/restaurant/${restaurant.id}`}
+                  className="focus-visible:ring-ring rounded-sm transition-colors hover:underline focus-visible:ring-2 focus-visible:outline-none"
+                >
+                  {restaurant.name}
+                </Link>
+              </h2>
+              {restaurant.address && (
+                <p className="text-muted-foreground mt-0.5 text-xs font-normal">
+                  {restaurant.address.street}
+                </p>
+              )}
+            </div>
             {(() => {
               if (!restaurant.openingHours) return null;
 
