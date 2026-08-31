@@ -83,11 +83,47 @@ export function resolveTargetDate(
   return getHelsinkiDateString();
 }
 
+/**
+ * Resolves whether dry run mode is enabled from CLI flags or environment variables.
+ *
+ * Supported formats:
+ * - CLI flags: --dry-run, --dryrun, -n, --dry-run=true, --dry-run=false
+ * - Environment variables: DRY_RUN (truthy values: "true", "1", "yes")
+ */
+export function resolveIsDryRun(
+  argv: string[] = process.argv.slice(2),
+): boolean {
+  for (const arg of argv) {
+    if (!arg) continue;
+
+    if (arg === "--dry-run" || arg === "--dryrun" || arg === "-n") {
+      return true;
+    }
+    if (arg.startsWith("--dry-run=") || arg.startsWith("--dryrun=")) {
+      const val = arg.split("=")[1]?.toLowerCase().trim();
+      return val === "true" || val === "1" || val === "yes";
+    }
+  }
+
+  const envDryRun = process.env.DRY_RUN?.toLowerCase().trim();
+  if (envDryRun) {
+    return envDryRun === "true" || envDryRun === "1" || envDryRun === "yes";
+  }
+
+  return false;
+}
+
 async function main() {
   const targetDate = resolveTargetDate();
+  const isDryRun = resolveIsDryRun();
   console.log(
-    `=== Campus Lunch List Scraper Starting (Target Date: ${targetDate}) ===`,
+    `=== Campus Lunch List Scraper Starting (Target Date: ${targetDate}${isDryRun ? " | DRY RUN MODE" : ""}) ===`,
   );
+  if (isDryRun) {
+    console.log(
+      "[Dry Run] Google Sheets update and revalidation will be skipped (no Google Cloud quota consumed).\n",
+    );
+  }
 
   // 1. Intra Restaurants: Huoltamo, Studio 10, Piccolo (JSON API)
   console.log(
@@ -102,6 +138,7 @@ async function main() {
         restaurant.name,
         menus,
         targetDate,
+        { dryRun: isDryRun },
       );
       console.log(
         `Successfully completed scraping for ${restaurant.name} (${restaurant.id})`,
@@ -120,6 +157,7 @@ async function main() {
       DYLAN_LUFT_RESTAURANT_NAME,
       dylanLuftMenus,
       targetDate,
+      { dryRun: isDryRun },
     );
     console.log(
       `Successfully completed scraping for ${DYLAN_LUFT_RESTAURANT_NAME} (${DYLAN_LUFT_RESTAURANT_ID})`,
@@ -137,6 +175,7 @@ async function main() {
       DYLAN_BOLE_RESTAURANT_NAME,
       dylanBoleMenus,
       targetDate,
+      { dryRun: isDryRun },
     );
     console.log(
       `Successfully completed scraping for ${DYLAN_BOLE_RESTAURANT_NAME} (${DYLAN_BOLE_RESTAURANT_ID})`,
@@ -154,6 +193,7 @@ async function main() {
       PASILAN_LINKKI_RESTAURANT_NAME,
       linkkiMenus,
       targetDate,
+      { dryRun: isDryRun },
     );
     console.log(
       `Successfully completed scraping for ${PASILAN_LINKKI_RESTAURANT_NAME} (${PASILAN_LINKKI_RESTAURANT_ID})`,
@@ -171,6 +211,7 @@ async function main() {
       ISO_PAJA_RESTAURANT_NAME,
       isoPajaMenus,
       targetDate,
+      { dryRun: isDryRun },
     );
     console.log(
       `Successfully completed scraping for ${ISO_PAJA_RESTAURANT_NAME} (${ISO_PAJA_RESTAURANT_ID})`,
@@ -188,6 +229,7 @@ async function main() {
       AKSELI_RESTAURANT_NAME,
       akseliMenus,
       targetDate,
+      { dryRun: isDryRun },
     );
     console.log(
       `Successfully completed scraping for ${AKSELI_RESTAURANT_NAME} (${AKSELI_RESTAURANT_ID})`,
@@ -205,6 +247,7 @@ async function main() {
       PAATTARI_RESTAURANT_NAME,
       paattariMenus,
       targetDate,
+      { dryRun: isDryRun },
     );
     console.log(
       `Successfully completed scraping for ${PAATTARI_RESTAURANT_NAME} (${PAATTARI_RESTAURANT_ID})`,
@@ -217,7 +260,7 @@ async function main() {
   console.log("\nProcessing target: Restaurant Opening Hours");
   try {
     const openingHours = await fetchAllOpeningHours();
-    await updateGoogleSheetOpeningHours(openingHours);
+    await updateGoogleSheetOpeningHours(openingHours, { dryRun: isDryRun });
     console.log(
       `Successfully completed opening hours update for ${openingHours.length} restaurants`,
     );
@@ -225,9 +268,15 @@ async function main() {
     console.error("Error processing opening hours:", error);
   }
 
-  // 9. Revalidate frontend cache (in production)
-  console.log("\nTriggering on-demand frontend revalidation...");
-  await triggerRevalidation();
+  // 9. Revalidate frontend cache (in production, skipped in dry run)
+  if (isDryRun) {
+    console.log(
+      "\n[Revalidate] Skipping frontend revalidation (dry run mode).",
+    );
+  } else {
+    console.log("\nTriggering on-demand frontend revalidation...");
+    await triggerRevalidation();
+  }
 
   console.log("\n=== Campus Lunch List Scraper Finished ===");
 }

@@ -94,6 +94,7 @@ The project reads variables from root `.env` (or `.env.local` / `.env.developmen
 | `AKSELI_URL` | Website URL for Akseli scraping | Scraper |
 | `PAATTARI_URL` | Website URL for Päättäri scraping | Scraper |
 | `TARGET_DATE` / `DATE` / `SCRAPE_DATE` | Optional date override (`YYYY-MM-DD`) | Scraper |
+| `DRY_RUN` | Run scraper in dry run mode without writing to Google Sheets | Scraper (Optional) |
 
 > **Dev vs. Prod Sheet Resolution**: In non-production environments (`NODE_ENV !== "production"`), both the frontend and scraper automatically prioritize `DEV_GOOGLE_SHEETS_URL` / `DEV_GOOGLE_SHEETS_ID` if defined.
 
@@ -114,10 +115,16 @@ pnpm dev
 # Start only the Next.js frontend
 pnpm dev:next
 
-# Run Scraper once (defaults to today's date in Europe/Helsinki)
+# Run Scraper in dry-run mode (recommended for testing & validation — does not write to Google Sheets)
+pnpm dev:scraper:dry-run
+
+# Run Scraper in dry-run mode with a custom date
+pnpm --filter @acme/scraper dev -- --dry-run --date 2026-08-24
+
+# Run Scraper once against Google Sheets (defaults to today's date in Europe/Helsinki)
 pnpm dev:scraper
 
-# Run Scraper for a specific target date
+# Run Scraper for a specific target date against Google Sheets
 pnpm --filter @acme/scraper dev -- --date 2026-08-24
 ```
 
@@ -189,6 +196,10 @@ When modifying an existing restaurant scraper or adding a new campus restaurant,
 
 ### Step 5: Test and verify
 ```bash
+# Test scraper pipeline locally in dry-run mode (skips Google Sheets writes & preserves quota)
+pnpm dev:scraper:dry-run
+
+# Run unit tests
 pnpm --filter @acme/scraper test
 pnpm typecheck
 pnpm lint
@@ -242,18 +253,21 @@ Structure UI components following Atomic Design principles to maintain modularit
 
 ## 10. General Coding Standards & Agent Guidelines
 
-1. **ESM Import Paths in Scraper**:
+1. **Mandatory Dry Run for Testing & Code Validation**:
+   - AI coding agents **MUST ALWAYS** use the dry run flag (`--dry-run`, `pnpm dev:scraper:dry-run`, or `DRY_RUN=true`) when testing, executing, or validating scraper changes, unless explicitly instructed by the user to perform a live update to the Google Sheets database.
+   - Dry run executes all HTTP network requests and HTML/RSS/JSON parsing logic completely while bypassing Google Sheets API writes and frontend cache revalidation, avoiding unnecessary Google Cloud API quota usage and preventing unintended changes to the database.
+2. **ESM Import Paths in Scraper**:
    - `apps/scraper` runs as pure ESM (`"type": "module"`). Relative local imports **must** include the `.js` file extension (e.g., `import { fetchIsoPajaMenu } from "./fetchers/iso-paja.js";`).
-2. **Next.js Server Components by Default**:
+3. **Next.js Server Components by Default**:
    - Prefer React Server Components for pages and data loading.
    - Only add `"use client"` when component requires React state/hooks, event listeners, or client-side storage (e.g. `localStorage` preferences).
-3. **Resilient Scraper Error Handling**:
+4. **Resilient Scraper Error Handling**:
    - Never allow a scraping failure in one restaurant to terminate the entire pipeline. Wrap each restaurant sync step in its own `try/catch` block.
-4. **Dates and Timezones**:
+5. **Dates and Timezones**:
    - Always format and resolve dates using `Europe/Helsinki` timezone. Use `Intl.DateTimeFormat` or shared date helper functions from `apps/nextjs/src/lib/dates.ts` and `apps/scraper/src/fetchers/intra.ts`.
-5. **No Secret Leaks**:
+6. **No Secret Leaks**:
    - Never commit raw private keys, service account JSON files, or production `.env` files. Ensure secrets are referenced only via environment variables.
-6. **Code Style**:
+7. **Code Style**:
    - Use Prettier and ESLint presets provided by `@acme/prettier-config` and `@acme/eslint-config`.
    - Run `pnpm format:fix` and `pnpm lint:fix` if formatting or linting checks fail.
 

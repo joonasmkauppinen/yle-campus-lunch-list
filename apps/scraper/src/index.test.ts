@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { resolveTargetDate } from "./index.js";
+import { resolveIsDryRun, resolveTargetDate } from "./index.js";
 
 void describe("resolveTargetDate", () => {
   void it("parses --date flag with separate argument", () => {
@@ -51,6 +51,58 @@ void describe("resolveTargetDate", () => {
       process.env.TARGET_DATE = originalTargetDate;
       process.env.DATE = originalDate;
       process.env.SCRAPE_DATE = originalScrapeDate;
+    }
+  });
+});
+
+void describe("resolveIsDryRun", () => {
+  void it("parses --dry-run, --dryrun, and -n flags", () => {
+    assert.equal(resolveIsDryRun(["--dry-run"]), true);
+    assert.equal(resolveIsDryRun(["--dryrun"]), true);
+    assert.equal(resolveIsDryRun(["-n"]), true);
+    assert.equal(resolveIsDryRun(["--date", "2026-08-21", "--dry-run"]), true);
+  });
+
+  void it("parses --dry-run= flag with boolean values", () => {
+    assert.equal(resolveIsDryRun(["--dry-run=true"]), true);
+    assert.equal(resolveIsDryRun(["--dry-run=1"]), true);
+    assert.equal(resolveIsDryRun(["--dry-run=yes"]), true);
+    assert.equal(resolveIsDryRun(["--dry-run=false"]), false);
+    assert.equal(resolveIsDryRun(["--dryrun=true"]), true);
+  });
+
+  void it("falls back to DRY_RUN env variable", () => {
+    const originalDryRun = process.env.DRY_RUN;
+
+    try {
+      process.env.DRY_RUN = "true";
+      assert.equal(resolveIsDryRun([]), true);
+
+      process.env.DRY_RUN = "1";
+      assert.equal(resolveIsDryRun([]), true);
+
+      process.env.DRY_RUN = "yes";
+      assert.equal(resolveIsDryRun([]), true);
+
+      process.env.DRY_RUN = "false";
+      assert.equal(resolveIsDryRun([]), false);
+
+      process.env.DRY_RUN = "0";
+      assert.equal(resolveIsDryRun([]), false);
+    } finally {
+      process.env.DRY_RUN = originalDryRun;
+    }
+  });
+
+  void it("returns false when no flag or env var is provided", () => {
+    const originalDryRun = process.env.DRY_RUN;
+
+    try {
+      delete process.env.DRY_RUN;
+      assert.equal(resolveIsDryRun([]), false);
+      assert.equal(resolveIsDryRun(["--date", "2026-08-21"]), false);
+    } finally {
+      process.env.DRY_RUN = originalDryRun;
     }
   });
 });

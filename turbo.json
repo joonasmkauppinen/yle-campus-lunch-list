@@ -35,9 +35,13 @@
     "ui-add": {
       "cache": false,
       "interactive": true
+    },
+    "test": {
+      "cache": false
     }
   },
   "globalEnv": [
+    "DRY_RUN",
     "DEV_GOOGLE_SHEETS_URL",
     "GOOGLE_SHEETS_DEV_URL",
     "DEV_GOOGLE_SHEETS_ID",

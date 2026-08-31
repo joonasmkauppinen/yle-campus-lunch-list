@@ -10,6 +10,10 @@ import {
   getSpreadsheetResolution,
 } from "./env.js";
 
+export interface UpdateSheetOptions {
+  dryRun?: boolean;
+}
+
 /**
  * Formats parsed menu items into 2D table row arrays for Google Sheets.
  * Returns an empty array if there are no menu items.
@@ -44,7 +48,19 @@ export async function updateGoogleSheet(
     month: "2-digit",
     day: "2-digit",
   }).format(new Date()),
+  options?: UpdateSheetOptions,
 ): Promise<void> {
+  if (options?.dryRun) {
+    console.log(
+      `[Google Sheets] [DRY RUN] Skipping sheet update for ${restaurantName} (${restaurantId}) on ${targetDate}.`,
+    );
+    console.log(
+      `[Google Sheets Payload] ${restaurantName} (${restaurantId}):`,
+      JSON.stringify(menus, null, 2),
+    );
+    return;
+  }
+
   const { spreadsheetId, source, isDev } = getSpreadsheetResolution();
   const clientEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL?.trim();
   let privateKey = process.env.GOOGLE_PRIVATE_KEY;
@@ -188,7 +204,19 @@ export function formatOpeningHoursRows(
 
 export async function updateGoogleSheetOpeningHours(
   openingHoursList: RestaurantOpeningHours[],
+  options?: UpdateSheetOptions,
 ): Promise<void> {
+  if (options?.dryRun) {
+    console.log(
+      `[Google Sheets Opening Hours] [DRY RUN] Skipping opening hours sheet update.`,
+    );
+    console.log(
+      `[Google Sheets Opening Hours Payload]:`,
+      JSON.stringify(openingHoursList, null, 2),
+    );
+    return;
+  }
+
   const { spreadsheetId, source } = getOpeningHoursSpreadsheetResolution();
   const clientEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL?.trim();
   let privateKey = process.env.GOOGLE_PRIVATE_KEY;

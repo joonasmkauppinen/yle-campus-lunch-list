@@ -1,9 +1,17 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import type { ParsedMenuItem } from "@acme/shared-types";
+import type {
+  ParsedMenuItem,
+  RestaurantOpeningHours,
+} from "@acme/shared-types";
 
-import { formatMenuRows } from "./sheets.js";
+import {
+  formatMenuRows,
+  formatOpeningHoursRows,
+  updateGoogleSheet,
+  updateGoogleSheetOpeningHours,
+} from "./sheets.js";
 
 void describe("formatMenuRows", () => {
   void it("returns an empty array when menus is empty", () => {
@@ -45,5 +53,72 @@ void describe("formatMenuRows", () => {
       "VEG, G",
       timestamp,
     ]);
+  });
+});
+
+void describe("formatOpeningHoursRows", () => {
+  void it("formats opening hours list into sheet rows correctly", () => {
+    const sampleHours: RestaurantOpeningHours[] = [
+      {
+        restaurantId: "huoltamo",
+        restaurantName: "Huoltamo",
+        openHours: "07:30 - 15:00",
+        lunchHours: "10:30 - 13:30",
+        rawText: "Avoinna ma-pe 07:30 - 15:00, lounas 10:30 - 13:30",
+        lastUpdated: "2026-08-21T10:00:00.000Z",
+      },
+    ];
+
+    const rows = formatOpeningHoursRows(sampleHours);
+    assert.equal(rows.length, 1);
+    assert.deepEqual(rows[0], [
+      "huoltamo",
+      "Huoltamo",
+      "07:30 - 15:00",
+      "10:30 - 13:30",
+      "Avoinna ma-pe 07:30 - 15:00, lounas 10:30 - 13:30",
+      "2026-08-21T10:00:00.000Z",
+    ]);
+  });
+});
+
+void describe("updateGoogleSheet dry run", () => {
+  void it("skips Google Sheets API calls and completes successfully when dryRun is true", async () => {
+    const sampleMenus: ParsedMenuItem[] = [
+      {
+        date: "2026-08-21",
+        item: "Lohikeitto",
+        dietaryFlags: ["G", "L"],
+      },
+    ];
+
+    // Even if credentials exist or do not exist, dryRun should return cleanly without making API calls
+    await assert.doesNotReject(async () => {
+      await updateGoogleSheet(
+        "huoltamo",
+        "Huoltamo",
+        sampleMenus,
+        "2026-08-21",
+        { dryRun: true },
+      );
+    });
+  });
+});
+
+void describe("updateGoogleSheetOpeningHours dry run", () => {
+  void it("skips Google Sheets API calls and completes successfully when dryRun is true", async () => {
+    const sampleHours: RestaurantOpeningHours[] = [
+      {
+        restaurantId: "huoltamo",
+        restaurantName: "Huoltamo",
+        openHours: "07:30 - 15:00",
+        lunchHours: "10:30 - 13:30",
+        lastUpdated: "2026-08-21T10:00:00.000Z",
+      },
+    ];
+
+    await assert.doesNotReject(async () => {
+      await updateGoogleSheetOpeningHours(sampleHours, { dryRun: true });
+    });
   });
 });
