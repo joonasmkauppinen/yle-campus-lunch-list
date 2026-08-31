@@ -87,6 +87,9 @@ function handleRevalidation(request: NextRequest) {
     revalidatePath("/api/current-day-menus");
     revalidatedPaths.push("/api/current-day-menus");
 
+    revalidatePath("/radiator");
+    revalidatedPaths.push("/radiator");
+
     for (const config of RESTAURANT_CONFIGS) {
       const restaurantPath = `/restaurant/${config.id}`;
       revalidatePath(restaurantPath);

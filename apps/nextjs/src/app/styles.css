@@ -15,8 +15,23 @@
   }
 }
 
+@keyframes radiatorMarquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(calc(-50% - 0.75rem), 0, 0);
+  }
+}
+
 @utility animate-fade-in {
   animation: fadeIn 300ms ease-out 300ms both;
+}
+
+@utility animate-radiator-marquee {
+  animation-name: radiatorMarquee;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
 }
 
 @utility container {

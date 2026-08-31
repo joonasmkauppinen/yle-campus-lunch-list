@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { RESTAURANT_CONFIGS } from "~/config/restaurants";
 
 export function Footer() {
@@ -5,9 +7,9 @@ export function Footer() {
 
   return (
     <footer className="border-border text-muted-foreground mt-16 border-t pt-12 pb-16">
-      <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3">
+      <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
         {/* Column 1: Info & Disclaimer */}
-        <div className="space-y-3 sm:col-span-2 md:col-span-1">
+        <div className="space-y-3">
           <h3 className="text-foreground text-base font-semibold tracking-wide">
             Lounaslistat
           </h3>
@@ -60,7 +62,43 @@ export function Footer() {
           </ul>
         </div>
 
-        {/* Column 3: Yhteys & Lähdekoodi */}
+        {/* Column 3: Radiaattori (Infopiste / Infonäyttö) */}
+        <div className="space-y-3">
+          <h3 className="text-foreground text-base font-semibold tracking-wide">
+            Radiaattori
+          </h3>
+          <p className="text-sm leading-relaxed">
+            Automaattisesti rullaava karusellinäkymä toimiston infonäytöille ja
+            taukotiloihin.
+          </p>
+          <ul className="space-y-2 text-sm">
+            <li>
+              <Link
+                href="/radiator"
+                className="hover:text-foreground inline-flex items-center gap-1.5 font-medium transition-colors hover:underline"
+              >
+                <svg
+                  className="h-4 w-4 shrink-0"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="2"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 20.25h12m-7.5-3v3m3-3v3m-10.125-3h17.25c.621 0 1.125-.504 1.125-1.125V4.875c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125Z"
+                  />
+                </svg>
+                <span>Avaa radiaattorinäkymä</span>
+              </Link>
+            </li>
+          </ul>
+        </div>
+
+        {/* Column 4: Yhteys & Lähdekoodi */}
         <div className="space-y-3">
           <h3 className="text-foreground text-base font-semibold tracking-wide">
             Palaute &amp; Koodi
