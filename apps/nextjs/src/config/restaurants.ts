@@ -107,7 +107,7 @@ export const RESTAURANT_CONFIGS: RestaurantConfig[] = [
     address: {
       city: "Helsinki",
       postalCode: "00240",
-      street: "Maistraatinportti 2",
+      street: "Pasilankatu 10",
     },
   },
   {
