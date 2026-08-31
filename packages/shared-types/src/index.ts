@@ -39,10 +39,17 @@ export interface RestaurantOpeningHours {
   lastUpdated: string;
 }
 
+export interface RestaurantAddress {
+  street: string;
+  postalCode: string;
+  city: string;
+}
+
 export interface Restaurant {
   id: string;
   name: string;
   websiteUrl?: string;
+  address?: RestaurantAddress;
   openingHours?: RestaurantOpeningHours;
   menus: DailyMenu[];
   lastUpdated: string; // ISO format

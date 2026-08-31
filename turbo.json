@@ -81,7 +81,8 @@
     "PORT",
     "REVALIDATION_SECRET",
     "FRONTEND_URL",
-    "REVALIDATE_URL"
+    "REVALIDATE_URL",
+    "NEXT_PUBLIC_SITE_URL"
   ],
   "globalPassThroughEnv": [
     "NODE_ENV",
@@ -89,6 +90,7 @@
     "VERCEL",
     "VERCEL_ENV",
     "VERCEL_URL",
+    "VERCEL_PROJECT_PRODUCTION_URL",
     "npm_lifecycle_event"
   ]
 }

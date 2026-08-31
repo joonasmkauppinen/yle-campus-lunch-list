@@ -4,14 +4,55 @@ import { Analytics } from "@vercel/analytics/next";
 
 import { ThemeProvider, ThemeToggle } from "~/components/ui/theme";
 import { Toaster } from "~/components/ui/toast";
+import { getBaseUrl } from "~/lib/seo";
 import { cn } from "~/lib/utils";
 
 import "~/app/styles.css";
 
+const siteTitle = "Lounaslistat – Ylen kampus & Pasila, Helsinki";
+const siteDescription =
+  "Päivittäiset lounaslistat ja aukioloajat Ylen kampusalueen ja Pasilan ravintoloista (Iso Paja, Huoltamo, Piccolo, Studio 10, Pasilan Linkki, Päättäri, Akseli, Dylan).";
+
 export const metadata: Metadata = {
-  title: "Lounaslistat",
-  description: "Päivittäiset lounaslistat Ylen kampusalueen ravintoloista.",
+  metadataBase: new URL(getBaseUrl()),
+  title: {
+    default: siteTitle,
+    template: "%s | Lounaslistat",
+  },
+  description: siteDescription,
   applicationName: "Lounaslistat",
+  keywords: [
+    "lounaslistat",
+    "lounas Helsinki",
+    "lounas Pasila",
+    "Yle kampus lounas",
+    "Iso Paja lounas",
+    "Huoltamo lounas",
+    "Piccolo lounas",
+    "Studio 10 lounas",
+    "Pasilan Linkki lounas",
+    "Päättäri lounas",
+    "Akseli lounas",
+    "Dylan Luft",
+    "Dylan Böle",
+    "Dylan La Ilma",
+  ],
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    locale: "fi_FI",
+    url: "/",
+    siteName: "Lounaslistat",
+    title: siteTitle,
+    description: siteDescription,
+  },
+  twitter: {
+    card: "summary",
+    title: siteTitle,
+    description: siteDescription,
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -103,7 +144,7 @@ const geistMono = Geist_Mono({
 
 export default function RootLayout(props: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="fi" suppressHydrationWarning>
       <body
         className={cn(
           "bg-background text-foreground min-h-screen font-sans antialiased",
