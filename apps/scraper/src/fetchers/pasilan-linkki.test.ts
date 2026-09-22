@@ -1,8 +1,7 @@
-import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
-import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
+import { describe, expect, it } from "vitest";
 
 import {
   decodeHtmlEntities,
@@ -66,45 +65,39 @@ const SAMPLE_WEEKLY_LINKKI_XML = `<?xml version="1.0" encoding="utf-8"?>
   </channel>
 </rss>`;
 
-void describe("pasilan-linkki fetcher", () => {
-  void it("exports correct restaurant constants", () => {
-    assert.equal(PASILAN_LINKKI_RESTAURANT_ID, "pasilan-linkki");
-    assert.equal(PASILAN_LINKKI_RESTAURANT_NAME, "Pasilan Linkki");
-    assert.ok(PASILAN_LINKKI_DEFAULT_RSS_URL.includes("costNumber=3642"));
+describe("pasilan-linkki fetcher", () => {
+  it("exports correct restaurant constants", () => {
+    expect(PASILAN_LINKKI_RESTAURANT_ID).toBe("pasilan-linkki");
+    expect(PASILAN_LINKKI_RESTAURANT_NAME).toBe("Pasilan Linkki");
+    expect(PASILAN_LINKKI_DEFAULT_RSS_URL).toContain("costNumber=3642");
   });
 
-  void it("decodeHtmlEntities unescapes HTML entities correctly", () => {
-    assert.equal(
+  it("decodeHtmlEntities unescapes HTML entities correctly", () => {
+    expect(
       decodeHtmlEntities("Lounas 10&euro; &auml; &ouml; &nbsp; &amp;"),
-      "Lounas 10€ ä ö   &",
-    );
+    ).toBe("Lounas 10€ ä ö   &");
   });
 
-  void it("extractCompassItemDate extracts ISO date correctly", () => {
-    assert.equal(
-      extractCompassItemDate("<title>Perjantai, 21-08-2026</title>"),
+  it("extractCompassItemDate extracts ISO date correctly", () => {
+    expect(extractCompassItemDate("<title>Perjantai, 21-08-2026</title>")).toBe(
       "2026-08-21",
     );
-    assert.equal(
+    expect(
       extractCompassItemDate("<guid>https://compass.fi/#17-08-2026</guid>"),
-      "2026-08-17",
-    );
+    ).toBe("2026-08-17");
   });
 
-  void it("parseCompassLine handles dish names, dietary flags and filters boilerplate", () => {
+  it("parseCompassLine handles dish names, dietary flags and filters boilerplate", () => {
     // Boilerplate should be filtered
-    assert.equal(
-      parseCompassLine("Lounas buffet 10&euro;", "2026-08-21"),
-      null,
-    );
-    assert.equal(parseCompassLine("&nbsp;", "2026-08-21"), null);
+    expect(parseCompassLine("Lounas buffet 10&euro;", "2026-08-21")).toBeNull();
+    expect(parseCompassLine("&nbsp;", "2026-08-21")).toBeNull();
 
     // Single parenthesized flag group
     const item1 = parseCompassLine(
       "Bataattikeittoa (*, A, G, L)",
       "2026-08-21",
     );
-    assert.deepEqual(item1, {
+    expect(item1).toEqual({
       date: "2026-08-21",
       item: "Bataattikeittoa",
       dietaryFlags: ["*", "A", "G", "L"],
@@ -115,97 +108,96 @@ void describe("pasilan-linkki fetcher", () => {
       "Halloumi-kukkakaalikormaa (A, G, VS) ja Riisi&auml; (G, L, M, Veg)",
       "2026-08-21",
     );
-    assert.deepEqual(item2, {
+    expect(item2).toEqual({
       date: "2026-08-21",
       item: "Halloumi-kukkakaalikormaa ja Riisiä",
       dietaryFlags: ["A", "G", "VS", "L", "M", "Veg"],
     });
   });
 
-  void it("parseCompassDescription parses full description HTML", () => {
+  it("parseCompassDescription parses full description HTML", () => {
     const desc = `<p>Lounas buffet 10&euro;</p><p>&nbsp;</p><p>Bataattikeittoa (*, A, G, L)</p><p>Kanaa Kiovan tapaan (A, L, VS) ja Chilimajoneesia (A, L, M, G)</p>`;
     const items = parseCompassDescription(desc, "2026-08-21");
 
-    assert.equal(items.length, 2);
+    expect(items.length).toBe(2);
     const item0 = items[0];
-    assert.ok(item0);
-    assert.equal(item0.item, "Bataattikeittoa");
-    assert.deepEqual(item0.dietaryFlags, ["*", "A", "G", "L"]);
+    expect(item0).toBeTruthy();
+    expect(item0?.item).toBe("Bataattikeittoa");
+    expect(item0?.dietaryFlags).toEqual(["*", "A", "G", "L"]);
 
     const item1 = items[1];
-    assert.ok(item1);
-    assert.equal(item1.item, "Kanaa Kiovan tapaan ja Chilimajoneesia");
-    assert.deepEqual(item1.dietaryFlags, ["A", "L", "VS", "M", "G"]);
+    expect(item1).toBeTruthy();
+    expect(item1?.item).toBe("Kanaa Kiovan tapaan ja Chilimajoneesia");
+    expect(item1?.dietaryFlags).toEqual(["A", "L", "VS", "M", "G"]);
   });
 
-  void it("parsePasilanLinkkiRss correctly extracts all menu items from sample RSS feed", () => {
+  it("parsePasilanLinkkiRss correctly extracts all menu items from sample RSS feed", () => {
     const items = parsePasilanLinkkiRss(SAMPLE_LINKKI_XML, "2026-08-21");
 
-    assert.equal(items.length, 5);
+    expect(items.length).toBe(5);
 
-    assert.deepEqual(items[0], {
+    expect(items[0]).toEqual({
       date: "2026-08-21",
       item: "Bataattikeittoa",
       dietaryFlags: ["*", "A", "G", "L"],
     });
 
-    assert.deepEqual(items[1], {
+    expect(items[1]).toEqual({
       date: "2026-08-21",
       item: "Halloumi-kukkakaalikormaa ja Riisiä",
       dietaryFlags: ["A", "G", "VS", "L", "M", "Veg"],
     });
 
-    assert.deepEqual(items[2], {
+    expect(items[2]).toEqual({
       date: "2026-08-21",
       item: "Uuniperunaa ja kylmäsavukirjolohitäytettä",
       dietaryFlags: ["A", "L", "G"],
     });
 
-    assert.deepEqual(items[3], {
+    expect(items[3]).toEqual({
       date: "2026-08-21",
       item: "Kanaa Kiovan tapaan ja Chilimajoneesia",
       dietaryFlags: ["A", "L", "VS", "M", "G"],
     });
 
-    assert.deepEqual(items[4], {
+    expect(items[4]).toEqual({
       date: "2026-08-21",
       item: "Jogurttipannacottaa ja Mustaherukkahilloketta",
       dietaryFlags: ["A", "G", "L", "M", "Veg"],
     });
   });
 
-  void it("parsePasilanLinkkiRss matches target date in weekly RSS feed", () => {
+  it("parsePasilanLinkkiRss matches target date in weekly RSS feed", () => {
     const mondayItems = parsePasilanLinkkiRss(
       SAMPLE_WEEKLY_LINKKI_XML,
       "2026-08-17",
     );
-    assert.equal(mondayItems.length, 6);
+    expect(mondayItems.length).toBe(6);
     const mon0 = mondayItems[0];
-    assert.ok(mon0);
-    assert.equal(mon0.item, "Sienikeittoa");
-    assert.deepEqual(mon0.dietaryFlags, ["A", "ILM", "L"]);
+    expect(mon0).toBeTruthy();
+    expect(mon0?.item).toBe("Sienikeittoa");
+    expect(mon0?.dietaryFlags).toEqual(["A", "ILM", "L"]);
 
     const fridayItems = parsePasilanLinkkiRss(
       SAMPLE_WEEKLY_LINKKI_XML,
       "2026-08-21",
     );
-    assert.equal(fridayItems.length, 5);
+    expect(fridayItems.length).toBe(5);
     const fri0 = fridayItems[0];
-    assert.ok(fri0);
-    assert.equal(fri0.item, "Bataattikeittoa");
+    expect(fri0).toBeTruthy();
+    expect(fri0?.item).toBe("Bataattikeittoa");
 
     const nonExistentItems = parsePasilanLinkkiRss(
       SAMPLE_WEEKLY_LINKKI_XML,
       "2026-08-19",
     );
-    assert.equal(nonExistentItems.length, 0);
+    expect(nonExistentItems.length).toBe(0);
   });
 
-  void it("handles empty or malformed XML gracefully", () => {
-    assert.deepEqual(parsePasilanLinkkiRss("", "2026-08-21"), []);
-    assert.deepEqual(
+  it("handles empty or malformed XML gracefully", () => {
+    expect(parsePasilanLinkkiRss("", "2026-08-21")).toEqual([]);
+    expect(
       parsePasilanLinkkiRss("<rss><channel></channel></rss>", "2026-08-21"),
-      [],
-    );
+    ).toEqual([]);
   });
 });

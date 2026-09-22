@@ -1,8 +1,7 @@
-import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
-import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
+import { describe, expect, it } from "vitest";
 
 import {
   getHelsinkiDateString,
@@ -24,21 +23,21 @@ interface TestRawApiResponse {
   }[];
 }
 
-void describe("huoltamo fetcher (compatibility)", () => {
-  void it("getHelsinkiDateString formats UTC timestamps to Europe/Helsinki date", () => {
+describe("huoltamo fetcher (compatibility)", () => {
+  it("getHelsinkiDateString formats UTC timestamps to Europe/Helsinki date", () => {
     const formatted = getHelsinkiDateString("2026-08-16T21:00:00.000Z");
-    assert.equal(formatted, "2026-08-17");
+    expect(formatted).toBe("2026-08-17");
 
     const formatted2 = getHelsinkiDateString("2026-08-20T21:00:00.000Z");
-    assert.equal(formatted2, "2026-08-21");
+    expect(formatted2).toBe("2026-08-21");
   });
 
-  void it("parseDietaryFlags parses various diet formats correctly", () => {
-    assert.deepEqual(parseDietaryFlags("G,Veg"), ["G", "Veg"]);
-    assert.deepEqual(parseDietaryFlags("(L, G)"), ["L", "G"]);
+  it("parseDietaryFlags parses various diet formats correctly", () => {
+    expect(parseDietaryFlags("G,Veg")).toEqual(["G", "Veg"]);
+    expect(parseDietaryFlags("(L, G)")).toEqual(["L", "G"]);
   });
 
-  void it("parseHuoltamoResponse extracts correct items for Huoltamo on 2026-08-21", () => {
+  it("parseHuoltamoResponse extracts correct items for Huoltamo on 2026-08-21", () => {
     const samplePath = path.resolve(
       __dirname,
       "../../../../docs/huoltamo-api-sample-response-data.json",
@@ -49,7 +48,7 @@ void describe("huoltamo fetcher (compatibility)", () => {
 
     const results = parseHuoltamoResponse(rawData, "2026-08-21");
 
-    assert.equal(results.length, 9);
-    assert.equal(results[0]?.item, "Fish remoulade burger");
+    expect(results.length).toBe(9);
+    expect(results[0]?.item).toBe("Fish remoulade burger");
   });
 });

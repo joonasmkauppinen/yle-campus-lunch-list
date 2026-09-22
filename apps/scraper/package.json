@@ -12,7 +12,8 @@
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "start": "tsx src/index.ts",
-    "test": "tsx --test 'src/**/*.test.ts'",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -31,7 +32,8 @@
     "oxlint": "catalog:",
     "prettier": "catalog:",
     "tsx": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
   "prettier": "@acme/prettier-config"
 }

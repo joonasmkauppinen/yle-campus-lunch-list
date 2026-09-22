@@ -1,41 +1,40 @@
-import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, expect, it } from "vitest";
 
 import { resolveIsDryRun, resolveTargetDate } from "./index.js";
 
-void describe("resolveTargetDate", () => {
-  void it("parses --date flag with separate argument", () => {
-    assert.equal(resolveTargetDate(["--date", "2026-08-21"]), "2026-08-21");
-    assert.equal(resolveTargetDate(["-d", "2026-08-20"]), "2026-08-20");
+describe("resolveTargetDate", () => {
+  it("parses --date flag with separate argument", () => {
+    expect(resolveTargetDate(["--date", "2026-08-21"])).toBe("2026-08-21");
+    expect(resolveTargetDate(["-d", "2026-08-20"])).toBe("2026-08-20");
   });
 
-  void it("parses --date= flag with equal sign", () => {
-    assert.equal(resolveTargetDate(["--date=2026-08-21"]), "2026-08-21");
-    assert.equal(resolveTargetDate(["-d=2026-08-20"]), "2026-08-20");
+  it("parses --date= flag with equal sign", () => {
+    expect(resolveTargetDate(["--date=2026-08-21"])).toBe("2026-08-21");
+    expect(resolveTargetDate(["-d=2026-08-20"])).toBe("2026-08-20");
   });
 
-  void it("parses positional date argument", () => {
-    assert.equal(resolveTargetDate(["2026-08-21"]), "2026-08-21");
+  it("parses positional date argument", () => {
+    expect(resolveTargetDate(["2026-08-21"])).toBe("2026-08-21");
   });
 
-  void it("falls back to env variables when no CLI args provided", () => {
+  it("falls back to env variables when no CLI args provided", () => {
     const originalTargetDate = process.env.TARGET_DATE;
     const originalDate = process.env.DATE;
 
     try {
       process.env.TARGET_DATE = "2026-08-19";
-      assert.equal(resolveTargetDate([]), "2026-08-19");
+      expect(resolveTargetDate([])).toBe("2026-08-19");
 
       delete process.env.TARGET_DATE;
       process.env.DATE = "2026-08-18";
-      assert.equal(resolveTargetDate([]), "2026-08-18");
+      expect(resolveTargetDate([])).toBe("2026-08-18");
     } finally {
       process.env.TARGET_DATE = originalTargetDate;
       process.env.DATE = originalDate;
     }
   });
 
-  void it("falls back to today in Helsinki timezone if no args or env specified", () => {
+  it("falls back to today in Helsinki timezone if no args or env specified", () => {
     const originalTargetDate = process.env.TARGET_DATE;
     const originalDate = process.env.DATE;
     const originalScrapeDate = process.env.SCRAPE_DATE;
@@ -46,7 +45,7 @@ void describe("resolveTargetDate", () => {
       delete process.env.SCRAPE_DATE;
 
       const dateStr = resolveTargetDate([]);
-      assert.match(dateStr, /^\d{4}-\d{2}-\d{2}$/);
+      expect(dateStr).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     } finally {
       process.env.TARGET_DATE = originalTargetDate;
       process.env.DATE = originalDate;
@@ -55,52 +54,52 @@ void describe("resolveTargetDate", () => {
   });
 });
 
-void describe("resolveIsDryRun", () => {
-  void it("parses --dry-run, --dryrun, and -n flags", () => {
-    assert.equal(resolveIsDryRun(["--dry-run"]), true);
-    assert.equal(resolveIsDryRun(["--dryrun"]), true);
-    assert.equal(resolveIsDryRun(["-n"]), true);
-    assert.equal(resolveIsDryRun(["--date", "2026-08-21", "--dry-run"]), true);
+describe("resolveIsDryRun", () => {
+  it("parses --dry-run, --dryrun, and -n flags", () => {
+    expect(resolveIsDryRun(["--dry-run"])).toBe(true);
+    expect(resolveIsDryRun(["--dryrun"])).toBe(true);
+    expect(resolveIsDryRun(["-n"])).toBe(true);
+    expect(resolveIsDryRun(["--date", "2026-08-21", "--dry-run"])).toBe(true);
   });
 
-  void it("parses --dry-run= flag with boolean values", () => {
-    assert.equal(resolveIsDryRun(["--dry-run=true"]), true);
-    assert.equal(resolveIsDryRun(["--dry-run=1"]), true);
-    assert.equal(resolveIsDryRun(["--dry-run=yes"]), true);
-    assert.equal(resolveIsDryRun(["--dry-run=false"]), false);
-    assert.equal(resolveIsDryRun(["--dryrun=true"]), true);
+  it("parses --dry-run= flag with boolean values", () => {
+    expect(resolveIsDryRun(["--dry-run=true"])).toBe(true);
+    expect(resolveIsDryRun(["--dry-run=1"])).toBe(true);
+    expect(resolveIsDryRun(["--dry-run=yes"])).toBe(true);
+    expect(resolveIsDryRun(["--dry-run=false"])).toBe(false);
+    expect(resolveIsDryRun(["--dryrun=true"])).toBe(true);
   });
 
-  void it("falls back to DRY_RUN env variable", () => {
+  it("falls back to DRY_RUN env variable", () => {
     const originalDryRun = process.env.DRY_RUN;
 
     try {
       process.env.DRY_RUN = "true";
-      assert.equal(resolveIsDryRun([]), true);
+      expect(resolveIsDryRun([])).toBe(true);
 
       process.env.DRY_RUN = "1";
-      assert.equal(resolveIsDryRun([]), true);
+      expect(resolveIsDryRun([])).toBe(true);
 
       process.env.DRY_RUN = "yes";
-      assert.equal(resolveIsDryRun([]), true);
+      expect(resolveIsDryRun([])).toBe(true);
 
       process.env.DRY_RUN = "false";
-      assert.equal(resolveIsDryRun([]), false);
+      expect(resolveIsDryRun([])).toBe(false);
 
       process.env.DRY_RUN = "0";
-      assert.equal(resolveIsDryRun([]), false);
+      expect(resolveIsDryRun([])).toBe(false);
     } finally {
       process.env.DRY_RUN = originalDryRun;
     }
   });
 
-  void it("returns false when no flag or env var is provided", () => {
+  it("returns false when no flag or env var is provided", () => {
     const originalDryRun = process.env.DRY_RUN;
 
     try {
       delete process.env.DRY_RUN;
-      assert.equal(resolveIsDryRun([]), false);
-      assert.equal(resolveIsDryRun(["--date", "2026-08-21"]), false);
+      expect(resolveIsDryRun([])).toBe(false);
+      expect(resolveIsDryRun(["--date", "2026-08-21"])).toBe(false);
     } finally {
       process.env.DRY_RUN = originalDryRun;
     }

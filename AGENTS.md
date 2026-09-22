@@ -48,7 +48,7 @@ Other key directories:
 | **Styling** | `tailwindcss` ^4.1.16, `@radix-ui` primitives, `class-variance-authority`, `sonner` |
 | **Env Validation** | `@t3-oss/env-nextjs`, `zod` |
 | **Data Ingestion** | `googleapis` ^144.0.0, `cheerio` ^1.0.0, native `fetch` |
-| **Test Runner** | Node.js native test runner via `tsx --test` |
+| **Test Runner** | Vitest `^3.0.8` |
 | **Linting & Formatting**| Oxlint (ultra-fast Rust linter) & ESLint 9, Oxfmt (Rust formatter with Tailwind sorting) & Prettier, Sherif monorepo linter |
 
 ---
@@ -255,8 +255,8 @@ Structure UI components following Atomic Design principles to maintain modularit
 - **Data Fixtures**: When testing scrapers and parsers, use representative fixture files in `docs/` (e.g. `docs/iso-paja-sample-response-data.html`) or inline minimal inputs.
 
 ### 3. Test Runner
-- Tests use the native Node.js test runner via `tsx --test` (`import test, { describe, it } from "node:test"; import assert from "node:assert";`).
-- Run tests via `pnpm test` or target individual packages (e.g. `pnpm --filter @acme/scraper test`).
+- Tests use Vitest (`import { describe, it, expect } from "vitest";`).
+- Run tests via `pnpm test` or target individual packages (e.g. `pnpm --filter @acme/scraper test`, `pnpm --filter @acme/nextjs test`).
 
 ---
 
