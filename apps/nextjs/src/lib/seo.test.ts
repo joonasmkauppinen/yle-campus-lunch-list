@@ -1,5 +1,4 @@
-import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, expect, it } from "vitest";
 
 import type { Restaurant } from "@acme/shared-types";
 
@@ -11,23 +10,23 @@ import {
   mapDietaryFlagsToSchema,
 } from "./seo";
 
-void describe("SEO utilities", () => {
-  void it("getBaseUrl returns valid URL string", () => {
+describe("SEO utilities", () => {
+  it("getBaseUrl returns valid URL string", () => {
     const url = getBaseUrl();
-    assert.ok(url.startsWith("http://") || url.startsWith("https://"));
+    expect(url.startsWith("http://") || url.startsWith("https://")).toBe(true);
   });
 
-  void it("mapDietaryFlagsToSchema maps gluten, vegan and lactose flags", () => {
-    assert.deepEqual(mapDietaryFlagsToSchema(["G", "L", "VEG"]), [
+  it("mapDietaryFlagsToSchema maps gluten, vegan and lactose flags", () => {
+    expect(mapDietaryFlagsToSchema(["G", "L", "VEG"])).toEqual([
       "https://schema.org/GlutenFreeDiet",
       "https://schema.org/VeganDiet",
       "https://schema.org/LactoseRestrictedDiet",
     ]);
-    assert.deepEqual(mapDietaryFlagsToSchema([]), []);
-    assert.deepEqual(mapDietaryFlagsToSchema(undefined), []);
+    expect(mapDietaryFlagsToSchema([])).toEqual([]);
+    expect(mapDietaryFlagsToSchema(undefined)).toEqual([]);
   });
 
-  void it("generateRestaurantJsonLd generates valid Schema.org Restaurant format", () => {
+  it("generateRestaurantJsonLd generates valid Schema.org Restaurant format", () => {
     const restaurant: Restaurant = {
       id: "iso-paja",
       name: "Iso Paja",
@@ -57,14 +56,13 @@ void describe("SEO utilities", () => {
       "https://yle-campus-lunch-list.vercel.app",
     );
 
-    assert.equal(schema["@context"], "https://schema.org");
-    assert.equal(schema["@type"], "Restaurant");
-    assert.equal(schema.name, "Iso Paja");
-    assert.equal(
-      schema.url,
+    expect(schema["@context"]).toBe("https://schema.org");
+    expect(schema["@type"]).toBe("Restaurant");
+    expect(schema.name).toBe("Iso Paja");
+    expect(schema.url).toBe(
       "https://yle-campus-lunch-list.vercel.app/restaurant/iso-paja",
     );
-    assert.deepEqual(schema.address, {
+    expect(schema.address).toEqual({
       "@type": "PostalAddress",
       streetAddress: "Radiokatu 3",
       postalCode: "00240",
@@ -72,10 +70,10 @@ void describe("SEO utilities", () => {
       addressRegion: "Uusimaa",
       addressCountry: "FI",
     });
-    assert.ok(schema.hasMenu);
+    expect(schema.hasMenu).toBeTruthy();
   });
 
-  void it("generateHomeJsonLd generates WebSite and ItemList schemas", () => {
+  it("generateHomeJsonLd generates WebSite and ItemList schemas", () => {
     const restaurants: Restaurant[] = [
       {
         id: "iso-paja",
@@ -89,14 +87,14 @@ void describe("SEO utilities", () => {
       restaurants,
       "https://yle-campus-lunch-list.vercel.app",
     );
-    assert.equal(schemas.length, 2);
-    assert.equal(schemas[0]?.["@type"], "WebSite");
-    assert.equal(schemas[1]?.["@type"], "ItemList");
+    expect(schemas.length).toBe(2);
+    expect(schemas[0]?.["@type"]).toBe("WebSite");
+    expect(schemas[1]?.["@type"]).toBe("ItemList");
   });
 
-  void it("robots disallows /radiator and /api/ paths", () => {
+  it("robots disallows /radiator and /api/ paths", () => {
     const robotsResult = robots();
-    assert.deepEqual(robotsResult.rules, {
+    expect(robotsResult.rules).toEqual({
       userAgent: "*",
       allow: "/",
       disallow: ["/api/", "/radiator"],

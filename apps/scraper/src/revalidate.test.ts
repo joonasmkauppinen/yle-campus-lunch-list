@@ -1,10 +1,9 @@
-import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, expect, it, vi } from "vitest";
 
 import { triggerRevalidation } from "./revalidate.js";
 
-void describe("triggerRevalidation", () => {
-  void it("skips revalidation when not in production and force is not set", async () => {
+describe("triggerRevalidation", () => {
+  it("skips revalidation when not in production and force is not set", async () => {
     const origEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = "development";
 
@@ -12,14 +11,14 @@ void describe("triggerRevalidation", () => {
       const result = await triggerRevalidation({
         frontendUrl: "https://campus-lunch.example.com",
       });
-      assert.equal(result.skipped, true);
-      assert.equal(result.success, true);
+      expect(result.skipped).toBe(true);
+      expect(result.success).toBe(true);
     } finally {
       process.env.NODE_ENV = origEnv;
     }
   });
 
-  void it("returns error if frontend URL is missing in production", async () => {
+  it("returns error if frontend URL is missing in production", async () => {
     const origEnv = process.env.NODE_ENV;
     const origUrl = process.env.FRONTEND_URL;
     process.env.NODE_ENV = "production";
@@ -28,38 +27,39 @@ void describe("triggerRevalidation", () => {
 
     try {
       const result = await triggerRevalidation();
-      assert.equal(result.success, false);
-      assert.match(result.error ?? "", /FRONTEND_URL/);
+      expect(result.success).toBe(false);
+      expect(result.error ?? "").toMatch(/FRONTEND_URL/);
     } finally {
       process.env.NODE_ENV = origEnv;
       process.env.FRONTEND_URL = origUrl;
     }
   });
 
-  void it("successfully calls revalidation endpoint when forced or in production", async () => {
-    const origFetch = globalThis.fetch;
+  it("successfully calls revalidation endpoint when forced or in production", async () => {
     let requestedUrl = "";
     let authHeader = "";
     let customHeader = "";
 
-    globalThis.fetch = ((url: string | URL | Request, init?: RequestInit) => {
-      requestedUrl =
-        typeof url === "string"
-          ? url
-          : url instanceof URL
-            ? url.toString()
-            : url.url;
-      const headers = (init?.headers ?? {}) as Record<string, string>;
-      authHeader = headers.Authorization ?? "";
-      customHeader = headers["x-revalidate-secret"] ?? "";
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockImplementation((url, init) => {
+        requestedUrl =
+          typeof url === "string"
+            ? url
+            : url instanceof URL
+              ? url.toString()
+              : (url as Request).url;
+        const headers = (init?.headers ?? {}) as Record<string, string>;
+        authHeader = headers.Authorization ?? "";
+        customHeader = headers["x-revalidate-secret"] ?? "";
 
-      return Promise.resolve(
-        new Response(JSON.stringify({ revalidated: true, paths: ["/"] }), {
-          status: 200,
-          headers: { "Content-Type": "application/json" },
-        }),
-      );
-    }) as typeof fetch;
+        return Promise.resolve(
+          new Response(JSON.stringify({ revalidated: true, paths: ["/"] }), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          }),
+        );
+      });
 
     try {
       const result = await triggerRevalidation({
@@ -68,30 +68,27 @@ void describe("triggerRevalidation", () => {
         force: true,
       });
 
-      assert.equal(result.success, true);
-      assert.equal(result.status, 200);
-      assert.equal(
-        requestedUrl,
+      expect(result.success).toBe(true);
+      expect(result.status).toBe(200);
+      expect(requestedUrl).toBe(
         "https://campus-lunch.example.com/api/revalidate",
       );
-      assert.equal(authHeader, "Bearer test-secret-123");
-      assert.equal(customHeader, "test-secret-123");
+      expect(authHeader).toBe("Bearer test-secret-123");
+      expect(customHeader).toBe("test-secret-123");
     } finally {
-      globalThis.fetch = origFetch;
+      fetchSpy.mockRestore();
     }
   });
 
-  void it("handles HTTP error status codes gracefully", async () => {
-    const origFetch = globalThis.fetch;
-
-    globalThis.fetch = (() => {
-      return Promise.resolve(
+  it("handles HTTP error status codes gracefully", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockImplementation(() =>
+      Promise.resolve(
         new Response(JSON.stringify({ error: "Unauthorized" }), {
           status: 401,
           headers: { "Content-Type": "application/json" },
         }),
-      );
-    }) as typeof fetch;
+      ),
+    );
 
     try {
       const result = await triggerRevalidation({
@@ -100,20 +97,20 @@ void describe("triggerRevalidation", () => {
         force: true,
       });
 
-      assert.equal(result.success, false);
-      assert.equal(result.status, 401);
-      assert.match(result.error ?? "", /HTTP 401/);
+      expect(result.success).toBe(false);
+      expect(result.status).toBe(401);
+      expect(result.error ?? "").toMatch(/HTTP 401/);
     } finally {
-      globalThis.fetch = origFetch;
+      fetchSpy.mockRestore();
     }
   });
 
-  void it("catches network errors and does not throw", async () => {
-    const origFetch = globalThis.fetch;
-
-    globalThis.fetch = (() => {
-      return Promise.reject(new Error("Connection refused"));
-    }) as typeof fetch;
+  it("catches network errors and does not throw", async () => {
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockImplementation(() =>
+        Promise.reject(new Error("Connection refused")),
+      );
 
     try {
       const result = await triggerRevalidation({
@@ -121,10 +118,10 @@ void describe("triggerRevalidation", () => {
         force: true,
       });
 
-      assert.equal(result.success, false);
-      assert.match(result.error ?? "", /Connection refused/);
+      expect(result.success).toBe(false);
+      expect(result.error ?? "").toMatch(/Connection refused/);
     } finally {
-      globalThis.fetch = origFetch;
+      fetchSpy.mockRestore();
     }
   });
 });

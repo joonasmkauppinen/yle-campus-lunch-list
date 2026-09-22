@@ -1,8 +1,7 @@
-import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
-import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
+import { describe, expect, it } from "vitest";
 
 import {
   getHelsinkiDateString,
@@ -26,7 +25,7 @@ interface TestRawApiResponse {
   }[];
 }
 
-void describe("intra fetcher", () => {
+describe("intra fetcher", () => {
   const samplePath = path.resolve(
     __dirname,
     "../../../../docs/huoltamo-api-sample-response-data.json",
@@ -35,122 +34,121 @@ void describe("intra fetcher", () => {
     fs.readFileSync(samplePath, "utf8"),
   ) as TestRawApiResponse;
 
-  void it("getHelsinkiDateString formats UTC timestamps to Europe/Helsinki date", () => {
+  it("getHelsinkiDateString formats UTC timestamps to Europe/Helsinki date", () => {
     // 2026-08-16T21:00:00.000Z is 2026-08-17 00:00:00 EEST (UTC+3)
     const formatted = getHelsinkiDateString("2026-08-16T21:00:00.000Z");
-    assert.equal(formatted, "2026-08-17");
+    expect(formatted).toBe("2026-08-17");
 
     const formatted2 = getHelsinkiDateString("2026-08-20T21:00:00.000Z");
-    assert.equal(formatted2, "2026-08-21");
+    expect(formatted2).toBe("2026-08-21");
   });
 
-  void it("parseDietaryFlags parses various diet formats correctly", () => {
-    assert.deepEqual(parseDietaryFlags("G,Veg"), ["G", "Veg"]);
-    assert.deepEqual(parseDietaryFlags("(L, G)"), ["L", "G"]);
-    assert.deepEqual(parseDietaryFlags("(L)"), ["L"]);
-    assert.deepEqual(parseDietaryFlags("(V, G)"), ["V", "G"]);
-    assert.deepEqual(parseDietaryFlags("VL,G, Vegaaninen keittiöstä"), [
+  it("parseDietaryFlags parses various diet formats correctly", () => {
+    expect(parseDietaryFlags("G,Veg")).toEqual(["G", "Veg"]);
+    expect(parseDietaryFlags("(L, G)")).toEqual(["L", "G"]);
+    expect(parseDietaryFlags("(L)")).toEqual(["L"]);
+    expect(parseDietaryFlags("(V, G)")).toEqual(["V", "G"]);
+    expect(parseDietaryFlags("VL,G, Vegaaninen keittiöstä")).toEqual([
       "VL",
       "G",
       "Vegaaninen keittiöstä",
     ]);
-    assert.deepEqual(parseDietaryFlags(""), []);
-    assert.deepEqual(parseDietaryFlags(undefined), []);
+    expect(parseDietaryFlags("")).toEqual([]);
+    expect(parseDietaryFlags(undefined)).toEqual([]);
   });
 
-  void it("parseIntraResponse extracts correct items for Huoltamo on 2026-08-21", () => {
+  it("parseIntraResponse extracts correct items for Huoltamo on 2026-08-21", () => {
     const results = parseIntraResponse(rawData, "huoltamo", "2026-08-21");
 
-    assert.equal(results.length, 9);
+    expect(results.length).toBe(9);
     const item0 = results[0];
-    assert.ok(item0);
-    assert.equal(item0.item, "Fish remoulade burger");
-    assert.deepEqual(item0.dietaryFlags, ["L"]);
-    assert.equal(item0.date, "2026-08-21");
+    expect(item0).toBeTruthy();
+    expect(item0?.item).toBe("Fish remoulade burger");
+    expect(item0?.dietaryFlags).toEqual(["L"]);
+    expect(item0?.date).toBe("2026-08-21");
 
     const item7 = results[7];
-    assert.ok(item7);
-    assert.equal(item7.item, "Jäätelöbaari 🍦🍬");
-    assert.deepEqual(item7.dietaryFlags, []);
+    expect(item7).toBeTruthy();
+    expect(item7?.item).toBe("Jäätelöbaari 🍦🍬");
+    expect(item7?.dietaryFlags).toEqual([]);
 
     const item8 = results[8];
-    assert.ok(item8);
-    assert.equal(item8.item, "Kahvi / tee");
+    expect(item8).toBeTruthy();
+    expect(item8?.item).toBe("Kahvi / tee");
   });
 
-  void it("parseIntraResponse extracts correct items for Studio 10 on 2026-08-21", () => {
+  it("parseIntraResponse extracts correct items for Studio 10 on 2026-08-21", () => {
     const results = parseIntraResponse(rawData, "studio-10", "2026-08-21");
 
-    assert.equal(results.length, 4);
+    expect(results.length).toBe(4);
     const item0 = results[0];
-    assert.ok(item0);
-    assert.equal(
-      item0.item,
+    expect(item0).toBeTruthy();
+    expect(item0?.item).toBe(
       "Pasta alla pancetta e panna - Kermaista pekonipastaa",
     );
-    assert.deepEqual(item0.dietaryFlags, ["L"]);
-    assert.equal(item0.date, "2026-08-21");
+    expect(item0?.dietaryFlags).toEqual(["L"]);
+    expect(item0?.date).toBe("2026-08-21");
 
     const item1 = results[1];
-    assert.ok(item1);
-    assert.equal(item1.item, "Scorfano al pesto - Puna-ahventa & pestoa");
-    assert.deepEqual(item1.dietaryFlags, ["L", "G"]);
+    expect(item1).toBeTruthy();
+    expect(item1?.item).toBe("Scorfano al pesto - Puna-ahventa & pestoa");
+    expect(item1?.dietaryFlags).toEqual(["L", "G"]);
 
     const item2 = results[2];
-    assert.ok(item2);
-    assert.equal(item2.item, "Tacchino Cordon Bleu - Kalkkuna Cordon Bleu");
-    assert.deepEqual(item2.dietaryFlags, ["L"]);
+    expect(item2).toBeTruthy();
+    expect(item2?.item).toBe("Tacchino Cordon Bleu - Kalkkuna Cordon Bleu");
+    expect(item2?.dietaryFlags).toEqual(["L"]);
 
     const item3 = results[3];
-    assert.ok(item3);
-    assert.equal(item3.item, "Zucchini al forno - Kesäkurpitsaa uunissa");
-    assert.deepEqual(item3.dietaryFlags, ["V", "G"]);
+    expect(item3).toBeTruthy();
+    expect(item3?.item).toBe("Zucchini al forno - Kesäkurpitsaa uunissa");
+    expect(item3?.dietaryFlags).toEqual(["V", "G"]);
   });
 
-  void it("parseIntraResponse extracts correct items for Piccolo on 2026-08-21", () => {
+  it("parseIntraResponse extracts correct items for Piccolo on 2026-08-21", () => {
     const results = parseIntraResponse(rawData, "piccolo", "2026-08-21");
 
-    assert.equal(results.length, 4);
+    expect(results.length).toBe(4);
     const item0 = results[0];
-    assert.ok(item0);
-    assert.equal(item0.item, "Katkarapu-pastasalaattia");
-    assert.deepEqual(item0.dietaryFlags, []);
-    assert.equal(item0.date, "2026-08-21");
+    expect(item0).toBeTruthy();
+    expect(item0?.item).toBe("Katkarapu-pastasalaattia");
+    expect(item0?.dietaryFlags).toEqual([]);
+    expect(item0?.date).toBe("2026-08-21");
 
     const item1 = results[1];
-    assert.ok(item1);
-    assert.equal(item1.item, "Raejuustosalaattia");
-    assert.deepEqual(item1.dietaryFlags, []);
+    expect(item1).toBeTruthy();
+    expect(item1?.item).toBe("Raejuustosalaattia");
+    expect(item1?.dietaryFlags).toEqual([]);
 
     const item2 = results[2];
-    assert.ok(item2);
-    assert.equal(item2.item, "Punajuurisosekeittoa");
-    assert.deepEqual(item2.dietaryFlags, ["L", "G"]);
+    expect(item2).toBeTruthy();
+    expect(item2?.item).toBe("Punajuurisosekeittoa");
+    expect(item2?.dietaryFlags).toEqual(["L", "G"]);
 
     const item3 = results[3];
-    assert.ok(item3);
-    assert.equal(item3.item, "Kahvi / tee & jälkiruoka");
-    assert.deepEqual(item3.dietaryFlags, []);
+    expect(item3).toBeTruthy();
+    expect(item3?.item).toBe("Kahvi / tee & jälkiruoka");
+    expect(item3?.dietaryFlags).toEqual([]);
   });
 
-  void it("parseIntraAllRestaurants parses all 3 restaurants at once", () => {
+  it("parseIntraAllRestaurants parses all 3 restaurants at once", () => {
     const allMenus = parseIntraAllRestaurants(rawData, "2026-08-21");
 
-    assert.equal(allMenus.huoltamo.length, 9);
-    assert.equal(allMenus["studio-10"].length, 4);
-    assert.equal(allMenus.piccolo.length, 4);
+    expect(allMenus.huoltamo.length).toBe(9);
+    expect(allMenus["studio-10"].length).toBe(4);
+    expect(allMenus.piccolo.length).toBe(4);
   });
 
-  void it("parseHuoltamoResponse backward compatibility helper works", () => {
+  it("parseHuoltamoResponse backward compatibility helper works", () => {
     const results = parseHuoltamoResponse(rawData, "2026-08-21");
-    assert.equal(results.length, 9);
+    expect(results.length).toBe(9);
     const item0 = results[0];
-    assert.ok(item0);
-    assert.equal(item0.item, "Fish remoulade burger");
+    expect(item0).toBeTruthy();
+    expect(item0?.item).toBe("Fish remoulade burger");
   });
 
-  void it("parseIntraResponse handles days with no menu for a restaurant", () => {
+  it("parseIntraResponse handles days with no menu for a restaurant", () => {
     const results = parseIntraResponse(rawData, "studio-10", "1999-01-01");
-    assert.deepEqual(results, []);
+    expect(results).toEqual([]);
   });
 });

@@ -1,5 +1,4 @@
-import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, expect, it } from "vitest";
 
 import {
   DYLAN_LUFT_RESTAURANT_ID,
@@ -53,32 +52,31 @@ const SAMPLE_WEEK_RSS = `<?xml version="1.0" encoding="utf-8"?>
     </channel>
 </rss>`;
 
-void describe("dylan-luft fetcher", () => {
-  void it("exports correct restaurant constants", () => {
-    assert.equal(DYLAN_LUFT_RESTAURANT_ID, "dylan-luft");
-    assert.equal(DYLAN_LUFT_RESTAURANT_NAME, "Dylan Luft");
+describe("dylan-luft fetcher", () => {
+  it("exports correct restaurant constants", () => {
+    expect(DYLAN_LUFT_RESTAURANT_ID).toBe("dylan-luft");
+    expect(DYLAN_LUFT_RESTAURANT_NAME).toBe("Dylan Luft");
   });
 
-  void it("unescapeXml converts XML entities", () => {
-    assert.equal(unescapeXml("&amp; &lt; &gt; &quot; &#39;"), "& < > \" '");
+  it("unescapeXml converts XML entities", () => {
+    expect(unescapeXml("&amp; &lt; &gt; &quot; &#39;")).toBe("& < > \" '");
   });
 
-  void it("parseDylanLine handles various menu item formats and filters boilerplate", () => {
+  it("parseDylanLine handles various menu item formats and filters boilerplate", () => {
     // Boilerplate intro should be filtered
-    assert.equal(
+    expect(
       parseDylanLine(
         "Dylan Luftin buffetlounas sisältää runsaan salaattipöydän sekä vastapaistettua leipää. Kysy tarvittaessa vegaanista ja gluteenitonta vaihtoehtoa henkilökunnalta",
         "2026-08-21",
       ),
-      null,
-    );
+    ).toBeNull();
 
     // Parenthesized dietary flags
     const item1 = parseDylanLine(
       "Kesäkeittoa ja rakuunaöljyä (L, G)",
       "2026-08-21",
     );
-    assert.deepEqual(item1, {
+    expect(item1).toEqual({
       date: "2026-08-21",
       item: "Kesäkeittoa ja rakuunaöljyä",
       dietaryFlags: ["L", "G"],
@@ -86,7 +84,7 @@ void describe("dylan-luft fetcher", () => {
 
     // Aamupuuro formatting normalization
     const item2 = parseDylanLine("Aamupuuro:Kaurapuuro (Veg)", "2026-08-21");
-    assert.deepEqual(item2, {
+    expect(item2).toEqual({
       date: "2026-08-21",
       item: "Aamupuuro: Kaurapuuro",
       dietaryFlags: ["Veg"],
@@ -97,7 +95,7 @@ void describe("dylan-luft fetcher", () => {
       'Broileria maukkaassa maapähkinäkastikkeessa "Satay" (M,G, sis. pähkinää)',
       "2026-08-21",
     );
-    assert.deepEqual(item3, {
+    expect(item3).toEqual({
       date: "2026-08-21",
       item: 'Broileria maukkaassa maapähkinäkastikkeessa "Satay"',
       dietaryFlags: ["M", "G", "sis. pähkinää"],
@@ -108,7 +106,7 @@ void describe("dylan-luft fetcher", () => {
       "Maapähkinävoilla höystetty kanakeitto M, G",
       "2026-08-21",
     );
-    assert.deepEqual(item4, {
+    expect(item4).toEqual({
       date: "2026-08-21",
       item: "Maapähkinävoilla höystetty kanakeitto",
       dietaryFlags: ["M", "G"],
@@ -116,102 +114,101 @@ void describe("dylan-luft fetcher", () => {
 
     // No dietary flags
     const item5 = parseDylanLine("Päivän makea jälkiruoka", "2026-08-21");
-    assert.deepEqual(item5, {
+    expect(item5).toEqual({
       date: "2026-08-21",
       item: "Päivän makea jälkiruoka",
       dietaryFlags: [],
     });
   });
 
-  void it("parseDylanDescription extracts all menu items from description HTML", () => {
+  it("parseDylanDescription extracts all menu items from description HTML", () => {
     const desc =
       "Dylan Luftin buffetlounas sisältää runsaan salaattipöydän...<br>Aamupuuro:Kaurapuuro (Veg)<br>Kesäkeittoa ja rakuunaöljyä (L, G)<br>Päivän makea jälkiruoka";
     const items = parseDylanDescription(desc, "2026-08-21");
 
-    assert.equal(items.length, 3);
+    expect(items.length).toBe(3);
     const item0 = items[0];
-    assert.ok(item0);
-    assert.equal(item0.item, "Aamupuuro: Kaurapuuro");
-    assert.deepEqual(item0.dietaryFlags, ["Veg"]);
+    expect(item0).toBeTruthy();
+    expect(item0?.item).toBe("Aamupuuro: Kaurapuuro");
+    expect(item0?.dietaryFlags).toEqual(["Veg"]);
 
     const item1 = items[1];
-    assert.ok(item1);
-    assert.equal(item1.item, "Kesäkeittoa ja rakuunaöljyä");
-    assert.deepEqual(item1.dietaryFlags, ["L", "G"]);
+    expect(item1).toBeTruthy();
+    expect(item1?.item).toBe("Kesäkeittoa ja rakuunaöljyä");
+    expect(item1?.dietaryFlags).toEqual(["L", "G"]);
 
     const item2 = items[2];
-    assert.ok(item2);
-    assert.equal(item2.item, "Päivän makea jälkiruoka");
-    assert.deepEqual(item2.dietaryFlags, []);
+    expect(item2).toBeTruthy();
+    expect(item2?.item).toBe("Päivän makea jälkiruoka");
+    expect(item2?.dietaryFlags).toEqual([]);
   });
 
-  void it("parseDylanLuftRss extracts items from single-day RSS feed", () => {
+  it("parseDylanLuftRss extracts items from single-day RSS feed", () => {
     const items = parseDylanLuftRss(SAMPLE_SINGLE_DAY_RSS, "2026-08-21");
 
-    assert.equal(items.length, 7);
+    expect(items.length).toBe(7);
     const item0 = items[0];
-    assert.ok(item0);
-    assert.equal(item0.item, "Aamupuuro: Kaurapuuro");
-    assert.deepEqual(item0.dietaryFlags, ["Veg"]);
+    expect(item0).toBeTruthy();
+    expect(item0?.item).toBe("Aamupuuro: Kaurapuuro");
+    expect(item0?.dietaryFlags).toEqual(["Veg"]);
 
     const item1 = items[1];
-    assert.ok(item1);
-    assert.equal(item1.item, "Kesäkeittoa ja rakuunaöljyä");
-    assert.deepEqual(item1.dietaryFlags, ["L", "G"]);
+    expect(item1).toBeTruthy();
+    expect(item1?.item).toBe("Kesäkeittoa ja rakuunaöljyä");
+    expect(item1?.dietaryFlags).toEqual(["L", "G"]);
 
     const item2 = items[2];
-    assert.ok(item2);
-    assert.equal(item2.item, "Kasvisgyosat kookoscurrykastikkeessa");
-    assert.deepEqual(item2.dietaryFlags, ["Veg"]);
+    expect(item2).toBeTruthy();
+    expect(item2?.item).toBe("Kasvisgyosat kookoscurrykastikkeessa");
+    expect(item2?.dietaryFlags).toEqual(["Veg"]);
 
     const item3 = items[3];
-    assert.ok(item3);
-    assert.equal(item3.item, "Rapeaa kana Cordon bleuta ja srirachamajoneesia");
-    assert.deepEqual(item3.dietaryFlags, ["L"]);
+    expect(item3).toBeTruthy();
+    expect(item3?.item).toBe("Rapeaa kana Cordon bleuta ja srirachamajoneesia");
+    expect(item3?.dietaryFlags).toEqual(["L"]);
 
     const item4 = items[4];
-    assert.ok(item4);
-    assert.equal(item4.item, "Ylikypsää porsaanniskaa Tamarind-kastikkeessa");
-    assert.deepEqual(item4.dietaryFlags, ["M", "G"]);
+    expect(item4).toBeTruthy();
+    expect(item4?.item).toBe("Ylikypsää porsaanniskaa Tamarind-kastikkeessa");
+    expect(item4?.dietaryFlags).toEqual(["M", "G"]);
 
     const item5 = items[5];
-    assert.ok(item5);
-    assert.equal(item5.item, "Paistettua riisiä");
-    assert.deepEqual(item5.dietaryFlags, ["G", "Veg"]);
+    expect(item5).toBeTruthy();
+    expect(item5?.item).toBe("Paistettua riisiä");
+    expect(item5?.dietaryFlags).toEqual(["G", "Veg"]);
 
     const item6 = items[6];
-    assert.ok(item6);
-    assert.equal(item6.item, "Päivän makea jälkiruoka");
-    assert.deepEqual(item6.dietaryFlags, []);
+    expect(item6).toBeTruthy();
+    expect(item6?.item).toBe("Päivän makea jälkiruoka");
+    expect(item6?.dietaryFlags).toEqual([]);
   });
 
-  void it("parseDylanLuftRss extracts target date from multi-day RSS feed", () => {
+  it("parseDylanLuftRss extracts target date from multi-day RSS feed", () => {
     const mondayItems = parseDylanLuftRss(SAMPLE_WEEK_RSS, "2026-08-17");
-    assert.equal(mondayItems.length, 7);
+    expect(mondayItems.length).toBe(7);
     const mon0 = mondayItems[0];
-    assert.ok(mon0);
-    assert.equal(mon0.item, "Aamupuuro: Kaurapuuro");
+    expect(mon0).toBeTruthy();
+    expect(mon0?.item).toBe("Aamupuuro: Kaurapuuro");
 
     const mon1 = mondayItems[1];
-    assert.ok(mon1);
-    assert.equal(mon1.item, "Tuorejuusto-kasvissosekeitto");
-    assert.deepEqual(mon1.dietaryFlags, ["L", "G"]);
+    expect(mon1).toBeTruthy();
+    expect(mon1?.item).toBe("Tuorejuusto-kasvissosekeitto");
+    expect(mon1?.dietaryFlags).toEqual(["L", "G"]);
 
     const fridayItems = parseDylanLuftRss(SAMPLE_WEEK_RSS, "2026-08-21");
-    assert.equal(fridayItems.length, 7);
+    expect(fridayItems.length).toBe(7);
     const fri1 = fridayItems[1];
-    assert.ok(fri1);
-    assert.equal(fri1.item, "Kesäkeittoa ja rakuunaöljyä");
+    expect(fri1).toBeTruthy();
+    expect(fri1?.item).toBe("Kesäkeittoa ja rakuunaöljyä");
 
     const nonExistentItems = parseDylanLuftRss(SAMPLE_WEEK_RSS, "2026-08-19");
-    assert.equal(nonExistentItems.length, 0);
+    expect(nonExistentItems.length).toBe(0);
   });
 
-  void it("handles empty or malformed XML gracefully", () => {
-    assert.deepEqual(parseDylanLuftRss("", "2026-08-21"), []);
-    assert.deepEqual(
+  it("handles empty or malformed XML gracefully", () => {
+    expect(parseDylanLuftRss("", "2026-08-21")).toEqual([]);
+    expect(
       parseDylanLuftRss("<rss><channel></channel></rss>", "2026-08-21"),
-      [],
-    );
+    ).toEqual([]);
   });
 });
