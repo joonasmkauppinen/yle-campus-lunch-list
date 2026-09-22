@@ -323,3 +323,19 @@ All commit messages in this repository must follow the **[Conventional Commits](
 3. **No Trailing Period**: Do not end the commit subject with a period.
 4. **Breaking Changes**: Indicate breaking changes with a `!` before the colon (e.g., `feat(scraper)!: change sheet schema column order`) or include `BREAKING CHANGE:` in the footer.
 
+
+---
+
+## 12. Agent skills
+
+### Issue tracker
+
+Issues live as GitHub issues in `joonasmkauppinen/yle-campus-lunch-list`, managed with the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+The five canonical triage roles, each label string equal to its name. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: `CONTEXT.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.
