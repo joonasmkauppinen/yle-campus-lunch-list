@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useState, useSyncExternalStore } from "react";
 
 import type { Restaurant } from "@acme/shared-types";
@@ -19,6 +20,9 @@ export interface RestaurantViewProps {
   todayStr: string;
   isDev?: boolean;
   source?: string | null;
+  /** Rendered between the heading and the restaurant lists. Passed in rather
+   * than composed here so it stays outside this component's preference state. */
+  dishTagSection?: ReactNode;
 }
 
 export function RestaurantView({
@@ -26,6 +30,7 @@ export function RestaurantView({
   todayStr,
   isDev,
   source,
+  dishTagSection,
 }: RestaurantViewProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -89,6 +94,8 @@ export function RestaurantView({
           )}
         </div>
       </header>
+
+      {dishTagSection}
 
       {/* Visible restaurants */}
       {visibleRestaurants.length === 0 && hiddenRestaurants.length > 0 ? (

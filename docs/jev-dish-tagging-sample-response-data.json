@@ -1,0 +1,506 @@
+{
+  "Jauhelihapihvit ja ruskeaa kastiketta": {
+    "model": "typesafe/jev-1.13-20260917",
+    "answers": {
+      "is_dish": {
+        "type": "noul",
+        "noul": 0.97
+      },
+      "meat": {
+        "type": "noul",
+        "noul": 0.92
+      },
+      "chicken": {
+        "type": "noul",
+        "noul": 0.05
+      },
+      "fish": {
+        "type": "noul",
+        "noul": 0.03
+      },
+      "vegetarian": {
+        "type": "noul",
+        "noul": 0.05
+      },
+      "vegan": {
+        "type": "noul",
+        "noul": 0.02
+      },
+      "soup": {
+        "type": "noul",
+        "noul": 0.02
+      },
+      "salad": {
+        "type": "noul",
+        "noul": 0.02
+      },
+      "pizza": {
+        "type": "noul",
+        "noul": 0.02
+      },
+      "burger": {
+        "type": "noul",
+        "noul": 0.08
+      },
+      "dessert": {
+        "type": "noul",
+        "noul": 0.02
+      },
+      "asian": {
+        "type": "noul",
+        "noul": 0.02
+      },
+      "indian": {
+        "type": "noul",
+        "noul": 0.02
+      },
+      "italian": {
+        "type": "noul",
+        "noul": 0.02
+      },
+      "tex-mex": {
+        "type": "noul",
+        "noul": 0.03
+      }
+    },
+    "usage": {
+      "input_tokens": 1361,
+      "output_tokens": 258,
+      "cost": 0.000057162
+    },
+    "id": "gen-dec-1790110931-Hqj90OT37izoUz73mPuV",
+    "provider": "TypeSafe"
+  },
+  "Härkäpapupihvit ja tomaattikastike": {
+    "model": "typesafe/jev-1.13-20260917",
+    "answers": {
+      "is_dish": {
+        "type": "noul",
+        "noul": 0.97
+      },
+      "meat": {
+        "type": "noul",
+        "noul": 0.04
+      },
+      "chicken": {
+        "type": "noul",
+        "noul": 0.04
+      },
+      "fish": {
+        "type": "noul",
+        "noul": 0.04
+      },
+      "vegetarian": {
+        "type": "noul",
+        "noul": 0.9
+      },
+      "vegan": {
+        "type": "noul",
+        "noul": 0.6
+      },
+      "soup": {
+        "type": "noul",
+        "noul": 0.03
+      },
+      "salad": {
+        "type": "noul",
+        "noul": 0.03
+      },
+      "pizza": {
+        "type": "noul",
+        "noul": 0.03
+      },
+      "burger": {
+        "type": "noul",
+        "noul": 0.15
+      },
+      "dessert": {
+        "type": "noul",
+        "noul": 0.02
+      },
+      "asian": {
+        "type": "noul",
+        "noul": 0.02
+      },
+      "indian": {
+        "type": "noul",
+        "noul": 0.04
+      },
+      "italian": {
+        "type": "noul",
+        "noul": 0.03
+      },
+      "tex-mex": {
+        "type": "noul",
+        "noul": 0.05
+      }
+    },
+    "usage": {
+      "input_tokens": 1366,
+      "output_tokens": 258,
+      "cost": 0.000057372
+    },
+    "id": "gen-dec-1790110931-qMFjV4Z1S4P8XrbxfjxD",
+    "provider": "TypeSafe"
+  },
+  "Huomioimme myös muut erikoisruokavaliot pyydettäessä": {
+    "model": "typesafe/jev-1.13-20260917",
+    "answers": {
+      "is_dish": {
+        "type": "noul",
+        "noul": 0.02
+      },
+      "meat": {
+        "type": "noul",
+        "noul": 0.11
+      },
+      "chicken": {
+        "type": "noul",
+        "noul": 0.07
+      },
+      "fish": {
+        "type": "noul",
+        "noul": 0.05
+      },
+      "vegetarian": {
+        "type": "noul",
+        "noul": 0.37
+      },
+      "vegan": {
+        "type": "noul",
+        "noul": 0.22
+      },
+      "soup": {
+        "type": "noul",
+        "noul": 0.1
+      },
+      "salad": {
+        "type": "noul",
+        "noul": 0.1
+      },
+      "pizza": {
+        "type": "noul",
+        "noul": 0.24
+      },
+      "burger": {
+        "type": "noul",
+        "noul": 0.18
+      },
+      "dessert": {
+        "type": "noul",
+        "noul": 0.14
+      },
+      "asian": {
+        "type": "noul",
+        "noul": 0.04
+      },
+      "indian": {
+        "type": "noul",
+        "noul": 0.04
+      },
+      "italian": {
+        "type": "noul",
+        "noul": 0.06
+      },
+      "tex-mex": {
+        "type": "noul",
+        "noul": 0.05
+      }
+    },
+    "usage": {
+      "input_tokens": 1364,
+      "output_tokens": 258,
+      "cost": 0.000057288
+    },
+    "id": "gen-dec-1790110931-LFalFzca31YqpxBW36DN",
+    "provider": "TypeSafe"
+  },
+  "Lohikeitto ja saaristolaisleipää": {
+    "model": "typesafe/jev-1.13-20260917",
+    "answers": {
+      "is_dish": {
+        "type": "noul",
+        "noul": 0.96
+      },
+      "meat": {
+        "type": "noul",
+        "noul": 0.05
+      },
+      "chicken": {
+        "type": "noul",
+        "noul": 0.08
+      },
+      "fish": {
+        "type": "noul",
+        "noul": 0.75
+      },
+      "vegetarian": {
+        "type": "noul",
+        "noul": 0.28
+      },
+      "vegan": {
+        "type": "noul",
+        "noul": 0.03
+      },
+      "soup": {
+        "type": "noul",
+        "noul": 0.89
+      },
+      "salad": {
+        "type": "noul",
+        "noul": 0.02
+      },
+      "pizza": {
+        "type": "noul",
+        "noul": 0.01
+      },
+      "burger": {
+        "type": "noul",
+        "noul": 0.01
+      },
+      "dessert": {
+        "type": "noul",
+        "noul": 0.03
+      },
+      "asian": {
+        "type": "noul",
+        "noul": 0.01
+      },
+      "indian": {
+        "type": "noul",
+        "noul": 0.01
+      },
+      "italian": {
+        "type": "noul",
+        "noul": 0.01
+      },
+      "tex-mex": {
+        "type": "noul",
+        "noul": 0.01
+      }
+    },
+    "usage": {
+      "input_tokens": 1365,
+      "output_tokens": 258,
+      "cost": 0.00005733
+    },
+    "id": "gen-dec-1790110931-GAJCMnZJQ1V3uis9DpEs",
+    "provider": "TypeSafe"
+  },
+  "Kokin valinta": {
+    "model": "typesafe/jev-1.13-20260917",
+    "answers": {
+      "is_dish": {
+        "type": "noul",
+        "noul": 0.56
+      },
+      "meat": {
+        "type": "noul",
+        "noul": 0.28
+      },
+      "chicken": {
+        "type": "noul",
+        "noul": 0.27
+      },
+      "fish": {
+        "type": "noul",
+        "noul": 0.26
+      },
+      "vegetarian": {
+        "type": "noul",
+        "noul": 0.51
+      },
+      "vegan": {
+        "type": "noul",
+        "noul": 0.39
+      },
+      "soup": {
+        "type": "noul",
+        "noul": 0.35
+      },
+      "salad": {
+        "type": "noul",
+        "noul": 0.26
+      },
+      "pizza": {
+        "type": "noul",
+        "noul": 0.26
+      },
+      "burger": {
+        "type": "noul",
+        "noul": 0.22
+      },
+      "dessert": {
+        "type": "noul",
+        "noul": 0.51
+      },
+      "asian": {
+        "type": "noul",
+        "noul": 0.69
+      },
+      "indian": {
+        "type": "noul",
+        "noul": 0.09
+      },
+      "italian": {
+        "type": "noul",
+        "noul": 0.07
+      },
+      "tex-mex": {
+        "type": "noul",
+        "noul": 0.09
+      }
+    },
+    "usage": {
+      "input_tokens": 1349,
+      "output_tokens": 258,
+      "cost": 0.000056658
+    },
+    "id": "gen-dec-1790110931-zPkTgMGSiHCBZMfPD1pN",
+    "provider": "TypeSafe"
+  },
+  "Broileri-nuudeliwok, soijakastike": {
+    "model": "typesafe/jev-1.13-20260917",
+    "answers": {
+      "is_dish": {
+        "type": "noul",
+        "noul": 0.94
+      },
+      "meat": {
+        "type": "noul",
+        "noul": 0.05
+      },
+      "chicken": {
+        "type": "noul",
+        "noul": 0.96
+      },
+      "fish": {
+        "type": "noul",
+        "noul": 0.05
+      },
+      "vegetarian": {
+        "type": "noul",
+        "noul": 0.07
+      },
+      "vegan": {
+        "type": "noul",
+        "noul": 0.06
+      },
+      "soup": {
+        "type": "noul",
+        "noul": 0.03
+      },
+      "salad": {
+        "type": "noul",
+        "noul": 0.03
+      },
+      "pizza": {
+        "type": "noul",
+        "noul": 0.02
+      },
+      "burger": {
+        "type": "noul",
+        "noul": 0.01
+      },
+      "dessert": {
+        "type": "noul",
+        "noul": 0.02
+      },
+      "asian": {
+        "type": "noul",
+        "noul": 0.92
+      },
+      "indian": {
+        "type": "noul",
+        "noul": 0.03
+      },
+      "italian": {
+        "type": "noul",
+        "noul": 0.03
+      },
+      "tex-mex": {
+        "type": "noul",
+        "noul": 0.02
+      }
+    },
+    "usage": {
+      "input_tokens": 1365,
+      "output_tokens": 258,
+      "cost": 0.00005733
+    },
+    "id": "gen-dec-1790110931-hkPgmmlfcR0Ha7Ag3cMu",
+    "provider": "TypeSafe"
+  },
+  "Päivän keitto": {
+    "model": "typesafe/jev-1.13-20260917",
+    "answers": {
+      "is_dish": {
+        "type": "noul",
+        "noul": 0.96
+      },
+      "meat": {
+        "type": "noul",
+        "noul": 0.22
+      },
+      "chicken": {
+        "type": "noul",
+        "noul": 0.27
+      },
+      "fish": {
+        "type": "noul",
+        "noul": 0.17
+      },
+      "vegetarian": {
+        "type": "noul",
+        "noul": 0.38
+      },
+      "vegan": {
+        "type": "noul",
+        "noul": 0.22
+      },
+      "soup": {
+        "type": "noul",
+        "noul": 0.96
+      },
+      "salad": {
+        "type": "noul",
+        "noul": 0.03
+      },
+      "pizza": {
+        "type": "noul",
+        "noul": 0.02
+      },
+      "burger": {
+        "type": "noul",
+        "noul": 0.01
+      },
+      "dessert": {
+        "type": "noul",
+        "noul": 0.07
+      },
+      "asian": {
+        "type": "noul",
+        "noul": 0.02
+      },
+      "indian": {
+        "type": "noul",
+        "noul": 0.03
+      },
+      "italian": {
+        "type": "noul",
+        "noul": 0.02
+      },
+      "tex-mex": {
+        "type": "noul",
+        "noul": 0.02
+      }
+    },
+    "usage": {
+      "input_tokens": 1351,
+      "output_tokens": 258,
+      "cost": 0.000056742
+    },
+    "id": "gen-dec-1790110931-jalJ7GMbtuU4MAZcMK3j",
+    "provider": "TypeSafe"
+  }
+}

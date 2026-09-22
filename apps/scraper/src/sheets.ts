@@ -35,6 +35,7 @@ export function formatMenuRows(
     menu.item,
     menu.dietaryFlags.join(", "),
     lastUpdated,
+    (menu.tags ?? []).join(", "),
   ]);
 }
 
@@ -125,7 +126,7 @@ export async function updateGoogleSheet(
 
       await sheets.spreadsheets.values.update({
         spreadsheetId,
-        range: `${restaurantId}!A1:F1`,
+        range: `${restaurantId}!A1:G1`,
         valueInputOption: "USER_ENTERED",
         requestBody: {
           values: [
@@ -136,6 +137,7 @@ export async function updateGoogleSheet(
               "item",
               "dietaryFlags",
               "lastUpdated",
+              "tags",
             ],
           ],
         },

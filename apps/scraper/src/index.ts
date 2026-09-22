@@ -45,6 +45,7 @@ import {
 } from "./fetchers/pasilan-linkki.js";
 import { triggerRevalidation } from "./revalidate.js";
 import { updateGoogleSheet, updateGoogleSheetOpeningHours } from "./sheets.js";
+import { tagMenuItems } from "./tagging.js";
 
 /**
  * Resolves the target scraping date (YYYY-MM-DD) from CLI flags, env variables, or today in Europe/Helsinki.
@@ -137,7 +138,10 @@ async function main() {
   try {
     const intraMenus = await fetchIntraMenus(targetDate);
     for (const restaurant of INTRA_RESTAURANTS) {
-      const menus = intraMenus[restaurant.id];
+      const menus = await tagMenuItems(
+        intraMenus[restaurant.id],
+        restaurant.name,
+      );
       await updateGoogleSheet(
         restaurant.id,
         restaurant.name,
@@ -156,7 +160,11 @@ async function main() {
   // 2. Dylan Luft (RSS Feed)
   console.log("\nProcessing target: Dylan Luft (RSS Feed)");
   try {
-    const dylanLuftMenus = await fetchDylanLuftMenu(targetDate);
+    const dylanLuftMenusRaw = await fetchDylanLuftMenu(targetDate);
+    const dylanLuftMenus = await tagMenuItems(
+      dylanLuftMenusRaw,
+      DYLAN_LUFT_RESTAURANT_NAME,
+    );
     await updateGoogleSheet(
       DYLAN_LUFT_RESTAURANT_ID,
       DYLAN_LUFT_RESTAURANT_NAME,
@@ -174,7 +182,11 @@ async function main() {
   // 3. Dylan Böle (RSS Feed)
   console.log("\nProcessing target: Dylan Böle (RSS Feed)");
   try {
-    const dylanBoleMenus = await fetchDylanBoleMenu(targetDate);
+    const dylanBoleMenusRaw = await fetchDylanBoleMenu(targetDate);
+    const dylanBoleMenus = await tagMenuItems(
+      dylanBoleMenusRaw,
+      DYLAN_BOLE_RESTAURANT_NAME,
+    );
     await updateGoogleSheet(
       DYLAN_BOLE_RESTAURANT_ID,
       DYLAN_BOLE_RESTAURANT_NAME,
@@ -192,7 +204,11 @@ async function main() {
   // 4. Dylan La Ilma (RSS Feed)
   console.log("\nProcessing target: Dylan La Ilma (RSS Feed)");
   try {
-    const dylanLaIlmaMenus = await fetchDylanLaIlmaMenu(targetDate);
+    const dylanLaIlmaMenusRaw = await fetchDylanLaIlmaMenu(targetDate);
+    const dylanLaIlmaMenus = await tagMenuItems(
+      dylanLaIlmaMenusRaw,
+      DYLAN_LA_ILMA_RESTAURANT_NAME,
+    );
     await updateGoogleSheet(
       DYLAN_LA_ILMA_RESTAURANT_ID,
       DYLAN_LA_ILMA_RESTAURANT_NAME,
@@ -210,7 +226,11 @@ async function main() {
   // 5. Pasilan Linkki (RSS Feed)
   console.log("\nProcessing target: Pasilan Linkki (RSS Feed)");
   try {
-    const linkkiMenus = await fetchPasilanLinkkiMenu(targetDate);
+    const linkkiMenusRaw = await fetchPasilanLinkkiMenu(targetDate);
+    const linkkiMenus = await tagMenuItems(
+      linkkiMenusRaw,
+      PASILAN_LINKKI_RESTAURANT_NAME,
+    );
     await updateGoogleSheet(
       PASILAN_LINKKI_RESTAURANT_ID,
       PASILAN_LINKKI_RESTAURANT_NAME,
@@ -228,7 +248,11 @@ async function main() {
   // 6. Iso Paja (Website Cheerio)
   console.log("\nProcessing target: Iso Paja (Website Cheerio)");
   try {
-    const isoPajaMenus = await fetchIsoPajaMenu(targetDate);
+    const isoPajaMenusRaw = await fetchIsoPajaMenu(targetDate);
+    const isoPajaMenus = await tagMenuItems(
+      isoPajaMenusRaw,
+      ISO_PAJA_RESTAURANT_NAME,
+    );
     await updateGoogleSheet(
       ISO_PAJA_RESTAURANT_ID,
       ISO_PAJA_RESTAURANT_NAME,
@@ -246,7 +270,11 @@ async function main() {
   // 7. Akseli (Website Cheerio)
   console.log("\nProcessing target: Akseli (Website Cheerio)");
   try {
-    const akseliMenus = await fetchAkseliMenu(targetDate);
+    const akseliMenusRaw = await fetchAkseliMenu(targetDate);
+    const akseliMenus = await tagMenuItems(
+      akseliMenusRaw,
+      AKSELI_RESTAURANT_NAME,
+    );
     await updateGoogleSheet(
       AKSELI_RESTAURANT_ID,
       AKSELI_RESTAURANT_NAME,
@@ -264,7 +292,11 @@ async function main() {
   // 8. Päättäri (Website Cheerio)
   console.log("\nProcessing target: Päättäri (Website Cheerio)");
   try {
-    const paattariMenus = await fetchPaattariMenu(targetDate);
+    const paattariMenusRaw = await fetchPaattariMenu(targetDate);
+    const paattariMenus = await tagMenuItems(
+      paattariMenusRaw,
+      PAATTARI_RESTAURANT_NAME,
+    );
     await updateGoogleSheet(
       PAATTARI_RESTAURANT_ID,
       PAATTARI_RESTAURANT_NAME,
