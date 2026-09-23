@@ -1,3 +1,4 @@
+import { DishTagSection } from "~/components/dish-tag-section";
 import { Footer } from "~/components/footer";
 import { RestaurantView } from "~/components/restaurant-view";
 import { getSortedRestaurantsWithMetadata } from "~/config/restaurants";
@@ -70,6 +71,12 @@ export default async function HomePage() {
             todayStr={todayStr}
             isDev={isDev}
             source={source}
+            // The key silences a false "unique key" warning: React can't see
+            // that this server-created element sits in a static slot once
+            // RestaurantView places it among its own children.
+            dishTagSection={
+              <DishTagSection key="dish-tags" restaurants={restaurants} />
+            }
           />
         )}
 

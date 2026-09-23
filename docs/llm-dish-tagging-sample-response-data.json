@@ -1,0 +1,345 @@
+{
+  "Huoltamo": {
+    "menus": [
+      {
+        "date": "2026-09-23",
+        "item": "Marry me chicken",
+        "dietaryFlags": [
+          "G"
+        ]
+      },
+      {
+        "date": "2026-09-23",
+        "item": "Riisiä",
+        "dietaryFlags": [
+          "G",
+          "Veg"
+        ]
+      },
+      {
+        "date": "2026-09-23",
+        "item": "Paahdettua turskaa sitruuna-kapriskastikkeessa",
+        "dietaryFlags": [
+          "M",
+          "G"
+        ]
+      },
+      {
+        "date": "2026-09-23",
+        "item": "Perunamuusia",
+        "dietaryFlags": [
+          "L",
+          "G"
+        ]
+      },
+      {
+        "date": "2026-09-23",
+        "item": "Haudutettua fenkoli",
+        "dietaryFlags": [
+          "G",
+          "veg"
+        ]
+      },
+      {
+        "date": "2026-09-23",
+        "item": "Talon vegaanisia härkäpapu-punajuuripihvejä",
+        "dietaryFlags": [
+          "Veg"
+        ]
+      },
+      {
+        "date": "2026-09-23",
+        "item": "Ruohosipuli-soijajogurttia",
+        "dietaryFlags": [
+          "G",
+          "Veg"
+        ]
+      },
+      {
+        "date": "2026-09-23",
+        "item": "Palsternakkasosekeittoa",
+        "dietaryFlags": [
+          "L",
+          "G",
+          "Vegaaninen saatavilla"
+        ]
+      },
+      {
+        "date": "2026-09-23",
+        "item": "Kahvi / tee & täytekakkua L",
+        "dietaryFlags": []
+      },
+      {
+        "date": "2026-09-23",
+        "item": "POP UP 10.30-13.30: Smoked pepper cheese burger / punajuuri-vuohenjuusto burger, ranskalaiset",
+        "dietaryFlags": [
+          "16",
+          "00"
+        ]
+      }
+    ],
+    "response": {
+      "id": "gen-1790185547-ZPEgY1891fE3PqzHXsgC",
+      "object": "chat.completion",
+      "created": 1790185547,
+      "model": "deepseek/deepseek-v4.1-flash",
+      "provider": "DeepInfra",
+      "system_fingerprint": null,
+      "service_tier": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "{\n  \"items\": [\n    {\n      \"index\": 0,\n      \"english\": \"Marry me chicken\",\n      \"kind\": \"main\",\n      \"tags\": [\"chicken\"]\n    },\n    {\n      \"index\": 1,\n      \"english\": \"Rice\",\n      \"kind\": \"side\",\n      \"tags\": []\n    },\n    {\n      \"index\": 2,\n      \"english\": \"Roasted cod in lemon-caper sauce\",\n      \"kind\": \"main\",\n      \"tags\": [\"fish\"]\n    },\n    {\n      \"index\": 3,\n      \"english\": \"Mashed potatoes\",\n      \"kind\": \"side\",\n      \"tags\": []\n    },\n    {\n      \"index\": 4,\n      \"english\": \"Braised fennel\",\n      \"kind\": \"side\",\n      \"tags\": []\n    },\n    {\n      \"index\": 5,\n      \"english\": \"House vegan broad bean and beetroot patties\",\n      \"kind\": \"main\",\n      \"tags\": [\"vegan\", \"vegetarian\"]\n    },\n    {\n      \"index\": 6,\n      \"english\": \"Chive soy yogurt\",\n      \"kind\": \"side\",\n      \"tags\": []\n    },\n    {\n      \"index\": 7,\n      \"english\": \"Parsnip puree soup\",\n      \"kind\": \"main\",\n      \"tags\": [\"soup\", \"vegetarian\"]\n    },\n    {\n      \"index\": 8,\n      \"english\": \"Coffee / tea & layer cake L\",\n      \"kind\": \"main\",\n      \"tags\": [\"dessert\"]\n    },\n    {\n      \"index\": 9,\n      \"english\": \"POP UP 10.30-13.30: Smoked pepper cheese burger / beetroot-goat cheese burger, fries\",\n      \"kind\": \"main\",\n      \"tags\": [\"burger\", \"vegetarian\"]\n    }\n  ]\n}",
+            "refusal": null,
+            "reasoning": null
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1402,
+        "completion_tokens": 398,
+        "total_tokens": 1800,
+        "cost": 0.0002069984,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 1152,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.0002069984,
+          "upstream_inference_prompt_cost": 3.98384e-05,
+          "upstream_inference_completions_cost": 0.00016716
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    }
+  },
+  "Piccolo": {
+    "menus": [
+      {
+        "date": "2026-09-23",
+        "item": "Katkarapu-avokadosalaattia",
+        "dietaryFlags": []
+      },
+      {
+        "date": "2026-09-23",
+        "item": "Tomaatti-mozzarellasalaattia",
+        "dietaryFlags": []
+      },
+      {
+        "date": "2026-09-23",
+        "item": "Palsternakkasosekeittoa",
+        "dietaryFlags": [
+          "L",
+          "G"
+        ]
+      },
+      {
+        "date": "2026-09-23",
+        "item": "Kahvi / tee & jälkiruoka",
+        "dietaryFlags": []
+      },
+      {
+        "date": "2026-09-23",
+        "item": "Uuniperunoita cheddar-kana / valkosipuli-tofutäytteellä, sivusalaatin, kahvi sekä jälkiruoan kera",
+        "dietaryFlags": [
+          "14",
+          "00"
+        ]
+      }
+    ],
+    "response": {
+      "id": "gen-1790185547-s0NAlKmHHmil67lOpNLs",
+      "object": "chat.completion",
+      "created": 1790185547,
+      "model": "deepseek/deepseek-v4.1-flash",
+      "provider": "DeepInfra",
+      "system_fingerprint": null,
+      "service_tier": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "{\n  \"items\": [\n    {\n      \"index\": 0,\n      \"english\": \"Shrimp and avocado salad\",\n      \"kind\": \"main\",\n      \"tags\": [\"fish\", \"salad\"]\n    },\n    {\n      \"index\": 1,\n      \"english\": \"Tomato and mozzarella salad\",\n      \"kind\": \"main\",\n      \"tags\": [\"vegetarian\", \"salad\"]\n    },\n    {\n      \"index\": 2,\n      \"english\": \"Parsnip puree soup\",\n      \"kind\": \"main\",\n      \"tags\": [\"vegetarian\", \"soup\"]\n    },\n    {\n      \"index\": 3,\n      \"english\": \"Coffee / tea & dessert\",\n      \"kind\": \"not_food\",\n      \"tags\": []\n    },\n    {\n      \"index\": 4,\n      \"english\": \"Baked potatoes with cheddar-chicken / garlic-tofu filling, with side salad, coffee and dessert\",\n      \"kind\": \"main\",\n      \"tags\": [\"chicken\", \"vegetarian\"]\n    }\n  ]\n}",
+            "refusal": null,
+            "reasoning": null
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1298,
+        "completion_tokens": 227,
+        "total_tokens": 1525,
+        "cost": 0.0001206184,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 1152,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.0001206184,
+          "upstream_inference_prompt_cost": 2.52784e-05,
+          "upstream_inference_completions_cost": 9.534e-05
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    }
+  },
+  "Iso Paja": {
+    "menus": [
+      {
+        "date": "2026-09-23",
+        "item": "BUFFET MENU",
+        "dietaryFlags": []
+      },
+      {
+        "date": "2026-09-23",
+        "item": "Pinaattitäytteinen kalarulla – gluteenitonta saatavilla",
+        "dietaryFlags": [
+          "VL"
+        ]
+      },
+      {
+        "date": "2026-09-23",
+        "item": "Sitruuna-kermaviilikastiketta",
+        "dietaryFlags": [
+          "L",
+          "G"
+        ]
+      },
+      {
+        "date": "2026-09-23",
+        "item": "Perunasosetta Vinegrettekasviksia",
+        "dietaryFlags": [
+          "L",
+          "G",
+          "M"
+        ]
+      },
+      {
+        "date": "2026-09-23",
+        "item": "Karhunvatukkakiisseliä",
+        "dietaryFlags": [
+          "Ve",
+          "G"
+        ]
+      },
+      {
+        "date": "2026-09-23",
+        "item": "VEGE MENU",
+        "dietaryFlags": []
+      },
+      {
+        "date": "2026-09-23",
+        "item": "Pajan pinaattilettuja",
+        "dietaryFlags": [
+          "Ve",
+          "G"
+        ]
+      },
+      {
+        "date": "2026-09-23",
+        "item": "Puolukkaa",
+        "dietaryFlags": [
+          "Ve",
+          "G"
+        ]
+      },
+      {
+        "date": "2026-09-23",
+        "item": "Metsäsienikääryleitä",
+        "dietaryFlags": [
+          "Ve",
+          "G"
+        ]
+      },
+      {
+        "date": "2026-09-23",
+        "item": "Perunasosetta",
+        "dietaryFlags": [
+          "Ve",
+          "G"
+        ]
+      },
+      {
+        "date": "2026-09-23",
+        "item": "AAMUPUURO",
+        "dietaryFlags": []
+      },
+      {
+        "date": "2026-09-23",
+        "item": "Ruispuuroa",
+        "dietaryFlags": [
+          "Ve"
+        ]
+      }
+    ],
+    "response": {
+      "id": "gen-1790185547-6lHc6HGSV4W6FVkTejbr",
+      "object": "chat.completion",
+      "created": 1790185547,
+      "model": "deepseek/deepseek-v4.1-flash",
+      "provider": "DeepInfra",
+      "system_fingerprint": null,
+      "service_tier": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "{\n  \"items\": [\n    {\n      \"index\": 0,\n      \"english\": \"BUFFET MENU\",\n      \"kind\": \"not_food\",\n      \"tags\": []\n    },\n    {\n      \"index\": 1,\n      \"english\": \"Spinach-filled fish roll – gluten-free available\",\n      \"kind\": \"main\",\n      \"tags\": [\"fish\"]\n    },\n    {\n      \"index\": 2,\n      \"english\": \"Lemon sour cream sauce\",\n      \"kind\": \"side\",\n      \"tags\": []\n    },\n    {\n      \"index\": 3,\n      \"english\": \"Mashed potatoes with vinaigrette vegetables\",\n      \"kind\": \"side\",\n      \"tags\": []\n    },\n    {\n      \"index\": 4,\n      \"english\": \"Blackberry kiisseli (berry soup)\",\n      \"kind\": \"main\",\n      \"tags\": [\"dessert\"]\n    },\n    {\n      \"index\": 5,\n      \"english\": \"VEGE MENU\",\n      \"kind\": \"not_food\",\n      \"tags\": []\n    },\n    {\n      \"index\": 6,\n      \"english\": \"Paja's spinach pancakes\",\n      \"kind\": \"main\",\n      \"tags\": [\"vegetarian\"]\n    },\n    {\n      \"index\": 7,\n      \"english\": \"Lingonberries\",\n      \"kind\": \"side\",\n      \"tags\": []\n    },\n    {\n      \"index\": 8,\n      \"english\": \"Forest mushroom rolls\",\n      \"kind\": \"main\",\n      \"tags\": [\"vegetarian\"]\n    },\n    {\n      \"index\": 9,\n      \"english\": \"Mashed potatoes\",\n      \"kind\": \"side\",\n      \"tags\": []\n    },\n    {\n      \"index\": 10,\n      \"english\": \"BREAKFAST PORRIDGE\",\n      \"kind\": \"not_food\",\n      \"tags\": []\n    },\n    {\n      \"index\": 11,\n      \"english\": \"Rye porridge\",\n      \"kind\": \"breakfast\",\n      \"tags\": []\n    }\n  ]\n}",
+            "refusal": null,
+            "reasoning": null
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1375,
+        "completion_tokens": 443,
+        "total_tokens": 1818,
+        "cost": 0.0002221184,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 1152,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.0002221184,
+          "upstream_inference_prompt_cost": 3.60584e-05,
+          "upstream_inference_completions_cost": 0.00018606
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      }
+    }
+  }
+}

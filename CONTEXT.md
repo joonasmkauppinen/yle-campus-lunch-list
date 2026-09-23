@@ -21,6 +21,12 @@ Dishes: disclaimers, section headers and price notices are published on the same
 lines.
 _Avoid_: Course, plate
 
+**Side**:
+A Dish that accompanies a main rather than being chosen on its own: rice, mash,
+fries, a sauce, lingonberries, cooked vegetables. Many restaurants print sides
+on their own lines beneath the main. A Side is always Untagged.
+_Avoid_: Garnish, extra
+
 **Menu Snapshot**:
 The complete set of Menu Items for one date. The sheet holds exactly one
 Snapshot at a time — each scraper run replaces it. There is no menu history.
@@ -62,3 +68,8 @@ and excludes `indian`; `italian` excludes `pizza`.
 **Vegan nests in vegetarian**:
 The one deliberate exception to "narrower wins". A vegan Dish carries both tags,
 so `vegetarian` shows everything free of meat and fish and `vegan` narrows it.
+
+**Dessert stands alone**:
+A dessert carries only `dessert`. Nearly every dessert is vegetarian, so tagging
+them `vegetarian` or `vegan` would bury the vegetarian lunches those tags exist
+to find. For the same reason a Side is never tagged, whatever its flags.

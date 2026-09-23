@@ -8,6 +8,7 @@ import type {
 } from "@acme/shared-types";
 
 import { env } from "~/env";
+import { parseDishTags } from "~/lib/dish-tags";
 
 /**
  * Safely extracts a string from unknown cell data and trims whitespace.
@@ -288,7 +289,7 @@ export const fetchRestaurantsFromGoogleSheets = cache(
         };
       }
 
-      const ranges = sheetTitles.map((title) => `'${title}'!A2:F`);
+      const ranges = sheetTitles.map((title) => `'${title}'!A2:G`);
       const batchResponse = await sheets.spreadsheets.values.batchGet({
         spreadsheetId,
         ranges,
@@ -359,9 +360,12 @@ export const fetchRestaurantsFromGoogleSheets = cache(
                   .filter((f) => f.length > 0)
               : [];
 
+          const tags = parseDishTags(safeString(row[6]));
+
           items.push({
             name: itemText,
             dietaryFlags,
+            tags,
           });
         }
 

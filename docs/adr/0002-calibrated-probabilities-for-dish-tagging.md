@@ -1,5 +1,7 @@
 # Dish Tagging asks for calibrated probabilities, not generated JSON
 
+_Superseded by [ADR 0003](0003-a-general-llm-tags-the-whole-menu.md)._
+
 Dishes are tagged by asking Jev, a System One model, one yes/no question per tag
 and keeping the tags whose probability clears a threshold — rather than
 prompting a general LLM to return a JSON array of tags.

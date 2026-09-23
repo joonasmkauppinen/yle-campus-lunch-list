@@ -224,7 +224,7 @@ The Next.js frontend (`apps/nextjs`) follows strict principles for component reu
 Structure UI components following Atomic Design principles to maintain modularity and clear separation of concerns:
 - **Atoms** (`src/components/ui/`): Fundamental, context-agnostic building blocks (e.g. `button.tsx`, `dropdown-menu.tsx`, theme toggles, icons, raw badges).
 - **Molecules** (`src/components/`): Small combinations of atoms functioning together as a focused unit (e.g. `restaurant-menu-item.tsx`, dietary badge clusters, modal trigger buttons).
-- **Organisms** (`src/components/`): Distinct, higher-level interface sections composed of molecules and atoms (e.g. `restaurant-view.tsx`, `restaurant-list-item.tsx`, `edit-restaurants-modal.tsx`, `footer.tsx`).
+- **Organisms** (`src/components/`): Distinct, higher-level interface sections composed of molecules and atoms (e.g. `restaurant-view.tsx`, `restaurant-list-item.tsx`, `settings-modal.tsx`, `footer.tsx`).
 - **Templates & Pages** (`src/app/`): Page layouts and route views that assemble organisms and bind them to route parameters and server data (e.g. `app/page.tsx`, `app/restaurant/[id]/page.tsx`, `app/layout.tsx`).
 
 ### 2. DRY (Don't Repeat Yourself)
@@ -239,7 +239,7 @@ Structure UI components following Atomic Design principles to maintain modularit
 
 ### 4. Server Components First
 - **Default to React Server Components (RSC)**: Keep pages, layouts, and data fetchers on the server for performance, smaller client bundles, and SEO.
-- **Isolate Client Boundaries**: Push `"use client"` down to the smallest possible leaf components that require interactivity (e.g. event handlers, React hooks, `localStorage` preferences in `edit-restaurants-modal.tsx`).
+- **Isolate Client Boundaries**: Push `"use client"` down to the smallest possible leaf components that require interactivity (e.g. event handlers, React hooks, `localStorage` preferences in `settings-modal.tsx`).
 
 ---
 

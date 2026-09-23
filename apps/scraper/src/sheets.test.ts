@@ -24,11 +24,13 @@ describe("formatMenuRows", () => {
         date: "2026-08-21",
         item: "Lohikeitto",
         dietaryFlags: ["G", "L"],
+        tags: ["fish", "soup"],
       },
       {
         date: "2026-08-21",
         item: "Kasvispihvit",
         dietaryFlags: ["VEG", "G"],
+        tags: ["vegetarian"],
       },
     ];
 
@@ -43,6 +45,7 @@ describe("formatMenuRows", () => {
       "Lohikeitto",
       "G, L",
       timestamp,
+      "fish, soup",
     ]);
     expect(rows[1]).toEqual([
       "huoltamo",
@@ -51,7 +54,37 @@ describe("formatMenuRows", () => {
       "Kasvispihvit",
       "VEG, G",
       timestamp,
+      "vegetarian",
     ]);
+  });
+
+  it("writes an empty tags column for untagged menu items", () => {
+    const timestamp = "2026-08-21T10:00:00.000Z";
+
+    const [absent] = formatMenuRows(
+      "huoltamo",
+      "Huoltamo",
+      [{ date: "2026-08-21", item: "Päivän keitto", dietaryFlags: [] }],
+      timestamp,
+    );
+    const [empty] = formatMenuRows(
+      "huoltamo",
+      "Huoltamo",
+      [
+        {
+          date: "2026-08-21",
+          item: "Päivän keitto",
+          dietaryFlags: [],
+          tags: [],
+        },
+      ],
+      timestamp,
+    );
+
+    // Tags serialize exactly like the dietary flags column beside them.
+    expect(absent?.[6]).toBe("");
+    expect(empty?.[6]).toBe("");
+    expect(absent).toHaveLength(7);
   });
 });
 
