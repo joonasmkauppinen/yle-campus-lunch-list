@@ -9,39 +9,70 @@ import { tagMenuItems } from "./tagging.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+interface RecordedExchange {
+  menus: ParsedMenuItem[];
+  response: unknown;
+}
+
 /**
- * A recorded Jev exchange, keyed by the dish text that produced it. Captured
- * from a live run against the questions this module sends.
+ * Recorded model exchanges, keyed by restaurant name: the menu that was sent
+ * and the chat completion that came back. Captured from a live run against
+ * the prompt this module sends.
  */
-const recordedResponses = JSON.parse(
+const recorded = JSON.parse(
   readFileSync(
     path.resolve(
       __dirname,
-      "../../../docs/jev-dish-tagging-sample-response-data.json",
+      "../../../docs/llm-dish-tagging-sample-response-data.json",
     ),
     "utf-8",
   ),
-) as Record<string, unknown>;
+) as Record<string, RecordedExchange>;
 
 function menuItem(item: string, dietaryFlags: string[] = []): ParsedMenuItem {
   return { date: "2026-09-23", item, dietaryFlags };
 }
 
-/** Replays the recorded response matching each request's dish text. */
+function okResponse(body: unknown) {
+  return {
+    ok: true,
+    status: 200,
+    statusText: "OK",
+    json: async () => body,
+  };
+}
+
+/** A chat completion whose message is the given structured output. */
+function completion(items: unknown[]) {
+  return {
+    choices: [{ message: { content: JSON.stringify({ items }) } }],
+  };
+}
+
+/** Replays the recorded response for the restaurant named in the request. */
 function stubRecordedFetch() {
   return vi.fn(async (_url: string, init: { body: string }) => {
-    const body = JSON.parse(init.body) as { state: { item: string } };
-    const recorded = recordedResponses[body.state.item];
-    if (!recorded) {
-      throw new Error(`No recorded response for "${body.state.item}"`);
-    }
-    return {
-      ok: true,
-      status: 200,
-      statusText: "OK",
-      json: async () => recorded,
+    const body = JSON.parse(init.body) as {
+      messages: { content: string }[];
     };
+    const exchange = Object.entries(recorded).find(([name]) =>
+      body.messages.some((message) =>
+        message.content.startsWith(`Restaurant: ${name}\n`),
+      ),
+    )?.[1];
+    if (!exchange) {
+      throw new Error("No recorded response for this restaurant");
+    }
+    return okResponse(exchange.response);
   });
+}
+
+/** Tags a recorded restaurant's menu and returns its tags keyed by dish text. */
+async function tagRecorded(restaurantName: string) {
+  const exchange = recorded[restaurantName];
+  if (!exchange) throw new Error(`No recording for ${restaurantName}`);
+  const tagged = await tagMenuItems(exchange.menus, restaurantName);
+  return new Map(tagged.map((menu) => [menu.item, menu.tags]));
 }
 
 const originalFetch = globalThis.fetch;
@@ -64,62 +95,118 @@ describe("tagMenuItems success path", () => {
     globalThis.fetch = stubRecordedFetch() as unknown as typeof fetch;
   });
 
-  it("applies every tag clearing the threshold, so a dish can earn several", async () => {
-    const [tagged] = await tagMenuItems(
-      [menuItem("Broileri-nuudeliwok, soijakastike", ["L", "M"])],
-      "Test",
-    );
+  it("tags each main by what it is", async () => {
+    const tags = await tagRecorded("Huoltamo");
 
-    // chicken 0.96 and asian 0.92 both clear; the dish is findable either way.
-    expect(tagged?.tags).toEqual(["chicken", "asian"]);
+    expect(tags.get("Marry me chicken")).toEqual(["chicken"]);
+    expect(tags.get("Paahdettua turskaa sitruuna-kapriskastikkeessa")).toEqual([
+      "fish",
+    ]);
+    expect(tags.get("Palsternakkasosekeittoa")).toEqual(["vegetarian", "soup"]);
   });
 
-  it("applies a tag just above the threshold and withholds one just below", async () => {
-    const [fishSoup] = await tagMenuItems(
-      [menuItem("Lohikeitto ja saaristolaisleipää", ["G", "L"])],
-      "Test",
-    );
-    // fish 0.75 clears, soup 0.89 clears.
-    expect(fishSoup?.tags).toEqual(["fish", "soup"]);
+  it("leaves the sides served with a main untagged", async () => {
+    const huoltamo = await tagRecorded("Huoltamo");
+    expect(huoltamo.get("Riisiä")).toBeUndefined();
+    expect(huoltamo.get("Perunamuusia")).toBeUndefined();
+    expect(huoltamo.get("Ruohosipuli-soijajogurttia")).toBeUndefined();
 
-    const [vegan] = await tagMenuItems(
-      [menuItem("Härkäpapupihvit ja tomaattikastike", ["VE", "M"])],
-      "Test",
-    );
-    // vegetarian 0.9 clears; vegan 0.6 does not.
-    expect(vegan?.tags).toEqual(["vegetarian"]);
+    const isoPaja = await tagRecorded("Iso Paja");
+    // Flagged Ve, but mash is a side, not a vegan lunch.
+    expect(isoPaja.get("Perunasosetta")).toBeUndefined();
+    expect(isoPaja.get("Puolukkaa")).toBeUndefined();
   });
 
-  it("keeps red meat separate from poultry and fish", async () => {
-    const [tagged] = await tagMenuItems(
-      [menuItem("Jauhelihapihvit ja ruskeaa kastiketta", ["G"])],
-      "Test",
-    );
+  it("leaves headings and breakfast untagged", async () => {
+    const tags = await tagRecorded("Iso Paja");
 
-    expect(tagged?.tags).toEqual(["meat"]);
+    expect(tags.get("BUFFET MENU")).toBeUndefined();
+    expect(tags.get("VEGE MENU")).toBeUndefined();
+    expect(tags.get("AAMUPUURO")).toBeUndefined();
+    expect(tags.get("Ruispuuroa")).toBeUndefined();
   });
 
-  it("suppresses all tags when the item is not a dish", async () => {
-    const [disclaimer] = await tagMenuItems(
-      [menuItem("Huomioimme myös muut erikoisruokavaliot pyydettäessä")],
-      "Test",
-    );
+  it("gives a vegan main both vegetarian and vegan", async () => {
+    const tags = await tagRecorded("Huoltamo");
 
-    expect(disclaimer?.tags).toBeUndefined();
+    expect(tags.get("Talon vegaanisia härkäpapu-punajuuripihvejä")).toEqual([
+      "vegetarian",
+      "vegan",
+    ]);
   });
 
-  it("suppresses a tag that clears the threshold when the is-a-dish gate fails", async () => {
-    // asian scores 0.69 here, but is_dish is only 0.56, so nothing is applied.
-    const [tagged] = await tagMenuItems([menuItem("Kokin valinta")], "Test");
+  it("tags every alternative a line offers", async () => {
+    const tags = await tagRecorded("Piccolo");
 
-    expect(tagged?.tags).toBeUndefined();
+    expect(
+      tags.get(
+        "Uuniperunoita cheddar-kana / valkosipuli-tofutäytteellä, sivusalaatin, kahvi sekä jälkiruoan kera",
+      ),
+    ).toEqual(["chicken", "vegetarian"]);
   });
 
-  it("leaves a dish untagged when no tag clears the threshold", async () => {
-    const [tagged] = await tagMenuItems([menuItem("Päivän keitto")], "Test");
+  it("tags a dessert as a dessert only", async () => {
+    const tags = await tagRecorded("Iso Paja");
 
-    // Only soup clears; every other answer stays well below.
-    expect(tagged?.tags).toEqual(["soup"]);
+    expect(tags.get("Karhunvatukkakiisseliä")).toEqual(["dessert"]);
+  });
+});
+
+describe("tagMenuItems guards against the model", () => {
+  const menus = [
+    menuItem("Kasvislasagnea", ["L"]),
+    menuItem("Riisiä", ["G"]),
+    menuItem("Mustikkapiirakkaa", ["L"]),
+  ];
+
+  function stubCompletion(items: unknown[]) {
+    globalThis.fetch = vi.fn(async () =>
+      okResponse(completion(items)),
+    ) as unknown as typeof fetch;
+  }
+
+  it("drops tags on anything but a main", async () => {
+    stubCompletion([
+      { index: 0, kind: "main", tags: ["italian"] },
+      { index: 1, kind: "side", tags: ["vegetarian"] },
+      { index: 2, kind: "not_food", tags: ["dessert"] },
+    ]);
+
+    const tagged = await tagMenuItems(menus, "Test");
+
+    expect(tagged.map((menu) => menu.tags)).toEqual([
+      ["italian"],
+      undefined,
+      undefined,
+    ]);
+  });
+
+  it("adds vegetarian to a vegan main and strips other tags from a dessert", async () => {
+    stubCompletion([
+      { index: 0, kind: "main", tags: ["vegan", "italian"] },
+      { index: 2, kind: "main", tags: ["vegetarian", "dessert"] },
+    ]);
+
+    const tagged = await tagMenuItems(menus, "Test");
+
+    expect(tagged[0]?.tags).toEqual(["vegetarian", "vegan", "italian"]);
+    expect(tagged[2]?.tags).toEqual(["dessert"]);
+  });
+
+  it("ignores unknown tags, unknown kinds and indexes outside the menu", async () => {
+    stubCompletion([
+      { index: 0, kind: "main", tags: ["italian", "lasagne"] },
+      { index: 1, kind: "starter", tags: ["salad"] },
+      { index: 7, kind: "main", tags: ["pizza"] },
+    ]);
+
+    const tagged = await tagMenuItems(menus, "Test");
+
+    expect(tagged.map((menu) => menu.tags)).toEqual([
+      ["italian"],
+      undefined,
+      undefined,
+    ]);
   });
 });
 
@@ -145,13 +232,18 @@ describe("tagMenuItems failure paths", () => {
     await expect(tagMenuItems(menus, "Test")).resolves.toEqual(menus);
   });
 
-  it("returns untagged menu items on a malformed body", async () => {
-    globalThis.fetch = vi.fn(async () => ({
-      ok: true,
-      status: 200,
-      statusText: "OK",
-      json: async () => ({ unexpected: "shape" }),
-    })) as unknown as typeof fetch;
+  it("returns untagged menu items on a body without a message", async () => {
+    globalThis.fetch = vi.fn(async () =>
+      okResponse({ unexpected: "shape" }),
+    ) as unknown as typeof fetch;
+
+    await expect(tagMenuItems(menus, "Test")).resolves.toEqual(menus);
+  });
+
+  it("returns untagged menu items when the message is not the expected JSON", async () => {
+    globalThis.fetch = vi.fn(async () =>
+      okResponse({ choices: [{ message: { content: "Sure! Here you go" } }] }),
+    ) as unknown as typeof fetch;
 
     await expect(tagMenuItems(menus, "Test")).resolves.toEqual(menus);
   });
@@ -163,26 +255,5 @@ describe("tagMenuItems failure paths", () => {
 
     await expect(tagMenuItems(menus, "Test")).resolves.toEqual(menus);
     expect(fetchStub).not.toHaveBeenCalled();
-  });
-
-  it("tags the items it can when a single request fails", async () => {
-    const recorded = stubRecordedFetch();
-    let call = 0;
-    globalThis.fetch = vi.fn(async (url: string, init: { body: string }) => {
-      call += 1;
-      if (call === 1) throw new Error("transient");
-      return recorded(url, init);
-    }) as unknown as typeof fetch;
-
-    const tagged = await tagMenuItems(
-      [
-        menuItem("Lohikeitto ja saaristolaisleipää", ["G", "L"]),
-        menuItem("Broileri-nuudeliwok, soijakastike", ["L", "M"]),
-      ],
-      "Test",
-    );
-
-    expect(tagged[0]?.tags).toBeUndefined();
-    expect(tagged[1]?.tags).toEqual(["chicken", "asian"]);
   });
 });

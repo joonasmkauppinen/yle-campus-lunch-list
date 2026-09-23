@@ -18,11 +18,12 @@ Tapping one highlights it and opens a section underneath listing every matching
 Dish, grouped by the restaurant serving it. Tapping it again closes the section.
 
 The tags themselves are produced by the scraper. After a restaurant's Menu
-Items are fetched and before they are written to the sheet, each one is put to
-Jev, a model that answers yes/no questions with calibrated probabilities. It is
-asked once per tag, plus once more to decide whether the line is a Dish at all —
-menus carry disclaimers, section headers and price notices on the same lines.
-Tags whose probability clears a threshold are stored alongside the Dish.
+Items are fetched and before they are written to the sheet, the whole menu is
+sent to a general LLM in one request. For each line the model decides whether it
+is a main, a Side, breakfast or not food at all — menus carry disclaimers,
+section headers and price notices on the same lines, and print a main's rice
+and mash on lines of their own — and tags the mains. The tags are stored
+alongside the Dish.
 
 ## User Stories
 
@@ -102,8 +103,8 @@ Tags whose probability clears a threshold are stored alongside the Dish.
     page before the sheet is rewritten.
 32. As a developer, I want the frontend to tolerate a missing or empty tags
     column, so that a sheet written by an older scraper still renders.
-33. As a developer, I want the threshold to be a single named constant, so that
-    I can tune how eagerly tags are applied after seeing real output.
+33. As a developer, I want the rules for which lines may carry tags enforced in
+    code, so that a model slip cannot flood a tag with side dishes.
 34. As a developer, I want the tag-to-label-and-emoji mapping to live beside
     the restaurant config, so that the next person looks in the obvious place.
 35. As a developer, I want the pure parts of tagging tested against a recorded
@@ -127,25 +128,25 @@ separate tab or spreadsheet: Menu Items have no id, so any separate table would
 have to join on free dish text, and the frontend turns every tab in the main
 spreadsheet into a Restaurant. Recorded as ADR 0001.
 
-**Model and call shape.** Jev via OpenRouter, using TypeSafe's native
-`systemone` request schema rather than chat completions, because the calibrated
-probabilities exist only in that schema. One request per Dish: `state` is the
-dish text plus its dietary flags, and the request carries fifteen yes/no
-questions — one per tag, plus one asking whether the line is a Dish at all.
-Requests within a restaurant are issued concurrently. Chosen over batching a
-restaurant's whole list into one request because the state is a six-word dish
-name, so the token saving is negligible while indexed question keys across
-several items invite misalignment bugs. Recorded as ADR 0002.
+**Model and call shape.** DeepSeek v4.1 Flash via OpenRouter's chat
+completions, with reasoning disabled and the answer constrained by a JSON
+schema. One request per restaurant: the whole menu, numbered, with each line's
+dietary flags. Seeing the whole menu is what lets the model tell a main from
+the Sides printed beneath it. For every line the model returns its index, a
+short English gloss, its kind — `main`, `side`, `breakfast` or `not_food` — and
+its Dish Tags. Answers are matched back by index; an index outside the menu is
+dropped. Recorded as ADR 0003, superseding ADR 0002's per-line Jev design.
 
-**Thresholding.** A tag applies when its probability clears a single named
-threshold, starting at 0.7, with no cap on how many tags a Dish may carry. The
-"is this a Dish" question gates everything: below threshold, the Menu Item gets
-no tags at all. The threshold is deliberately strict because a wrong tag costs
+**Which lines carry tags.** Only a `main` keeps its tags; a Side, breakfast or a
+non-food line is always Untagged. A dessert carries only `dessert`, and every
+`vegan` main also carries `vegetarian`. These rules are in the prompt and are
+enforced again in code after the model answers. There is no threshold: the
+prompt tells the model to tag only when confident, because a wrong tag costs
 more than a missing one — a user who taps Kala and is shown chicken stops
 trusting the feature.
 
 **Dietary flags feed the model rather than bypassing it.** The `vegetarian` and
-`vegan` tags are decided by Jev with the Menu Item's dietary flags supplied as
+`vegan` tags are decided by the model with the Menu Item's dietary flags supplied as
 part of the state, not derived from those flags by rule. The flag vocabulary is
 not normalised across restaurants — fetchers pass through whatever the source
 publishes — so a rule would be confidently wrong for specific restaurants,
@@ -184,7 +185,7 @@ showing two Dishes.
 ## Testing Decisions
 
 A good test here exercises external behaviour through a public function: given
-this model response and this threshold, these tags; given these sheet rows,
+this model response, these tags; given these sheet rows,
 this grid and these groups. It does not assert on how many requests were
 issued, in what order, or with what prompt text. Prompt wording and request
 shape must stay free to change without breaking a test.
@@ -203,12 +204,16 @@ fixture.
 Three seams:
 
 1. **The tagging entry point**, in the scraper, taking Menu Items and returning
-   them tagged. The global fetch is stubbed. On the success path it is fed a
-   recorded Jev response committed to `docs/` alongside the other payload
-   fixtures, covering the threshold boundary in both directions, the is-a-Dish
-   gate suppressing all tags, a Dish that legitimately earns several tags, and
-   a response where nothing clears the threshold. On the failure path the stub
-   throws, returns a non-success status, and returns a malformed body; each
+   them tagged. The global fetch is stubbed. On the success path it is fed
+   recorded model responses for three restaurants' menus, committed to `docs/`
+   alongside the other payload fixtures, covering mains tagged by what they
+   are, Sides and headings and breakfast left Untagged, a vegan main carrying
+   both diet tags, a line offering alternatives, and a dessert tagged dessert
+   only. Hand-written responses cover the rules the code enforces over the
+   model: tags dropped on anything but a main, unknown tags and kinds ignored,
+   and out-of-range indexes dropped. On the failure path the stub throws,
+   returns a non-success status, returns a body without a message, and returns
+   a message that is not the expected JSON; each
    must yield untagged Menu Items rather than an exception. A missing API key
    is covered the same way. Because this seam reaches the whole path, the
    answers-to-tags selection stays a private implementation detail rather than
@@ -235,34 +240,25 @@ shipping.
 - Respecting the hide-a-restaurant preferences inside the tag section.
 - Menu history. The sheet holds exactly one date, replaced on every run, so
   Dish Tags are only ever computed for the date the scraper targeted.
-- Caching or reusing tags for a dish seen on a previous day. At roughly two
-  hundredths of a cent per run there is nothing to save.
+- Caching or reusing tags for a dish seen on a previous day. At roughly a
+  third of a cent per run there is nothing to save.
 - Normalising the dietary flag vocabulary across restaurants.
 - Free-text or fuzzy search over Dishes.
-- Any user-facing control over the threshold.
+- Any user-facing control over how eagerly tags are applied.
 - Backfilling tags for dates already written.
 
 ## Further Notes
 
-The OpenRouter listing for Jev could not be verified from this environment: the
-model page returned 404 and the id appears in none of the 452 models in
-OpenRouter's public catalogue. It is presumably unlisted or account-gated. The
-request and response shapes in this spec come from a real exchange supplied by
-the developer, which matches TypeSafe's documented `systemone` schema exactly.
-The first implementation step should therefore be a single live call before any
-other code is written — and if the route turns out not to work, the fallback is
-a general model with structured output, which invalidates ADR 0002 and the
-thresholding decisions that rest on it.
+The first implementation asked Jev, a System One model, one calibrated yes/no
+question per tag for each line on its own (ADR 0002). Its output showed the
+per-line shape was the problem rather than the threshold: every Side cleared
+`vegetarian`, and some lines were misread outright — "Perunasosetta" came back
+as pizza and dessert. ADR 0003 records the switch to one LLM request per
+restaurant.
 
-The client is an open question deliberately left to implementation: the
-TypeSafe SDK accepts a base URL override and would give typed helpers, but it
-posts to a path that may not line up with OpenRouter's. Try the SDK, fall back
-to plain fetch with hand-written types, which is what every other network call
-in the scraper already does.
-
-Two numbers are expected to need tuning after a week of real output. The 0.7
-threshold is most likely too strict for `vegetarian`, where the Finnish dish
-name often carries no signal and the dietary flags do the work. And `tex-mex`
-and `indian` may rarely clear it at all — harmless, since a tag with no matches
-simply does not render, but worth watching before concluding the vocabulary is
-right.
+Two things are worth watching after a week of real output. Whether the model
+keeps tagging a lactose-free soup `vegan` now and then, where the flags say it
+contains dairy; if it does, a flag rule may be worth its cost after all. And
+whether `tex-mex` and `indian` ever match — harmless if not, since a tag with no
+matches simply does not render, but worth checking before concluding the
+vocabulary is right.
