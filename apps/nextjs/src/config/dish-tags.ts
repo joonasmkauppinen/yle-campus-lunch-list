@@ -22,15 +22,15 @@ export const DISH_TAG_CONFIGS: DishTagConfig[] = [
   { id: "fish", label: "Kala", emoji: "🐟" },
   { id: "vegetarian", label: "Kasvis", emoji: "🌱" },
   { id: "vegan", label: "Vegaani", emoji: "🌿" },
-  { id: "soup", label: "Keitto", emoji: "🍲" },
   { id: "salad", label: "Salaatti", emoji: "🥗" },
-  { id: "pizza", label: "Pizza", emoji: "🍕" },
-  { id: "burger", label: "Burgeri", emoji: "🍔" },
-  { id: "dessert", label: "Jälkiruoka", emoji: "🍰" },
+  { id: "soup", label: "Keitto", emoji: "🍲" },
   { id: "asian", label: "Aasialainen", emoji: "🍜" },
   { id: "indian", label: "Intialainen", emoji: "🍛" },
   { id: "italian", label: "Italialainen", emoji: "🍝" },
+  { id: "burger", label: "Burgeri", emoji: "🍔" },
+  { id: "pizza", label: "Pizza", emoji: "🍕" },
   { id: "tex-mex", label: "Tex Mex", emoji: "🌮" },
+  { id: "dessert", label: "Jälkiruoka", emoji: "🍰" },
 ];
 
 const CONFIG_BY_ID = new Map<DishTagId, DishTagConfig>(
