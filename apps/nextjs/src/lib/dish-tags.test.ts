@@ -88,14 +88,14 @@ describe("getAvailableDishTags", () => {
       ({ config }) => config.id,
     );
 
-    // Configured order is meat, chicken, fish, vegetarian, ... soup ... pizza ... asian.
+    // Configured order is meat, chicken, fish, vegetarian, ... soup, asian ... pizza.
     expect(ids).toEqual([
       "chicken",
       "fish",
       "vegetarian",
       "soup",
-      "pizza",
       "asian",
+      "pizza",
     ]);
   });
 
