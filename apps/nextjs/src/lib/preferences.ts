@@ -55,6 +55,73 @@ export function resetStoredPreferences(): void {
 }
 
 /**
+ * Whether the dish tags section is shown on the home page.
+ *
+ * - `visible`: the section is shown (default)
+ * - `hidden`: the user hid the section from the page, and an info box in its
+ *   place tells them how to bring it back
+ * - `dismissed`: the section is hidden and the info box has been closed too
+ */
+export type DishTagsVisibility = "visible" | "hidden" | "dismissed";
+
+export const DISH_TAGS_VISIBILITY_STORAGE_KEY = "dish-tags-visibility";
+
+const DISH_TAGS_VISIBILITY_VALUES: readonly DishTagsVisibility[] = [
+  "visible",
+  "hidden",
+  "dismissed",
+];
+
+/**
+ * Retrieves the stored dish tags section visibility from localStorage,
+ * defaulting to `visible` for missing or unrecognised values.
+ */
+export function getStoredDishTagsVisibility(): DishTagsVisibility {
+  if (typeof window === "undefined") return "visible";
+  try {
+    const raw = localStorage.getItem(DISH_TAGS_VISIBILITY_STORAGE_KEY);
+    return (
+      DISH_TAGS_VISIBILITY_VALUES.find((value) => value === raw) ?? "visible"
+    );
+  } catch {
+    return "visible";
+  }
+}
+
+/**
+ * Saves the dish tags section visibility and dispatches a change event, so
+ * the page and the settings modal stay in sync.
+ */
+export function setStoredDishTagsVisibility(
+  visibility: DishTagsVisibility,
+): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(DISH_TAGS_VISIBILITY_STORAGE_KEY, visibility);
+    window.dispatchEvent(new Event(PREFERENCES_CHANGE_EVENT));
+  } catch {
+    // Silently handle error if storage is not accessible
+  }
+}
+
+/**
+ * The visibility to store when the settings modal is saved with the
+ * "show dish tags" switch in the given position.
+ *
+ * Turning the section off from settings skips the info box: the user is
+ * already looking at the place they would re-enable it from. Leaving the
+ * switch off keeps whatever hidden state was stored, so an info box the user
+ * has not dismissed yet stays put.
+ */
+export function resolveDishTagsVisibility(
+  current: DishTagsVisibility,
+  show: boolean,
+): DishTagsVisibility {
+  if (show) return "visible";
+  return current === "visible" ? "dismissed" : current;
+}
+
+/**
  * Subscribes to storage events and custom preference change events.
  */
 export function subscribeToPreferences(callback: () => void): () => void {

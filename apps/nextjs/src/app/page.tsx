@@ -71,7 +71,12 @@ export default async function HomePage() {
             todayStr={todayStr}
             isDev={isDev}
             source={source}
-            dishTagSection={<DishTagSection restaurants={restaurants} />}
+            // The key silences a false "unique key" warning: React can't see
+            // that this server-created element sits in a static slot once
+            // RestaurantView places it among its own children.
+            dishTagSection={
+              <DishTagSection key="dish-tags" restaurants={restaurants} />
+            }
           />
         )}
 
