@@ -1,6 +1,8 @@
 import { DishTagSection } from "~/components/dish-tag-section";
 import { Footer } from "~/components/footer";
 import { RestaurantView } from "~/components/restaurant-view";
+import { WhatsNewNotice } from "~/components/whats-new-notice";
+import { ANNOUNCEMENTS } from "~/config/announcements";
 import { getSortedRestaurantsWithMetadata } from "~/config/restaurants";
 import { getTodayFormattedString } from "~/lib/dates";
 import { generateHomeJsonLd } from "~/lib/seo";
@@ -71,9 +73,12 @@ export default async function HomePage() {
             todayStr={todayStr}
             isDev={isDev}
             source={source}
-            // The key silences a false "unique key" warning: React can't see
-            // that this server-created element sits in a static slot once
-            // RestaurantView places it among its own children.
+            whatsNewNotice={
+              <WhatsNewNotice key="whats-new" announcements={ANNOUNCEMENTS} />
+            }
+            // The keys silence a false "unique key" warning: React can't see
+            // that these server-created elements sit in static slots once
+            // RestaurantView places them among its own children.
             dishTagSection={
               <DishTagSection key="dish-tags" restaurants={restaurants} />
             }

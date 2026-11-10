@@ -20,17 +20,24 @@ export function getTodayFormattedString(date: Date = new Date()): string {
 }
 
 /**
+ * Returns today's date in Europe/Helsinki as an ISO string (YYYY-MM-DD).
+ */
+export function getTodayIsoString(date: Date = new Date()): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Helsinki",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date);
+}
+
+/**
  * Checks whether a given menu date string matches today in Europe/Helsinki timezone.
  */
 export function isCurrentDate(menuDate?: string): boolean {
   if (!menuDate) return false;
 
-  const todayIso = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Europe/Helsinki",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date());
+  const todayIso = getTodayIsoString();
 
   if (menuDate === todayIso) return true;
 

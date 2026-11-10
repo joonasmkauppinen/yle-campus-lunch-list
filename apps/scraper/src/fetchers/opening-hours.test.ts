@@ -6,10 +6,12 @@ import {
   parseDylanBoleOpeningHours,
   parseDylanLaIlmaOpeningHours,
   parseDylanLuftOpeningHours,
+  parseFenniaOpeningHours,
   parseHuoltamoOpeningHours,
   parseIsoPajaOpeningHours,
   parsePaattariOpeningHours,
   parsePasilanLinkkiOpeningHours,
+  parsePianoOpeningHours,
   parsePiccoloOpeningHours,
   parseStudio10OpeningHours,
 } from "./opening-hours.js";
@@ -138,5 +140,20 @@ describe("opening-hours fetcher", () => {
     expect(parsed.restaurantName).toBe("Dylan La Ilma");
     expect(parsed.lunchHours).toBe("Ma–pe 10.30–14.00");
     expect(parsed.openHours).toBe("Ma–pe 8.00–14.00");
+  });
+
+  it("parseFenniaOpeningHours reads service and lunch hours from Ninan Keittiö HTML", () => {
+    const parsed = parseFenniaOpeningHours(
+      "<p>Palvelemme ma-pe klo 7.30-14<br />Lounas 10.30-13.30</p>",
+    );
+    expect(parsed.openHours).toBe("Ma–pe 7.30–14.00");
+    expect(parsed.lunchHours).toBe("Ma–pe 10.30–13.30");
+  });
+
+  it("parsePianoOpeningHours combines the Monday–Thursday and Friday hours", () => {
+    const parsed = parsePianoOpeningHours(
+      "<aside><h3>Lounasbuffet on katettu maanantai-torstai 10.30-13.30</h3><h3>Perjantaisin klo 10.30-13.00&nbsp;</h3></aside>",
+    );
+    expect(parsed.lunchHours).toBe("Ma–to 10.30–13.30, pe 10.30–13.00");
   });
 });

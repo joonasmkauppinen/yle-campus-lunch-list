@@ -405,6 +405,77 @@ export function parseDylanLaIlmaOpeningHours(
 /**
  * Fetches all restaurant opening hours across endpoints and websites.
  */
+/**
+ * Parses Ninan Keittiö Fennia opening and lunch hours from its website
+ * ("Palvelemme ma-pe klo 7.30-14 / Lounas 10.30-13.30").
+ */
+export function parseFenniaOpeningHours(html: string): RestaurantOpeningHours {
+  const lastUpdated = new Date().toISOString();
+  let lunchHours = "Ma–pe 10.30–13.30";
+  let openHours = "Ma–pe 7.30–14.00";
+
+  if (html) {
+    const $ = cheerio.load(html);
+    const text = $("p:contains('Palvelemme')").first().text();
+    const openMatch =
+      /palvelemme\s*ma\s*[-–]\s*pe\s*(?:klo\s*)?(\d{1,2}(?:[.:]\d{2})?\s*[-–]\s*\d{1,2}(?:[.:]\d{2})?)/i.exec(
+        text,
+      );
+    if (openMatch?.[1]) {
+      openHours = `Ma–pe ${normalizeTimeRange(openMatch[1])}`;
+    }
+    const lunchMatch =
+      /lounas\s*(?:klo\s*)?(\d{1,2}[.:]\d{2}\s*[-–]\s*\d{1,2}[.:]\d{2})/i.exec(
+        text,
+      );
+    if (lunchMatch?.[1]) {
+      lunchHours = `Ma–pe ${normalizeTimeRange(lunchMatch[1])}`;
+    }
+  }
+
+  return {
+    restaurantId: "fennia",
+    restaurantName: "Ninan Keittiö Fennia",
+    openHours,
+    lunchHours,
+    rawText: `Palvelemme ${openHours}, Lounas ${lunchHours}`,
+    lastUpdated,
+  };
+}
+
+/**
+ * Parses Ravintola Piano lunch hours from its front page, which lists
+ * Monday–Thursday and Friday separately.
+ */
+export function parsePianoOpeningHours(html: string): RestaurantOpeningHours {
+  const lastUpdated = new Date().toISOString();
+  let lunchHours = "Ma–to 10.30–13.30, pe 10.30–13.00";
+
+  if (html) {
+    const text = cheerio.load(html)("aside").text().replace(/\s+/g, " ");
+    const monThuMatch =
+      /maanantai\s*[-–]\s*torstai\s*(?:klo\s*)?(\d{1,2}[.:]\d{2}\s*[-–]\s*\d{1,2}[.:]\d{2})/i.exec(
+        text,
+      );
+    const friMatch =
+      /perjantaisin\s*(?:klo\s*)?(\d{1,2}[.:]\d{2}\s*[-–]\s*\d{1,2}[.:]\d{2})/i.exec(
+        text,
+      );
+    if (monThuMatch?.[1] && friMatch?.[1]) {
+      lunchHours = `Ma–to ${normalizeTimeRange(monThuMatch[1])}, pe ${normalizeTimeRange(friMatch[1])}`;
+    }
+  }
+
+  return {
+    restaurantId: "piano",
+    restaurantName: "Ravintola Piano",
+    openHours: lunchHours,
+    lunchHours,
+    rawText: `Lounas ${lunchHours}`,
+    lastUpdated,
+  };
+}
+
 export async function fetchAllOpeningHours(): Promise<
   RestaurantOpeningHours[]
 > {
@@ -576,6 +647,38 @@ export async function fetchAllOpeningHours(): Promise<
   } catch (err) {
     console.error("[Opening Hours] Error fetching Dylan La Ilma:", err);
     results.push(parseDylanLaIlmaOpeningHours(""));
+  }
+
+  // 11. Ninan Keittiö Fennia (Website)
+  try {
+    const url =
+      process.env.FENNIA_URL ??
+      "https://www.ninankeittio.fi/helsinki-pasila-fennia/";
+    const res = await fetch(url, {
+      headers: { "User-Agent": "Mozilla/5.0" },
+      signal: AbortSignal.timeout(15000),
+    });
+    const html = res.ok ? await res.text() : "";
+    results.push(parseFenniaOpeningHours(html));
+    console.log(`[Opening Hours] Fetched Ninan Keittiö Fennia`);
+  } catch (err) {
+    console.error("[Opening Hours] Error fetching Ninan Keittiö Fennia:", err);
+    results.push(parseFenniaOpeningHours(""));
+  }
+
+  // 12. Ravintola Piano (Website)
+  try {
+    const url = process.env.PIANO_URL ?? "https://www.ravintolapiano.fi/";
+    const res = await fetch(url, {
+      headers: { "User-Agent": "Mozilla/5.0" },
+      signal: AbortSignal.timeout(15000),
+    });
+    const html = res.ok ? await res.text() : "";
+    results.push(parsePianoOpeningHours(html));
+    console.log(`[Opening Hours] Fetched Ravintola Piano`);
+  } catch (err) {
+    console.error("[Opening Hours] Error fetching Ravintola Piano:", err);
+    results.push(parsePianoOpeningHours(""));
   }
 
   return results;

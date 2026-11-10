@@ -23,6 +23,11 @@ import {
   fetchDylanLuftMenu,
 } from "./fetchers/dylan-luft.js";
 import {
+  FENNIA_RESTAURANT_ID,
+  FENNIA_RESTAURANT_NAME,
+  fetchFenniaMenu,
+} from "./fetchers/fennia.js";
+import {
   fetchIntraMenus,
   getHelsinkiDateString,
   INTRA_RESTAURANTS,
@@ -43,6 +48,11 @@ import {
   PASILAN_LINKKI_RESTAURANT_ID,
   PASILAN_LINKKI_RESTAURANT_NAME,
 } from "./fetchers/pasilan-linkki.js";
+import {
+  fetchPianoMenu,
+  PIANO_RESTAURANT_ID,
+  PIANO_RESTAURANT_NAME,
+} from "./fetchers/piano.js";
 import { triggerRevalidation } from "./revalidate.js";
 import { updateGoogleSheet, updateGoogleSheetOpeningHours } from "./sheets.js";
 import { tagMenuItems } from "./tagging.js";
@@ -311,7 +321,48 @@ async function main() {
     console.error("Error processing Päättäri:", error);
   }
 
-  // 9. Opening Hours (All restaurants)
+  // 9. Ninan Keittiö Fennia (Website Cheerio)
+  console.log("\nProcessing target: Ninan Keittiö Fennia (Website Cheerio)");
+  try {
+    const fenniaMenusRaw = await fetchFenniaMenu(targetDate);
+    const fenniaMenus = await tagMenuItems(
+      fenniaMenusRaw,
+      FENNIA_RESTAURANT_NAME,
+    );
+    await updateGoogleSheet(
+      FENNIA_RESTAURANT_ID,
+      FENNIA_RESTAURANT_NAME,
+      fenniaMenus,
+      targetDate,
+      { dryRun: isDryRun },
+    );
+    console.log(
+      `Successfully completed scraping for ${FENNIA_RESTAURANT_NAME} (${FENNIA_RESTAURANT_ID})`,
+    );
+  } catch (error) {
+    console.error("Error processing Ninan Keittiö Fennia:", error);
+  }
+
+  // 10. Ravintola Piano (Website Cheerio)
+  console.log("\nProcessing target: Ravintola Piano (Website Cheerio)");
+  try {
+    const pianoMenusRaw = await fetchPianoMenu(targetDate);
+    const pianoMenus = await tagMenuItems(pianoMenusRaw, PIANO_RESTAURANT_NAME);
+    await updateGoogleSheet(
+      PIANO_RESTAURANT_ID,
+      PIANO_RESTAURANT_NAME,
+      pianoMenus,
+      targetDate,
+      { dryRun: isDryRun },
+    );
+    console.log(
+      `Successfully completed scraping for ${PIANO_RESTAURANT_NAME} (${PIANO_RESTAURANT_ID})`,
+    );
+  } catch (error) {
+    console.error("Error processing Ravintola Piano:", error);
+  }
+
+  // 11. Opening Hours (All restaurants)
   console.log("\nProcessing target: Restaurant Opening Hours");
   try {
     const openingHours = await fetchAllOpeningHours();
@@ -323,7 +374,7 @@ async function main() {
     console.error("Error processing opening hours:", error);
   }
 
-  // 9. Revalidate frontend cache (in production, skipped in dry run)
+  // 12. Revalidate frontend cache (in production, skipped in dry run)
   if (isDryRun) {
     console.log(
       "\n[Revalidate] Skipping frontend revalidation (dry run mode).",
