@@ -8,6 +8,7 @@ import type { DishTagId, Restaurant } from "@acme/shared-types";
 import type { DishTagsVisibility } from "~/lib/preferences";
 import { RestaurantMenuItem } from "~/components/restaurant-menu-item";
 import { Button } from "~/components/ui/button";
+import { Notice } from "~/components/ui/notice";
 import { getAvailableDishTags, getDishesForTag } from "~/lib/dish-tags";
 import {
   getStoredDishTagsVisibility,
@@ -152,56 +153,16 @@ export function DishTagSection({ restaurants }: DishTagSectionProps) {
  * where it can be switched back on. */
 function DishTagsHiddenNotice() {
   return (
-    <div
-      role="status"
-      className="border-border bg-card text-muted-foreground animate-fade-in mb-8 flex items-start gap-3 rounded-xl border p-4 shadow-sm"
-    >
-      <svg
-        className="mt-0.5 h-5 w-5 shrink-0"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        strokeWidth="2"
-        stroke="currentColor"
-        aria-hidden="true"
+    <div role="status" className="mb-8">
+      <Notice
+        title="Ruokalajiosio on piilotettu"
+        onDismiss={() => setStoredDishTagsVisibility("dismissed")}
       >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
-        />
-      </svg>
-      <div className="min-w-0 flex-1 text-sm">
-        <p className="text-foreground font-medium">
-          Ruokalajiosio on piilotettu
-        </p>
-        <p className="mt-0.5">
+        <p>
           Voit ottaa sen takaisin käyttöön sivun asetuksista yläkulman
           Asetukset-painikkeesta.
         </p>
-      </div>
-      <button
-        type="button"
-        onClick={() => setStoredDishTagsVisibility("dismissed")}
-        className="text-muted-foreground hover:text-foreground hover:bg-muted focus-visible:ring-ring -m-1 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md transition-colors focus-visible:ring-2 focus-visible:outline-none"
-        aria-label="Sulje ilmoitus"
-      >
-        <svg
-          className="h-4 w-4"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth="2"
-          stroke="currentColor"
-          aria-hidden="true"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M6 18 18 6M6 6l12 12"
-          />
-        </svg>
-      </button>
+      </Notice>
     </div>
   );
 }

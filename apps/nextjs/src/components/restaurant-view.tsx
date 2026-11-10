@@ -10,8 +10,9 @@ import { RestaurantListItem } from "~/components/restaurant-list-item";
 import { SettingsModal } from "~/components/settings-modal";
 import { Button } from "~/components/ui/button";
 import {
-  applyPreferencesToRestaurants,
   getStoredPreferences,
+  groupRestaurantsByArea,
+  OTHER_AREA_LABEL,
   subscribeToPreferences,
 } from "~/lib/preferences";
 
@@ -20,6 +21,8 @@ export interface RestaurantViewProps {
   todayStr: string;
   isDev?: boolean;
   source?: string | null;
+  /** Rendered right below the heading, above the dish tag section. */
+  whatsNewNotice?: ReactNode;
   /** Rendered between the heading and the restaurant lists. Passed in rather
    * than composed here so it stays outside this component's preference state. */
   dishTagSection?: ReactNode;
@@ -30,6 +33,7 @@ export function RestaurantView({
   todayStr,
   isDev,
   source,
+  whatsNewNotice,
   dishTagSection,
 }: RestaurantViewProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -48,8 +52,10 @@ export function RestaurantView({
     ? (JSON.parse(preferencesString) as RestaurantPreferences)
     : null;
 
-  const { visible: visibleRestaurants, hidden: hiddenRestaurants } =
-    applyPreferencesToRestaurants(restaurants, parsedPreferences);
+  const { groups, hidden: hiddenRestaurants } = groupRestaurantsByArea(
+    restaurants,
+    parsedPreferences,
+  );
 
   return (
     <>
@@ -100,10 +106,12 @@ export function RestaurantView({
         </div>
       </header>
 
+      {whatsNewNotice}
+
       {dishTagSection}
 
-      {/* Visible restaurants */}
-      {visibleRestaurants.length === 0 && hiddenRestaurants.length > 0 ? (
+      {/* Visible restaurants, one section per Area */}
+      {groups.length === 0 && hiddenRestaurants.length > 0 ? (
         <div className="border-border bg-card text-muted-foreground rounded-xl border p-8 text-center shadow-sm">
           <p className="text-base font-medium">
             Kaikki ravintolat on piilotettu
@@ -123,7 +131,22 @@ export function RestaurantView({
           </Button>
         </div>
       ) : (
-        <RestaurantListMasonry restaurants={visibleRestaurants} />
+        <div className="space-y-10">
+          {groups.map((group) => {
+            const headingId = `area-${group.area?.id ?? "other"}`;
+            return (
+              <section key={headingId} aria-labelledby={headingId}>
+                <h2
+                  id={headingId}
+                  className="text-foreground mb-4 text-xl font-bold tracking-tight sm:text-2xl"
+                >
+                  {group.area?.label ?? OTHER_AREA_LABEL}
+                </h2>
+                <RestaurantListMasonry restaurants={group.restaurants} />
+              </section>
+            );
+          })}
+        </div>
       )}
 
       {/* Hidden restaurants section */}

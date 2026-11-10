@@ -6,7 +6,7 @@ This document provides context, architecture details, conventions, and operation
 
 ## 1. Project Overview
 
-**Yle Campus Lunch List** (`yle-campus-lunch-list`) is a monorepo application that aggregates, normalizes, and displays daily lunch menus from campus restaurants around Yleisradio (Huoltamo, Piccolo, Iso Paja, Studio 10, Pasilan Linkki, Päättäri, Akseli, Dylan Luft, Dylan Böle, Dylan La Ilma) in Helsinki, Finland.
+**Yle Campus Lunch List** (`yle-campus-lunch-list`) is a monorepo application that aggregates, normalizes, and displays daily lunch menus from campus restaurants around Yleisradio (Huoltamo, Piccolo, Iso Paja, Studio 10, Pasilan Linkki, Päättäri, Akseli, Dylan Luft, Dylan Böle, Dylan La Ilma, Ninan Keittiö Fennia, Ravintola Piano), grouped by Area (Ylen kampusalue, Ilmala, Pasila), in Helsinki, Finland.
 
 ### Key Characteristics
 - **Headless CMS / Data Store**: Google Sheets API acts as the data store.
@@ -92,6 +92,8 @@ The project reads variables from root `.env` (or `.env.local` / `.env.developmen
 | `HUOLTAMO_API_URL` | Yle Intra Apps Script JSON API URL for Huoltamo, Piccolo, Studio 10 | Scraper |
 | `ISO_PAJA_URL` | Website URL for Iso Paja scraping | Scraper |
 | `AKSELI_URL` | Website URL for Akseli scraping | Scraper |
+| `FENNIA_URL` | Website URL for Ninan Keittiö Fennia scraping | Scraper |
+| `PIANO_URL` | Website URL for Ravintola Piano scraping | Scraper |
 | `PAATTARI_URL` | Website URL for Päättäri scraping | Scraper |
 | `TARGET_DATE` / `DATE` / `SCRAPE_DATE` | Optional date override (`YYYY-MM-DD`) | Scraper |
 | `DRY_RUN` | Run scraper in dry run mode without writing to Google Sheets | Scraper (Optional) |
@@ -193,11 +195,12 @@ When modifying an existing restaurant scraper or adding a new campus restaurant,
   ```typescript
   {
     id: "my-restaurant",
+    area: "pasila", // "yle-campus" | "ilmala" | "pasila"
     name: "My Restaurant",
     websiteUrl: "https://...",
   }
   ```
-- Adjust array ordering to position the restaurant in the UI.
+- Pick its Area (see `RESTAURANT_AREAS`) and adjust array ordering to position the restaurant within that Area.
 
 ### Step 4: Update environment configuration (if applicable)
 - Add new source URLs to `.env.example`.

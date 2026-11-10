@@ -10,6 +10,14 @@ A campus eatery that publishes a lunch menu. Identified by a stable kebab-case i
 (`iso-paja`) that is also its tab name in the sheet.
 _Avoid_: Venue, place, cafeteria
 
+**Area**:
+The fixed location group a Restaurant belongs to: `yle-campus` (Ylen kampusalue),
+`ilmala` (Ilmala) or `pasila` (Pasila). Set in the frontend config, never by
+the user. The page lists Restaurants under their Area; users can reorder and
+hide whole Areas and reorder Restaurants within one, but never move a
+Restaurant to another Area.
+_Avoid_: Group, location, campus, region
+
 **Menu Item**:
 One published line of a restaurant's menu for a given day. Its text is its only
 identity; there is no item id.

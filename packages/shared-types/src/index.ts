@@ -26,6 +26,15 @@ export const DISH_TAG_IDS = [
 export type DishTagId = (typeof DISH_TAG_IDS)[number];
 
 /**
+ * The fixed Areas restaurants are grouped by on the page, in default order.
+ * Like Dish Tags, the stable ids live here and the Finnish labels in the
+ * frontend config. See CONTEXT.md.
+ */
+export const AREA_IDS = ["yle-campus", "ilmala", "pasila"] as const;
+
+export type AreaId = (typeof AREA_IDS)[number];
+
+/**
  * Represents a single menu item parsed directly by a restaurant scraper/fetcher.
  */
 export interface ParsedMenuItem {
@@ -79,6 +88,9 @@ export interface RestaurantAddress {
 export interface Restaurant {
   id: string;
   name: string;
+  /** The Area the restaurant belongs to. Absent for a sheet tab that has no
+   * frontend config entry. */
+  area?: AreaId;
   websiteUrl?: string;
   address?: RestaurantAddress;
   openingHours?: RestaurantOpeningHours;
