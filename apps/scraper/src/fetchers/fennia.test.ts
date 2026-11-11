@@ -37,6 +37,20 @@ describe("fennia fetcher", () => {
     expect(names.some((n) => /Gluteeniton|Laktoositon/.test(n))).toBe(false);
   });
 
+  it("keeps one copy of a repeated staff note at the top of the day", () => {
+    const items = parseFenniaHtml(SAMPLE_HTML, "2026-11-11");
+    const notices = items.filter((i) => /klo/i.test(i.item));
+
+    expect(notices).toEqual([
+      {
+        date: "2026-11-11",
+        item: "LOUNASTA KLO.10.30-12.00",
+        dietaryFlags: [],
+      },
+    ]);
+    expect(items[0]).toEqual(notices[0]);
+  });
+
   it("returns an empty list for a date not on the page", () => {
     expect(parseFenniaHtml(SAMPLE_HTML, "2026-11-14")).toEqual([]);
     expect(parseFenniaHtml("", "2026-11-09")).toEqual([]);
