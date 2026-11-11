@@ -1,9 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
+  fetchIntraMenus,
   getHelsinkiDateString,
   parseDietaryFlags,
   parseHuoltamoResponse,
@@ -150,5 +151,46 @@ describe("intra fetcher", () => {
   it("parseIntraResponse handles days with no menu for a restaurant", () => {
     const results = parseIntraResponse(rawData, "studio-10", "1999-01-01");
     expect(results).toEqual([]);
+  });
+});
+
+describe("fetchIntraMenus retries", () => {
+  const url = "https://example.test/intra";
+  const options = { attempts: 3, retryDelayMs: 0 };
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("recovers when an early attempt fails or returns an HTML error page", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockRejectedValueOnce(
+        new Error("The operation was aborted due to timeout"),
+      )
+      .mockResolvedValueOnce(
+        new Response("<html>Error</html>", { status: 200 }),
+      )
+      .mockResolvedValueOnce(Response.json({ items: [] }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const menus = await fetchIntraMenus("2026-11-11", url, options);
+
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+    expect(menus).toEqual({ huoltamo: [], "studio-10": [], piccolo: [] });
+  });
+
+  it("throws once every attempt has failed", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockImplementation(() =>
+        Promise.resolve(new Response("Service unavailable", { status: 503 })),
+      );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(fetchIntraMenus("2026-11-11", url, options)).rejects.toThrow(
+      "failed after 3 attempts",
+    );
+    expect(fetchMock).toHaveBeenCalledTimes(3);
   });
 });

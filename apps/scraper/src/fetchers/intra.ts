@@ -203,6 +203,59 @@ export function parseHuoltamoResponse(
   return parseIntraResponse(apiData, "huoltamo", targetDate);
 }
 
+export interface IntraFetchOptions {
+  attempts: number;
+  timeoutMs: number;
+  retryDelayMs: number;
+}
+
+/**
+ * The Apps Script behind the API answers in 3-5 s when warm but can be far
+ * slower on a cold start, and then sometimes serves an HTML error page instead
+ * of JSON. A failed attempt is retried after a short pause.
+ */
+export const INTRA_FETCH_DEFAULTS: IntraFetchOptions = {
+  attempts: 3,
+  timeoutMs: 30_000,
+  retryDelayMs: 2_000,
+};
+
+async function fetchIntraJson(
+  url: string,
+  { attempts, timeoutMs, retryDelayMs }: IntraFetchOptions,
+): Promise<RawApiResponse> {
+  let lastError: unknown;
+
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    try {
+      const response = await fetch(url, {
+        headers: { Accept: "application/json" },
+        signal: AbortSignal.timeout(timeoutMs),
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `API request failed with status ${response.status}: ${await response.text()}`,
+        );
+      }
+
+      return (await response.json()) as RawApiResponse;
+    } catch (error) {
+      lastError = error;
+      console.warn(
+        `[Intra] Attempt ${attempt}/${attempts} failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
+      if (attempt < attempts) {
+        await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+      }
+    }
+  }
+
+  throw new Error(`[Intra] API request failed after ${attempts} attempts`, {
+    cause: lastError,
+  });
+}
+
 /**
  * Fetches and parses menu items for all intra restaurants (Huoltamo, Studio 10, Piccolo)
  * from the shared Google Apps Script JSON API.
@@ -212,26 +265,17 @@ export async function fetchIntraMenus(
   apiUrl: string = process.env.INTRA_API_URL ??
     process.env.HUOLTAMO_API_URL ??
     INTRA_DEFAULT_API_URL,
+  fetchOptions: Partial<IntraFetchOptions> = {},
 ): Promise<Record<IntraRestaurantId, ParsedMenuItem[]>> {
   const targetUrl = apiUrl.replace(/^["']|["']$/g, "").trim();
   console.log(
     `[Intra] Fetching menus for date ${targetDate} from API (${targetUrl})...`,
   );
 
-  const response = await fetch(targetUrl, {
-    headers: {
-      Accept: "application/json",
-    },
-    signal: AbortSignal.timeout(15000),
+  const data = await fetchIntraJson(targetUrl, {
+    ...INTRA_FETCH_DEFAULTS,
+    ...fetchOptions,
   });
-
-  if (!response.ok) {
-    throw new Error(
-      `[Intra] API request failed with status ${response.status}: ${await response.text()}`,
-    );
-  }
-
-  const data = (await response.json()) as RawApiResponse;
   const menusByRestaurant = parseIntraAllRestaurants(data, targetDate);
 
   for (const restaurant of INTRA_RESTAURANTS) {
