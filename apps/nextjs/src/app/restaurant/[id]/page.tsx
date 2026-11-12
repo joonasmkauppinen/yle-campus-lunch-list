@@ -87,7 +87,10 @@ export default async function RestaurantPage(props: RestaurantPageProps) {
   }
 
   const today = getTodayIsoString();
-  const jsonLd = restaurant ? generateRestaurantJsonLd(restaurant) : null;
+  const currentMenu = restaurant?.menus.find((menu) => menu.date === today);
+  const jsonLd = restaurant
+    ? generateRestaurantJsonLd(restaurant, currentMenu)
+    : null;
   return (
     <MenuDateProvider today={today}>
       {jsonLd && (
