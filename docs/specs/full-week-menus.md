@@ -234,10 +234,14 @@ date; no whole-week filter mode is needed.
 can be published late, dishes can change, holidays can be corrected, and a
 Monday-only failure would otherwise persist for the whole week.
 
-Recommended starting schedule: 06:00 and 10:00 Europe/Helsinki, every day including weekends.
-The first run prepares the day; the second catches late publication and
-pre-lunch updates. This is a proposed schedule, not a claim about the deployed
-cron. A simpler minimum is one daily morning run, including weekends for Huoltamo.
+Recommended schedule: 08:00 Europe/Helsinki every day, including weekends for
+Huoltamo, with additional Monday checks at 06:30 and 10:30. The early Monday run
+picks up already-published menus; 08:00 is the office's daily baseline; 10:30
+catches late Monday publications. Use one cron expression `0,30 6,8,10 * * *`
+with a Bash gate accepting only Monday 06:30, daily 08:00, and Monday 10:30.
+All unused slots exit before starting Docker. Keep `--force` available for
+manual runs outside those slots. The gate must inspect minutes as well as hours.
+This is a recommended configuration, not a claim about the deployed cron.
 The week navigation still includes weekends even when no lunch is published.
 
 Configure the scheduler's timezone explicitly and verify DST behavior. Refresh

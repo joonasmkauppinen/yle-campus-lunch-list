@@ -190,9 +190,23 @@ pnpm --filter @acme/scraper dev -- --dry-run --skip-tagging --week 2026-11-12
 Dry run alone still exercises AI tagging if configured; `--skip-tagging`
 explicitly disables it. Dry run never revalidates production pages.
 
-Recommended Unraid schedule: 06:00 and 10:00 Europe/Helsinki every day,
-including weekends for Huoltamo. This repository does not configure the Unraid
-scheduler. Configure a scheduler/host lock around the entire Docker invocation
+Recommended Unraid schedule: 08:00 Europe/Helsinki every day, including weekends
+for Huoltamo, with additional Monday runs at 06:30 and 10:30. Use the single cron
+expression `0,30 6,8,10 * * *` and the time gate below to skip unused slots.
+This repository does not configure the Unraid scheduler.
+
+```bash
+export TZ=Europe/Helsinki
+if [[ "${1:-}" != "--force" ]]; then
+  read -r weekday hour minute < <(date '+%u %H %M')
+  case "$weekday:$hour:$minute" in
+    1:06:30|*:08:00|1:10:30) ;;
+    *) exit 0 ;;
+  esac
+fi
+```
+
+Configure a scheduler/host lock around the entire Docker invocation
 so scheduled and manual live runs never overlap; the shared status tab requires
 a single writer. Set the scheduler timezone and verify DST behavior. Deploy the
 weekly-compatible frontend reader before enabling the weekly scraper. Menu
