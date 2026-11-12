@@ -169,6 +169,12 @@ trigger another Google Sheets read.
   Use the exact capitalized Finnish abbreviation and date format `Ma 9.11.`.
   Mark the selected tab and today, support keyboard navigation, and scroll the
   row horizontally on narrow screens with the selected day brought into view.
+- On mobile touch screens (viewport below 768px with a coarse primary pointer),
+  swipe left/right over menu content to move one day forward/backward. Do not
+  wrap beyond Monday/Sunday. Preserve vertical scrolling, pinch zoom, native
+  browser edge gestures and nested scrolling/interactive controls. The tab row
+  scrolls horizontally rather than interpreting swipes as day changes. Selecting
+  a day keeps its tab visible without changing the page's vertical position.
 - Default to today, including weekends. Missing content has an empty state;
   do not silently jump to Monday or display Friday as today's menu.
 - Keep existing Area grouping, cards, ordering, hidden preferences and detail
