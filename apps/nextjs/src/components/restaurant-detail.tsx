@@ -76,7 +76,7 @@ export function RestaurantDetail({
               </svg>
               <div className="space-y-1">
                 <h2 className="text-base font-semibold">
-                  Unable to load lunch menu
+                  Lounaslistan lataaminen epäonnistui
                 </h2>
                 <p className="text-sm opacity-90">{error}</p>
               </div>
