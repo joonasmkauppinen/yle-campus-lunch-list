@@ -66,6 +66,9 @@ export interface MenuItem {
 }
 
 export interface DailyMenu {
+  availability?: "published" | "closed" | "unpublished" | "failed";
+  lastChecked?: string;
+  lastSuccess?: string;
   date: string; // ISO format YYYY-MM-DD
   items: MenuItem[];
 }
@@ -110,4 +113,24 @@ export type LegacyRestaurantMenus = Record<string, LegacyMenuItem[]>;
 
 export interface LegacyCurrentDayMenusResponse {
   restaurant: LegacyRestaurantMenus;
+}
+
+/** Calendar dates use UTC only for arithmetic, never the host timezone. */
+export function isIsoDate(value: string): boolean {
+  return (
+    /^\d{4}-\d{2}-\d{2}$/.test(value) &&
+    !Number.isNaN(Date.parse(value)) &&
+    new Date(`${value}T12:00:00Z`).toISOString().slice(0, 10) === value
+  );
+}
+
+export function getWeekDates(date: string): string[] {
+  if (!isIsoDate(date)) throw new Error(`Invalid calendar date: ${date}`);
+  const anchor = new Date(`${date}T12:00:00Z`);
+  anchor.setUTCDate(anchor.getUTCDate() - ((anchor.getUTCDay() + 6) % 7));
+  return Array.from({ length: 7 }, (_, offset) => {
+    const day = new Date(anchor);
+    day.setUTCDate(day.getUTCDate() + offset);
+    return day.toISOString().slice(0, 10);
+  });
 }

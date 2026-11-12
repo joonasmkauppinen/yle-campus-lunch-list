@@ -17,6 +17,11 @@ export interface Announcement {
  */
 export const ANNOUNCEMENTS: Announcement[] = [
   {
+    id: "2026-11-weekly-menus",
+    publishedAt: "2026-11-12",
+    text: "Näet nyt koko viikon lounaslistat valitsemalla päivän välilehdistä.",
+  },
+  {
     id: "2026-11-fennia-and-piano",
     publishedAt: "2026-11-10",
     text: "Listalla ovat nyt myös Ninan Keittiö Fennia ja Ravintola Piano.",

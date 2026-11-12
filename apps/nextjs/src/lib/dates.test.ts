@@ -53,6 +53,15 @@ describe("getOpeningHoursForCurrentDay", () => {
     expect(getOpeningHoursForCurrentDay(str, sunday)).toBe("Suljettu");
   });
 
+  it("resolves shorter weekday ranges for the selected date", () => {
+    const hours = "Ma–to 10.30–13.30, pe 10.30–13.00";
+    expect(getOpeningHoursForCurrentDay(hours, wednesday)).toBe("10.30–13.30");
+    expect(
+      getOpeningHoursForCurrentDay(hours, new Date("2026-08-28T10:00:00Z")),
+    ).toBe("10.30–13.00");
+    expect(getOpeningHoursForCurrentDay(hours, saturday)).toBe("Suljettu");
+  });
+
   it("handles 24/7 strings (Piccolo open hours)", () => {
     const str = "24/7 (Itsepalvelu)";
     expect(getOpeningHoursForCurrentDay(str, monday)).toBe(

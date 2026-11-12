@@ -176,12 +176,12 @@ export function parseDylanRss(
 
   const itemRegex = /<item(?:[\s\S]*?)>([\s\S]*?)<\/item>/gi;
   let match: RegExpExecArray | null;
+  const results: ParsedMenuItem[] = [];
 
   while ((match = itemRegex.exec(xmlText)) !== null) {
     const itemXml = match[1];
     if (!itemXml) continue;
 
-    const title = extractTagContent(itemXml, "title") ?? "";
     const pubDate = extractTagContent(itemXml, "pubDate") ?? "";
     const description = extractTagContent(itemXml, "description") ?? "";
 
@@ -198,34 +198,11 @@ export function parseDylanRss(
 
     // Match if date matches the target date
     if (itemDateStr === targetDate) {
-      return parseDylanDescription(description, targetDate);
-    }
-
-    // If pubDate is not matching or invalid, check if this is the only item in current-day feed
-    // or fallback if targetDate wasn't provided or pubDate wasn't available
-    if (!itemDateStr && title) {
-      return parseDylanDescription(description, targetDate);
+      results.push(...parseDylanDescription(description, targetDate));
     }
   }
 
-  // If no matching item by date was found, check if it was a single-item feed
-  const singleItemMatch = /<item(?:[\s\S]*?)>([\s\S]*?)<\/item>/i.exec(xmlText);
-  if (singleItemMatch?.[1]) {
-    const description =
-      extractTagContent(singleItemMatch[1], "description") ?? "";
-    const pubDate = extractTagContent(singleItemMatch[1], "pubDate");
-    if (pubDate) {
-      try {
-        const itemDate = getHelsinkiDateString(new Date(pubDate));
-        if (itemDate === targetDate) {
-          return parseDylanDescription(description, targetDate);
-        }
-      } catch {
-        // Fallback
-      }
-    }
-  }
-
+  if (results.length) return results;
   console.log(
     `[${restaurantName}] No menu entry found for ${restaurantName} on date ${targetDate}`,
   );

@@ -56,12 +56,15 @@ export function Notice({
       {/* Header: icon, title and close button on one row */}
       <div className="flex items-center gap-2">
         <svg
-          className={cn("h-5 w-5 shrink-0", isHighlight && "text-primary")}
+          className={cn(
+            "shrink-0",
+            isHighlight ? "text-primary h-6 w-6" : "h-5 w-5",
+          )}
           xmlns="http://www.w3.org/2000/svg"
-          fill="none"
+          fill={isHighlight ? "currentColor" : "none"}
           viewBox="0 0 24 24"
           strokeWidth="2"
-          stroke="currentColor"
+          stroke={isHighlight ? "none" : "currentColor"}
           aria-hidden="true"
         >
           <path

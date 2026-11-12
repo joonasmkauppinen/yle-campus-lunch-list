@@ -55,7 +55,7 @@ describe("dylan-la-ilma fetcher", () => {
     expect(DYLAN_LA_ILMA_RESTAURANT_ID).toBe("dylan-la-ilma");
     expect(DYLAN_LA_ILMA_RESTAURANT_NAME).toBe("Dylan La Ilma");
     expect(DYLAN_LA_ILMA_DEFAULT_RSS_URL).toBe(
-      "https://lounastaja.app/api/v1/rss/week/70835b81-ec1f-443f-92bb-9832d21fb3af/current?days=current&language=fi",
+      "https://lounastaja.app/api/v1/rss/week/70835b81-ec1f-443f-92bb-9832d21fb3af/current?language=fi",
     );
   });
 

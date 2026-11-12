@@ -32,7 +32,7 @@ export function RadiatorRestaurantCard({
   );
   const lastHeightRef = useRef<number>(0);
 
-  const currentMenu = restaurant.menus[0];
+  const currentMenu = restaurant.menus.find((menu) => isCurrentDate(menu.date));
   const items = currentMenu?.items ?? [];
   const itemsCount = items.length;
   const hasItems = itemsCount > 0;

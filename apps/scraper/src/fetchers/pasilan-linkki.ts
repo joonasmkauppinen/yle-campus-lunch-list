@@ -6,7 +6,7 @@ import { getHelsinkiDateString } from "./intra.js";
 export const PASILAN_LINKKI_RESTAURANT_ID = "pasilan-linkki";
 export const PASILAN_LINKKI_RESTAURANT_NAME = "Pasilan Linkki";
 export const PASILAN_LINKKI_DEFAULT_RSS_URL =
-  "https://www.compass-group.fi/menuapi/feed/rss/current-day?costNumber=3642&language=fi";
+  "https://www.compass-group.fi/menuapi/feed/rss/current-week?costNumber=3642&language=fi";
 
 /**
  * Regex for filtering out general buffet boilerplate or salad bar descriptions in Compass Group feeds.
@@ -151,6 +151,7 @@ export function parsePasilanLinkkiRss(
 
   const itemRegex = /<item(?:[\s\S]*?)>([\s\S]*?)<\/item>/gi;
   let match: RegExpExecArray | null;
+  const results: ParsedMenuItem[] = [];
 
   while ((match = itemRegex.exec(xmlText)) !== null) {
     const itemXml = match[1];
@@ -160,22 +161,11 @@ export function parsePasilanLinkkiRss(
     const description = extractTagContent(itemXml, "description") ?? "";
 
     if (itemDateStr === targetDate) {
-      return parseCompassDescription(description, targetDate);
+      results.push(...parseCompassDescription(description, targetDate));
     }
   }
 
-  // Fallback: If single item feed and date couldn't be extracted, check if only one item exists
-  const singleItemMatch = /<item(?:[\s\S]*?)>([\s\S]*?)<\/item>/i.exec(xmlText);
-  if (singleItemMatch?.[1]) {
-    const itemXml = singleItemMatch[1];
-    const itemDateStr = extractCompassItemDate(itemXml);
-    const description = extractTagContent(itemXml, "description") ?? "";
-
-    if (!itemDateStr && description) {
-      return parseCompassDescription(description, targetDate);
-    }
-  }
-
+  if (results.length) return results;
   console.log(
     `[${PASILAN_LINKKI_RESTAURANT_NAME}] No menu entry found for ${PASILAN_LINKKI_RESTAURANT_NAME} on date ${targetDate}`,
   );

@@ -1,14 +1,11 @@
 import { cache } from "react";
 import { google } from "googleapis";
 
-import type {
-  MenuItem,
-  Restaurant,
-  RestaurantOpeningHours,
-} from "@acme/shared-types";
+import type { Restaurant, RestaurantOpeningHours } from "@acme/shared-types";
 
 import { env } from "~/env";
-import { parseDishTags } from "~/lib/dish-tags";
+import { groupMenuRows } from "~/lib/menu-rows";
+import { RESTAURANT_CONFIGS } from "~/config/restaurants";
 
 /**
  * Safely extracts a string from unknown cell data and trims whitespace.
@@ -277,7 +274,11 @@ export const fetchRestaurantsFromGoogleSheets = cache(
 
       const sheetTitles = (spreadsheet.data.sheets ?? [])
         .map((s) => s.properties?.title)
-        .filter((t): t is string => typeof t === "string" && t.length > 0);
+        .filter(
+          (t): t is string =>
+            typeof t === "string" &&
+            RESTAURANT_CONFIGS.some((config) => config.id === t),
+        );
 
       if (sheetTitles.length === 0) {
         return {
@@ -289,18 +290,15 @@ export const fetchRestaurantsFromGoogleSheets = cache(
         };
       }
 
+      const hasStatus = (spreadsheet.data.sheets ?? []).some(
+        (sheet) => sheet.properties?.title === "menu-status",
+      );
       const ranges = sheetTitles.map((title) => `'${title}'!A2:G`);
+      if (hasStatus) ranges.push("'menu-status'!A2:H");
       const batchResponse = await sheets.spreadsheets.values.batchGet({
         spreadsheetId,
         ranges,
       });
-
-      const todayIsoDate = new Intl.DateTimeFormat("en-CA", {
-        timeZone: "Europe/Helsinki",
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      }).format(new Date());
 
       const restaurants: Restaurant[] = [];
       const valueRanges = batchResponse.data.valueRanges ?? [];
@@ -312,28 +310,10 @@ export const fetchRestaurantsFromGoogleSheets = cache(
         const valRange = valueRanges[i];
         const rawRows = valRange?.values ?? [];
 
-        if (rawRows.length === 0) {
-          // Tab exists but has no rows currently published
-          restaurants.push({
-            id: tabTitle,
-            name: formatRestaurantTitle(tabTitle),
-            openingHours: openingHoursMap[tabTitle],
-            lastUpdated: new Date().toISOString(),
-            menus: [
-              {
-                date: todayIsoDate,
-                items: [],
-              },
-            ],
-          });
-          continue;
-        }
-
         // First valid row gives restaurant metadata
         const firstRow = rawRows[0];
         const rowRestaurantId = safeString(firstRow?.[0]);
         const rowRestaurantName = safeString(firstRow?.[1]);
-        const rowMenuDate = safeString(firstRow?.[2]);
         const rowLastUpdated = safeString(firstRow?.[5]);
 
         const restaurantId =
@@ -342,32 +322,7 @@ export const fetchRestaurantsFromGoogleSheets = cache(
           rowRestaurantName.length > 0
             ? rowRestaurantName
             : formatRestaurantTitle(tabTitle);
-        const menuDate = rowMenuDate.length > 0 ? rowMenuDate : todayIsoDate;
-        const lastUpdated =
-          rowLastUpdated.length > 0 ? rowLastUpdated : new Date().toISOString();
-
-        const items: MenuItem[] = [];
-        for (const row of rawRows) {
-          const itemText = safeString(row[3]);
-          if (!itemText) continue;
-
-          const dietaryRaw = safeString(row[4]);
-          const dietaryFlags =
-            dietaryRaw.length > 0
-              ? dietaryRaw
-                  .split(",")
-                  .map((f) => f.trim())
-                  .filter((f) => f.length > 0)
-              : [];
-
-          const tags = parseDishTags(safeString(row[6]));
-
-          items.push({
-            name: itemText,
-            dietaryFlags,
-            tags,
-          });
-        }
+        const lastUpdated = rowLastUpdated;
 
         restaurants.push({
           id: restaurantId,
@@ -375,15 +330,23 @@ export const fetchRestaurantsFromGoogleSheets = cache(
           openingHours:
             openingHoursMap[restaurantId] ?? openingHoursMap[tabTitle],
           lastUpdated,
-          menus: [
-            {
-              date: menuDate,
-              items,
-            },
-          ],
+          menus: groupMenuRows(
+            rawRows,
+            hasStatus ? (valueRanges[sheetTitles.length]?.values ?? []) : [],
+            restaurantId,
+          ),
         });
       }
 
+      for (const config of RESTAURANT_CONFIGS) {
+        if (!restaurants.some((restaurant) => restaurant.id === config.id))
+          restaurants.push({
+            id: config.id,
+            name: config.name ?? config.id,
+            menus: [],
+            lastUpdated: "",
+          });
+      }
       return {
         restaurants,
         resolvedSpreadsheetId: spreadsheetId,

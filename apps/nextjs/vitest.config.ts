@@ -5,6 +5,8 @@ import { defineConfig } from "vitest/config";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
+  // Match Next.js when a unit test imports a server component.
+  esbuild: { jsx: "automatic" },
   test: {
     environment: "node",
     // Only `.ts` unit tests run today. Adding component (`.tsx`) tests requires

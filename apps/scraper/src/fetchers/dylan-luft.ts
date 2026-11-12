@@ -13,7 +13,7 @@ import { getHelsinkiDateString } from "./intra.js";
 export const DYLAN_LUFT_RESTAURANT_ID = "dylan-luft";
 export const DYLAN_LUFT_RESTAURANT_NAME = "Dylan Luft";
 export const DYLAN_LUFT_DEFAULT_RSS_URL =
-  "https://lounastaja.app/api/v1/rss/week/5843f3ec-6a2c-49ba-ba3e-b384f6c996f1/current?days=current&language=fi";
+  "https://lounastaja.app/api/v1/rss/week/5843f3ec-6a2c-49ba-ba3e-b384f6c996f1/current?language=fi";
 
 // Re-export common functions for backward compatibility
 export {
