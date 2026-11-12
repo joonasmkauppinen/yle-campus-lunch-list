@@ -6,7 +6,7 @@ import { getHelsinkiDateString } from "./intra.js";
 export const DYLAN_BOLE_RESTAURANT_ID = "dylan-bole";
 export const DYLAN_BOLE_RESTAURANT_NAME = "Dylan Böle";
 export const DYLAN_BOLE_DEFAULT_RSS_URL =
-  "https://lounastaja.app/api/v1/rss/week/3aba0b64-0d43-41ea-b665-1d2d6c0f2d5e/current?days=current&language=fi";
+  "https://lounastaja.app/api/v1/rss/week/3aba0b64-0d43-41ea-b665-1d2d6c0f2d5e/current?language=fi";
 
 /**
  * Parses Dylan Böle RSS XML feed and extracts menu items for the target date.

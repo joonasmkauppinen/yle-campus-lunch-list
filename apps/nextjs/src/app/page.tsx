@@ -1,10 +1,11 @@
+import { MenuDateProvider } from "~/components/menu-date";
 import { DishTagSection } from "~/components/dish-tag-section";
 import { Footer } from "~/components/footer";
 import { RestaurantView } from "~/components/restaurant-view";
 import { WhatsNewNotice } from "~/components/whats-new-notice";
 import { ANNOUNCEMENTS } from "~/config/announcements";
 import { getSortedRestaurantsWithMetadata } from "~/config/restaurants";
-import { getTodayFormattedString } from "~/lib/dates";
+import { getTodayIsoString } from "~/lib/dates";
 import { generateHomeJsonLd } from "~/lib/seo";
 import { fetchRestaurantsFromGoogleSheets } from "~/lib/sheets";
 
@@ -20,7 +21,6 @@ export default async function HomePage() {
   } = await fetchRestaurantsFromGoogleSheets();
 
   const restaurants = getSortedRestaurantsWithMetadata(rawRestaurants);
-  const todayStr = getTodayFormattedString();
   const homeJsonLd = generateHomeJsonLd(restaurants);
 
   return (
@@ -68,21 +68,22 @@ export default async function HomePage() {
             </p>
           </div>
         ) : (
-          <RestaurantView
-            restaurants={restaurants}
-            todayStr={todayStr}
-            isDev={isDev}
-            source={source}
-            whatsNewNotice={
-              <WhatsNewNotice key="whats-new" announcements={ANNOUNCEMENTS} />
-            }
-            // The keys silence a false "unique key" warning: React can't see
-            // that these server-created elements sit in static slots once
-            // RestaurantView places them among its own children.
-            dishTagSection={
-              <DishTagSection key="dish-tags" restaurants={restaurants} />
-            }
-          />
+          <MenuDateProvider today={getTodayIsoString()}>
+            <RestaurantView
+              restaurants={restaurants}
+              isDev={isDev}
+              source={source}
+              whatsNewNotice={
+                <WhatsNewNotice key="whats-new" announcements={ANNOUNCEMENTS} />
+              }
+              // The keys silence a false "unique key" warning: React can't see
+              // that these server-created elements sit in static slots once
+              // RestaurantView places them among its own children.
+              dishTagSection={
+                <DishTagSection key="dish-tags" restaurants={restaurants} />
+              }
+            />
+          </MenuDateProvider>
         )}
 
         <Footer />

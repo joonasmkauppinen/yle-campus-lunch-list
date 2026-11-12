@@ -1,4 +1,6 @@
 "use client";
+import { selectRestaurantMenus } from "~/lib/menu-selection";
+import { useMenuDate } from "~/components/menu-date";
 
 import { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
@@ -24,7 +26,20 @@ export interface DishTagSectionProps {
   restaurants: Restaurant[];
 }
 
-export function DishTagSection({ restaurants }: DishTagSectionProps) {
+export function DishTagSection({
+  restaurants: allRestaurants,
+}: DishTagSectionProps) {
+  const date = useMenuDate();
+  const restaurants = selectRestaurantMenus(allRestaurants, date);
+  return (
+    <DishTagSectionForDate key={date} restaurants={restaurants} date={date} />
+  );
+}
+
+function DishTagSectionForDate({
+  restaurants,
+  date,
+}: DishTagSectionProps & { date: string }) {
   const [activeTag, setActiveTag] = useState<DishTagId | null>(null);
   const visibility = useSyncExternalStore<DishTagsVisibility>(
     subscribeToPreferences,
@@ -44,7 +59,12 @@ export function DishTagSection({ restaurants }: DishTagSectionProps) {
     return <DishTagsHiddenNotice />;
   }
 
-  const groups = activeTag ? getDishesForTag(restaurants, activeTag) : [];
+  const selectedTag = availableTags.some(
+    ({ config }) => config.id === activeTag,
+  )
+    ? activeTag
+    : null;
+  const groups = selectedTag ? getDishesForTag(restaurants, selectedTag) : [];
 
   return (
     <section
@@ -92,7 +112,7 @@ export function DishTagSection({ restaurants }: DishTagSectionProps) {
 
       <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7">
         {availableTags.map(({ config, count }) => {
-          const isActive = config.id === activeTag;
+          const isActive = config.id === selectedTag;
           return (
             <button
               key={config.id}
@@ -121,13 +141,13 @@ export function DishTagSection({ restaurants }: DishTagSectionProps) {
         })}
       </div>
 
-      {activeTag && (
+      {selectedTag && (
         <div className="border-border bg-card divide-border mt-4 divide-y rounded-xl border p-4 shadow-sm sm:p-6">
           {groups.map((group) => (
             <div key={group.restaurantId} className="py-3 first:pt-0 last:pb-0">
               <h3 className="text-foreground mb-1 text-sm font-bold tracking-tight">
                 <Link
-                  href={`/restaurant/${group.restaurantId}`}
+                  href={`/restaurant/${group.restaurantId}?date=${date}`}
                   className="focus-visible:ring-ring rounded-sm transition-colors hover:underline focus-visible:ring-2 focus-visible:outline-none"
                 >
                   {group.restaurantName}

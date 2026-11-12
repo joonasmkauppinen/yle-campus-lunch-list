@@ -6,7 +6,7 @@ import { getHelsinkiDateString } from "./intra.js";
 export const DYLAN_LA_ILMA_RESTAURANT_ID = "dylan-la-ilma";
 export const DYLAN_LA_ILMA_RESTAURANT_NAME = "Dylan La Ilma";
 export const DYLAN_LA_ILMA_DEFAULT_RSS_URL =
-  "https://lounastaja.app/api/v1/rss/week/70835b81-ec1f-443f-92bb-9832d21fb3af/current?days=current&language=fi";
+  "https://lounastaja.app/api/v1/rss/week/70835b81-ec1f-443f-92bb-9832d21fb3af/current?language=fi";
 
 /**
  * Parses Dylan La Ilma RSS XML feed and extracts menu items for the target date.

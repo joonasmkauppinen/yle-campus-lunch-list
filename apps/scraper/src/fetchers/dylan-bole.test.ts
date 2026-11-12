@@ -55,7 +55,7 @@ describe("dylan-bole fetcher", () => {
     expect(DYLAN_BOLE_RESTAURANT_ID).toBe("dylan-bole");
     expect(DYLAN_BOLE_RESTAURANT_NAME).toBe("Dylan Böle");
     expect(DYLAN_BOLE_DEFAULT_RSS_URL).toBe(
-      "https://lounastaja.app/api/v1/rss/week/3aba0b64-0d43-41ea-b665-1d2d6c0f2d5e/current?days=current&language=fi",
+      "https://lounastaja.app/api/v1/rss/week/3aba0b64-0d43-41ea-b665-1d2d6c0f2d5e/current?language=fi",
     );
   });
 

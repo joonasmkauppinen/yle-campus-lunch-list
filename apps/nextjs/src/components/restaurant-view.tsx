@@ -1,4 +1,6 @@
 "use client";
+import { DateTabs, MenuDayPanel, useMenuDate } from "~/components/menu-date";
+import { getTodayFormattedString } from "~/lib/dates";
 
 import type { ReactNode } from "react";
 import { useState, useSyncExternalStore } from "react";
@@ -18,7 +20,6 @@ import {
 
 export interface RestaurantViewProps {
   restaurants: Restaurant[];
-  todayStr: string;
   isDev?: boolean;
   source?: string | null;
   /** Rendered right below the heading, above the dish tag section. */
@@ -30,12 +31,13 @@ export interface RestaurantViewProps {
 
 export function RestaurantView({
   restaurants,
-  todayStr,
   isDev,
   source,
   whatsNewNotice,
   dishTagSection,
 }: RestaurantViewProps) {
+  const date = useMenuDate();
+  const todayStr = getTodayFormattedString(new Date(`${date}T12:00:00Z`));
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Read stored preferences with useSyncExternalStore for safe SSR / client hydration
@@ -104,74 +106,75 @@ export function RestaurantView({
             </span>
           )}
         </div>
+        <DateTabs />
       </header>
+      <MenuDayPanel>
+        {whatsNewNotice}
 
-      {whatsNewNotice}
+        {dishTagSection}
 
-      {dishTagSection}
-
-      {/* Visible restaurants, one section per Area */}
-      {groups.length === 0 && hiddenRestaurants.length > 0 ? (
-        <div className="border-border bg-card text-muted-foreground rounded-xl border p-8 text-center shadow-sm">
-          <p className="text-base font-medium">
-            Kaikki ravintolat on piilotettu
-          </p>
-          <p className="mt-1 text-sm">
-            Voit ottaa ravintoloita takaisin käyttöön päänäkymään yläkulman
-            Asetukset-painikkeesta.
-          </p>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => setIsModalOpen(true)}
-            className="mt-4"
-          >
-            Avaa asetukset
-          </Button>
-        </div>
-      ) : (
-        <div className="space-y-10">
-          {groups.map((group) => {
-            const headingId = `area-${group.area?.id ?? "other"}`;
-            return (
-              <section key={headingId} aria-labelledby={headingId}>
-                <h2
-                  id={headingId}
-                  className="text-foreground mb-4 text-xl font-bold tracking-tight sm:text-2xl"
-                >
-                  {group.area?.label ?? OTHER_AREA_LABEL}
-                </h2>
-                <RestaurantListMasonry restaurants={group.restaurants} />
-              </section>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Hidden restaurants section */}
-      {hiddenRestaurants.length > 0 && (
-        <section className="mt-12 border-t pt-8">
-          <div className="mb-6 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
-            <div>
-              <h2 className="text-foreground text-xl font-bold tracking-tight sm:text-2xl">
-                Piilotetut ravintolat
-              </h2>
-              <p className="text-muted-foreground mt-0.5 text-sm">
-                Nämä ravintolat on piilotettu päänäkymästä. Voit palauttaa ne
-                näkyviin asetuksista.
-              </p>
-            </div>
-            <span className="text-muted-foreground self-start rounded-full border px-2.5 py-0.5 text-xs font-medium sm:self-auto">
-              {hiddenRestaurants.length}{" "}
-              {hiddenRestaurants.length === 1 ? "ravintola" : "ravintolaa"}
-            </span>
+        {/* Visible restaurants, one section per Area */}
+        {groups.length === 0 && hiddenRestaurants.length > 0 ? (
+          <div className="border-border bg-card text-muted-foreground rounded-xl border p-8 text-center shadow-sm">
+            <p className="text-base font-medium">
+              Kaikki ravintolat on piilotettu
+            </p>
+            <p className="mt-1 text-sm">
+              Voit ottaa ravintoloita takaisin käyttöön päänäkymään yläkulman
+              Asetukset-painikkeesta.
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setIsModalOpen(true)}
+              className="mt-4"
+            >
+              Avaa asetukset
+            </Button>
           </div>
+        ) : (
+          <div className="space-y-10">
+            {groups.map((group) => {
+              const headingId = `area-${group.area?.id ?? "other"}`;
+              return (
+                <section key={headingId} aria-labelledby={headingId}>
+                  <h2
+                    id={headingId}
+                    className="text-foreground mb-4 text-xl font-bold tracking-tight sm:text-2xl"
+                  >
+                    {group.area?.label ?? OTHER_AREA_LABEL}
+                  </h2>
+                  <RestaurantListMasonry restaurants={group.restaurants} />
+                </section>
+              );
+            })}
+          </div>
+        )}
 
-          <RestaurantListMasonry restaurants={hiddenRestaurants} />
-        </section>
-      )}
+        {/* Hidden restaurants section */}
+        {hiddenRestaurants.length > 0 && (
+          <section className="mt-12 border-t pt-8">
+            <div className="mb-6 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
+              <div>
+                <h2 className="text-foreground text-xl font-bold tracking-tight sm:text-2xl">
+                  Piilotetut ravintolat
+                </h2>
+                <p className="text-muted-foreground mt-0.5 text-sm">
+                  Nämä ravintolat on piilotettu päänäkymästä. Voit palauttaa ne
+                  näkyviin asetuksista.
+                </p>
+              </div>
+              <span className="text-muted-foreground self-start rounded-full border px-2.5 py-0.5 text-xs font-medium sm:self-auto">
+                {hiddenRestaurants.length}{" "}
+                {hiddenRestaurants.length === 1 ? "ravintola" : "ravintolaa"}
+              </span>
+            </div>
 
+            <RestaurantListMasonry restaurants={hiddenRestaurants} />
+          </section>
+        )}
+      </MenuDayPanel>
       {isModalOpen && (
         <SettingsModal
           isOpen={isModalOpen}

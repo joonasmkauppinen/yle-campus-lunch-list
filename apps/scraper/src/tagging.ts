@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import type { DishTagId, ParsedMenuItem } from "@acme/shared-types";
 import { DISH_TAG_IDS } from "@acme/shared-types";
 
@@ -156,7 +157,7 @@ async function requestTags(
   apiKey: string,
   baseUrl: string,
   model: string,
-): Promise<DishTagId[][]> {
+): Promise<{ tagsByIndex: DishTagId[][]; complete: boolean }> {
   const response = await fetch(`${baseUrl}/chat/completions`, {
     method: "POST",
     headers: {
@@ -170,7 +171,7 @@ async function requestTags(
         { role: "system", content: SYSTEM_PROMPT },
         {
           role: "user",
-          content: `Restaurant: ${restaurantName}\n\n${formatMenu(menus)}`,
+          content: `Restaurant: ${restaurantName}\nDate: ${menus[0]?.date}\n\n${formatMenu(menus)}`,
         },
       ],
       response_format: RESPONSE_FORMAT,
@@ -201,6 +202,7 @@ async function requestTags(
   }
 
   const tagsByIndex: DishTagId[][] = menus.map(() => []);
+  const validIndexes = new Set<number>();
   for (const line of parsed.items as TaggedLine[]) {
     if (
       typeof line.index === "number" &&
@@ -208,12 +210,16 @@ async function requestTags(
       line.index >= 0 &&
       line.index < menus.length &&
       typeof line.kind === "string" &&
-      KNOWN_KINDS.has(line.kind)
+      KNOWN_KINDS.has(line.kind) &&
+      Array.isArray(line.tags)
     ) {
+      if (validIndexes.has(line.index))
+        throw new Error("Duplicate tagging index");
+      validIndexes.add(line.index);
       tagsByIndex[line.index] = selectTags(line);
     }
   }
-  return tagsByIndex;
+  return { tagsByIndex, complete: validIndexes.size === menus.length };
 }
 
 /**
@@ -224,12 +230,12 @@ async function requestTags(
  * malformed body, the Menu Items come back untagged so the caller can still
  * write them to the sheet.
  */
-export async function tagMenuItems(
+export async function tagMenuItemsWithOutcome(
   menus: ParsedMenuItem[],
   restaurantName: string,
-): Promise<ParsedMenuItem[]> {
+): Promise<{ items: ParsedMenuItem[]; success: boolean }> {
   if (menus.length === 0) {
-    return menus;
+    return { items: menus, success: false };
   }
 
   const apiKey = process.env.OPENROUTER_API_KEY?.trim();
@@ -237,7 +243,7 @@ export async function tagMenuItems(
     console.warn(
       `[Dish Tags] OPENROUTER_API_KEY is not configured. Writing ${restaurantName} menus untagged.`,
     );
-    return menus;
+    return { items: menus, success: false };
   }
 
   const baseUrl = (
@@ -246,20 +252,23 @@ export async function tagMenuItems(
   const model = process.env.OPENROUTER_MODEL?.trim() || DEFAULT_MODEL;
 
   let tagsByIndex: DishTagId[][];
+  let complete = false;
   try {
-    tagsByIndex = await requestTags(
+    const result = await requestTags(
       menus,
       restaurantName,
       apiKey,
       baseUrl,
       model,
     );
+    tagsByIndex = result.tagsByIndex;
+    complete = result.complete;
   } catch (error) {
     console.warn(
       `[Dish Tags] Could not tag ${restaurantName} menus. Writing them untagged:`,
       error,
     );
-    return menus;
+    return { items: menus, success: false };
   }
 
   const tagged = menus.map((menu, index) => {
@@ -274,5 +283,25 @@ export async function tagMenuItems(
     `[Dish Tags] Tagged ${taggedCount}/${tagged.length} menu items for ${restaurantName}.`,
   );
 
-  return tagged;
+  return { items: tagged, success: complete };
+}
+
+export async function tagMenuItems(
+  menus: ParsedMenuItem[],
+  restaurantName: string,
+): Promise<ParsedMenuItem[]> {
+  return (await tagMenuItemsWithOutcome(menus, restaurantName)).items;
+}
+
+export function taggingVersion(): string {
+  return createHash("sha256")
+    .update(
+      JSON.stringify([
+        SYSTEM_PROMPT,
+        RESPONSE_FORMAT,
+        process.env.OPENROUTER_MODEL || DEFAULT_MODEL,
+        process.env.OPENROUTER_BASE_URL || DEFAULT_BASE_URL,
+      ]),
+    )
+    .digest("hex");
 }

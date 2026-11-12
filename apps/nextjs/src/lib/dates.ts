@@ -93,89 +93,45 @@ export function getOpeningHoursForCurrentDay(
     return trimmed;
   }
 
-  // Get current day of week in Helsinki (0 = Sun, 1 = Mon, ..., 6 = Sat)
-  const helsinkiDay = new Intl.DateTimeFormat("en-US", {
-    weekday: "short",
-    timeZone: "Europe/Helsinki",
-  })
-    .format(date)
-    .toLowerCase(); // 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'
-
-  const isWeekend = helsinkiDay === "sat" || helsinkiDay === "sun";
-  const isSaturday = helsinkiDay === "sat";
-  const isSunday = helsinkiDay === "sun";
-
-  // Check if string contains comma-separated parts like "Ma–pe 10.30–17.30, la–su 12.00–17.30"
-  const parts = trimmed.split(/,\s*/);
-  for (const part of parts) {
-    const cleanPart = part.trim();
-
-    if (isWeekend) {
-      if (
-        /la\s*[-–—]\s*su/i.test(cleanPart) ||
-        (isSaturday && /\bla\b/i.test(cleanPart)) ||
-        (isSunday && /\bsu\b/i.test(cleanPart))
-      ) {
-        const timeMatch =
-          /(\d{1,2}[.:]\d{2}\s*[-–—]\s*\d{1,2}[.:]\d{2}|\d{1,2}[.:]\d{2})/.exec(
-            cleanPart,
-          );
-        if (timeMatch?.[1]) {
-          return timeMatch[1].replace(/:/g, ".").replace(/\s*[-–—]\s*/g, "–");
-        }
-        return cleanPart;
-      }
-    } else {
-      if (
-        /ma\s*[-–—]\s*pe/i.test(cleanPart) ||
-        /ark/i.test(cleanPart) ||
-        (helsinkiDay === "mon" && /\bma\b/i.test(cleanPart)) ||
-        (helsinkiDay === "tue" && /\bti\b/i.test(cleanPart)) ||
-        (helsinkiDay === "wed" && /\bke\b/i.test(cleanPart)) ||
-        (helsinkiDay === "thu" && /\bto\b/i.test(cleanPart)) ||
-        (helsinkiDay === "fri" && /\bpe\b/i.test(cleanPart))
-      ) {
-        const timeMatch =
-          /(\d{1,2}[.:]\d{2}\s*[-–—]\s*\d{1,2}[.:]\d{2}|\d{1,2}[.:]\d{2})/.exec(
-            cleanPart,
-          );
-        if (timeMatch?.[1]) {
-          return timeMatch[1].replace(/:/g, ".").replace(/\s*[-–—]\s*/g, "–");
-        }
-        return cleanPart;
-      }
-    }
-  }
-
-  // If only weekday hours were specified (e.g. "Ma–pe 10.30–13.30") and today is weekend:
-  if (
-    isWeekend &&
-    /ma\s*[-–—]\s*pe/i.test(trimmed) &&
-    !/la|su|viikonlopp/i.test(trimmed)
-  ) {
-    return "Suljettu";
-  }
-
-  // If weekday and the whole string is just "Ma–pe 10.30–13.30"
-  if (!isWeekend && /ma\s*[-–—]\s*pe/i.test(trimmed)) {
-    const timeMatch = /(\d{1,2}[.:]\d{2}\s*[-–—]\s*\d{1,2}[.:]\d{2})/.exec(
-      trimmed,
-    );
-    if (timeMatch?.[1]) {
-      return timeMatch[1].replace(/:/g, ".").replace(/\s*[-–—]\s*/g, "–");
-    }
-  }
-
-  // If it's a raw time range like "10.30–14.00"
-  const plainTimeMatch = /^(\d{1,2}[.:]\d{2}\s*[-–—]\s*\d{1,2}[.:]\d{2})$/.exec(
-    trimmed,
+  const dayNames = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+  const day = dayNames.indexOf(
+    new Intl.DateTimeFormat("en-US", {
+      weekday: "short",
+      timeZone: "Europe/Helsinki",
+    })
+      .format(date)
+      .toLowerCase(),
   );
-  if (plainTimeMatch?.[1]) {
-    if (isWeekend) {
-      return "Suljettu";
+  const weekdays = ["ma", "ti", "ke", "to", "pe", "la", "su"];
+  const schedules = [
+    ...trimmed.matchAll(
+      /\b(ma|ti|ke|to|pe|la|su)(?:\s*[-–—]\s*(ma|ti|ke|to|pe|la|su))?\s+([^,;]+)/gi,
+    ),
+  ];
+  for (const schedule of schedules) {
+    const first = weekdays.indexOf(schedule[1]?.toLowerCase() ?? "");
+    const last = weekdays.indexOf(
+      (schedule[2] ?? schedule[1] ?? "").toLowerCase(),
+    );
+    const matches =
+      first <= last ? day >= first && day <= last : day >= first || day <= last;
+    if (matches) {
+      const value = schedule[3]?.trim() ?? "";
+      if (/suljettu/i.test(value)) return "Suljettu";
+      const time =
+        /(\d{1,2}[.:]\d{2}\s*[-–—]\s*\d{1,2}[.:]\d{2}|\d{1,2}[.:]\d{2})/.exec(
+          value,
+        )?.[1];
+      return time
+        ? time.replace(/:/g, ".").replace(/\s*[-–—]\s*/g, "–")
+        : value;
     }
-    return plainTimeMatch[1].replace(/:/g, ".").replace(/\s*[-–—]\s*/g, "–");
   }
-
+  if (schedules.length) return "Suljettu";
+  if (/^(\d{1,2}[.:]\d{2}\s*[-–—]\s*\d{1,2}[.:]\d{2})$/.test(trimmed)) {
+    return day >= 5
+      ? "Suljettu"
+      : trimmed.replace(/:/g, ".").replace(/\s*[-–—]\s*/g, "–");
+  }
   return trimmed;
 }

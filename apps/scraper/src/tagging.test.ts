@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ParsedMenuItem } from "@acme/shared-types";
 
-import { tagMenuItems } from "./tagging.js";
+import { tagMenuItems, tagMenuItemsWithOutcome } from "./tagging.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -212,6 +212,13 @@ describe("tagMenuItems guards against the model", () => {
 
 describe("tagMenuItems failure paths", () => {
   const menus = [menuItem("Lohikeitto ja saaristolaisleipää", ["G", "L"])];
+
+  it("does not cache an incomplete response as successful tagging", async () => {
+    globalThis.fetch = vi.fn(async () =>
+      okResponse(completion([])),
+    ) as unknown as typeof fetch;
+    expect((await tagMenuItemsWithOutcome(menus, "Test")).success).toBe(false);
+  });
 
   it("returns untagged menu items when the request throws", async () => {
     globalThis.fetch = vi.fn(async () => {

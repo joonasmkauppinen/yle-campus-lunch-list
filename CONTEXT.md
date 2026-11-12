@@ -1,7 +1,7 @@
 # Yle Campus Lunch List
 
 Aggregates the daily lunch menus of the campus restaurants around Yleisradio in
-Pasila, Helsinki, and presents them as a single day view.
+Pasila, Helsinki, and presents one selected day at a time, with tabs for the current week.
 
 ## Language
 
@@ -36,8 +36,10 @@ on their own lines beneath the main. A Side is always Untagged.
 _Avoid_: Garnish, extra
 
 **Menu Snapshot**:
-The complete set of Menu Items for one date. The sheet holds exactly one
-Snapshot at a time — each scraper run replaces it. There is no menu history.
+The complete set of Menu Items for the current Helsinki calendar week
+(Monday–Sunday), grouped by Restaurant and date. Successful daily menus replace
+that date; unavailable or failed dates retain their last-good data with a
+freshness warning. There is no menu history outside the active week.
 _Avoid_: Menu history, archive
 
 **Dietary Flag**:

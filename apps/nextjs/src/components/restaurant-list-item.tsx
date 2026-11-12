@@ -1,4 +1,6 @@
 "use client";
+import { MenuFreshness, MenuUnavailable } from "~/components/menu-availability";
+import { useMenuDate } from "~/components/menu-date";
 
 import { useSyncExternalStore } from "react";
 import Link from "next/link";
@@ -6,11 +8,7 @@ import Link from "next/link";
 import type { Restaurant } from "@acme/shared-types";
 
 import { RestaurantMenuItem } from "~/components/restaurant-menu-item";
-import {
-  formatDisplayDate,
-  getOpeningHoursForCurrentDay,
-  isCurrentDate,
-} from "~/lib/dates";
+import { getOpeningHoursForCurrentDay } from "~/lib/dates";
 import { cn } from "~/lib/utils";
 
 export interface RestaurantListItemProps {
@@ -61,11 +59,9 @@ export function RestaurantListItem({
     setStoredAccordionState(restaurant.id, !isOpen);
   };
 
-  const currentMenu = restaurant.menus[0];
+  const date = useMenuDate();
+  const currentMenu = restaurant.menus.find((menu) => menu.date === date);
   const hasItems = (currentMenu?.items.length ?? 0) > 0;
-  const isOutdated = currentMenu?.date
-    ? !isCurrentDate(currentMenu.date)
-    : false;
 
   return (
     <div
@@ -85,7 +81,7 @@ export function RestaurantListItem({
             <div>
               <h2 className="text-card-foreground text-xl font-bold">
                 <Link
-                  href={`/restaurant/${restaurant.id}`}
+                  href={`/restaurant/${restaurant.id}?date=${date}`}
                   className="focus-visible:ring-ring rounded-sm transition-colors hover:underline focus-visible:ring-2 focus-visible:outline-none"
                 >
                   {restaurant.name}
@@ -102,9 +98,11 @@ export function RestaurantListItem({
 
               const todayLunch = getOpeningHoursForCurrentDay(
                 restaurant.openingHours.lunchHours,
+                new Date(`${date}T12:00:00Z`),
               );
               const todayOpen = getOpeningHoursForCurrentDay(
                 restaurant.openingHours.openHours,
+                new Date(`${date}T12:00:00Z`),
               );
 
               if (!todayLunch && !todayOpen) return null;
@@ -129,7 +127,7 @@ export function RestaurantListItem({
               } else {
                 return (
                   <div className="text-muted-foreground/80 text-xs sm:text-sm">
-                    <span>Suljettu tänään</span>
+                    <span>Suljettu valittuna päivänä</span>
                   </div>
                 );
               }
@@ -198,42 +196,10 @@ export function RestaurantListItem({
         {isOpen &&
           (hasItems && currentMenu ? (
             <>
-              {isOutdated && currentMenu.date && (
-                <div className="mt-4">
-                  <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 py-0.5 pr-2 pl-1.5 text-xs font-semibold text-amber-700 dark:text-amber-400">
-                    <svg
-                      className="h-3.5 w-3.5 shrink-0"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth="2"
-                      stroke="currentColor"
-                      aria-hidden="true"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
-                      />
-                    </svg>
-                    <span>
-                      Vanha lista ({formatDisplayDate(currentMenu.date)})
-                    </span>
-                  </span>
-                </div>
-              )}
-              <ul
-                className={cn(
-                  "space-y-2",
-                  isOutdated && currentMenu.date ? "mt-3" : "mt-4",
-                )}
-              >
+              <MenuFreshness menu={currentMenu} />
+              <ul className="mt-4 space-y-2">
                 {currentMenu.items.map((item, idx) => (
-                  <RestaurantMenuItem
-                    key={idx}
-                    item={item}
-                    disabled={isOutdated}
-                  />
+                  <RestaurantMenuItem key={idx} item={item} />
                 ))}
               </ul>
               {restaurant.websiteUrl && (
@@ -266,9 +232,7 @@ export function RestaurantListItem({
             </>
           ) : (
             <div className="py-4">
-              <p className="text-muted-foreground text-sm">
-                Listaa ei löytynyt tälle päivälle.
-              </p>
+              <MenuUnavailable menu={currentMenu} />
               {restaurant.websiteUrl && (
                 <a
                   href={restaurant.websiteUrl}

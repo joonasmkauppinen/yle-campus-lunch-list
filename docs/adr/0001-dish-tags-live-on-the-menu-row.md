@@ -24,3 +24,13 @@ to an empty column rather than being retryable afterwards. This is the accepted
 trade: the menus are the product and must be written regardless, and the whole
 tab is cleared and rewritten on every run anyway, so tags and dishes cannot
 drift apart by construction.
+
+## Weekly-menu amendment (issue #70)
+
+Tags still live on each Menu Item row. A separate `menu-status` tab now records
+per-Restaurant/date availability and whole-menu tagging hashes/outcomes; it does
+not store dish classifications or join on dish text. The reader explicitly selects
+configured Restaurant tabs, so metadata cannot become a phantom Restaurant.
+Daily menu replacements and metadata updates use one atomic batch; unavailable
+days retain last-good rows. Persistent hashes allow failed tagging to be retried
+and successful unchanged daily menus to reuse their existing row tags.

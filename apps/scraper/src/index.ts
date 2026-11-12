@@ -1,62 +1,12 @@
 import "./env.js";
-
 import { fileURLToPath } from "node:url";
-
-import {
-  AKSELI_RESTAURANT_ID,
-  AKSELI_RESTAURANT_NAME,
-  fetchAkseliMenu,
-} from "./fetchers/akseli.js";
-import {
-  DYLAN_BOLE_RESTAURANT_ID,
-  DYLAN_BOLE_RESTAURANT_NAME,
-  fetchDylanBoleMenu,
-} from "./fetchers/dylan-bole.js";
-import {
-  DYLAN_LA_ILMA_RESTAURANT_ID,
-  DYLAN_LA_ILMA_RESTAURANT_NAME,
-  fetchDylanLaIlmaMenu,
-} from "./fetchers/dylan-la-ilma.js";
-import {
-  DYLAN_LUFT_RESTAURANT_ID,
-  DYLAN_LUFT_RESTAURANT_NAME,
-  fetchDylanLuftMenu,
-} from "./fetchers/dylan-luft.js";
-import {
-  FENNIA_RESTAURANT_ID,
-  FENNIA_RESTAURANT_NAME,
-  fetchFenniaMenu,
-} from "./fetchers/fennia.js";
-import {
-  fetchIntraMenus,
-  getHelsinkiDateString,
-  INTRA_RESTAURANTS,
-} from "./fetchers/intra.js";
-import {
-  fetchIsoPajaMenu,
-  ISO_PAJA_RESTAURANT_ID,
-  ISO_PAJA_RESTAURANT_NAME,
-} from "./fetchers/iso-paja.js";
+import { isIsoDate } from "@acme/shared-types";
+import { getHelsinkiDateString } from "./fetchers/intra.js";
 import { fetchAllOpeningHours } from "./fetchers/opening-hours.js";
-import {
-  fetchPaattariMenu,
-  PAATTARI_RESTAURANT_ID,
-  PAATTARI_RESTAURANT_NAME,
-} from "./fetchers/paattari.js";
-import {
-  fetchPasilanLinkkiMenu,
-  PASILAN_LINKKI_RESTAURANT_ID,
-  PASILAN_LINKKI_RESTAURANT_NAME,
-} from "./fetchers/pasilan-linkki.js";
-import {
-  fetchPianoMenu,
-  PIANO_RESTAURANT_ID,
-  PIANO_RESTAURANT_NAME,
-} from "./fetchers/piano.js";
+import { updateGoogleSheetOpeningHours } from "./sheets.js";
 import { triggerRevalidation } from "./revalidate.js";
-import { updateGoogleSheet, updateGoogleSheetOpeningHours } from "./sheets.js";
-import { tagMenuItems } from "./tagging.js";
-
+import { createSourceFetcher, getSources, getWeekDates } from "./weekly.js";
+import { createWeeklySync } from "./weekly-sync.js";
 /**
  * Resolves the target scraping date (YYYY-MM-DD) from CLI flags, env variables, or today in Europe/Helsinki.
  *
@@ -129,275 +79,84 @@ export function resolveIsDryRun(
   return false;
 }
 
-async function main() {
-  const targetDate = resolveTargetDate();
-  const isDryRun = resolveIsDryRun();
-  console.log(
-    `=== Campus Lunch List Scraper Starting (Target Date: ${targetDate}${isDryRun ? " | DRY RUN MODE" : ""}) ===`,
-  );
-  if (isDryRun) {
-    console.log(
-      "[Dry Run] Google Sheets update and revalidation will be skipped (no Google Cloud quota consumed).\n",
+export function resolveScrapeDates(argv: string[] = process.argv.slice(2)): {
+  anchor: string;
+  dates: string[];
+} {
+  const flagValue = (name: string) => {
+    const equals = argv.find((arg) => arg.startsWith(`${name}=`));
+    if (equals !== undefined) return equals.slice(name.length + 1);
+    const index = argv.indexOf(name);
+    return index >= 0 ? (argv[index + 1] ?? "") : undefined;
+  };
+  const weekArg = flagValue("--week");
+  const singleArg =
+    flagValue("--date") ??
+    flagValue("-d") ??
+    argv.find(
+      (arg, index) =>
+        argv[index - 1] !== "--week" && /^\d{4}-\d{2}-\d{2}$/.test(arg),
     );
-  }
-
-  // 1. Intra Restaurants: Huoltamo, Studio 10, Piccolo (JSON API)
-  console.log(
-    "\nProcessing target: Intra Restaurants (Huoltamo, Studio 10, Piccolo)",
-  );
-  try {
-    const intraMenus = await fetchIntraMenus(targetDate);
-    for (const restaurant of INTRA_RESTAURANTS) {
-      const menus = await tagMenuItems(
-        intraMenus[restaurant.id],
-        restaurant.name,
-      );
-      await updateGoogleSheet(
-        restaurant.id,
-        restaurant.name,
-        menus,
-        targetDate,
-        { dryRun: isDryRun },
-      );
-      console.log(
-        `Successfully completed scraping for ${restaurant.name} (${restaurant.id})`,
-      );
-    }
-  } catch (error) {
-    console.error("Error processing Intra Restaurants:", error);
-  }
-
-  // 2. Dylan Luft (RSS Feed)
-  console.log("\nProcessing target: Dylan Luft (RSS Feed)");
-  try {
-    const dylanLuftMenusRaw = await fetchDylanLuftMenu(targetDate);
-    const dylanLuftMenus = await tagMenuItems(
-      dylanLuftMenusRaw,
-      DYLAN_LUFT_RESTAURANT_NAME,
-    );
-    await updateGoogleSheet(
-      DYLAN_LUFT_RESTAURANT_ID,
-      DYLAN_LUFT_RESTAURANT_NAME,
-      dylanLuftMenus,
-      targetDate,
-      { dryRun: isDryRun },
-    );
-    console.log(
-      `Successfully completed scraping for ${DYLAN_LUFT_RESTAURANT_NAME} (${DYLAN_LUFT_RESTAURANT_ID})`,
-    );
-  } catch (error) {
-    console.error("Error processing Dylan Luft:", error);
-  }
-
-  // 3. Dylan Böle (RSS Feed)
-  console.log("\nProcessing target: Dylan Böle (RSS Feed)");
-  try {
-    const dylanBoleMenusRaw = await fetchDylanBoleMenu(targetDate);
-    const dylanBoleMenus = await tagMenuItems(
-      dylanBoleMenusRaw,
-      DYLAN_BOLE_RESTAURANT_NAME,
-    );
-    await updateGoogleSheet(
-      DYLAN_BOLE_RESTAURANT_ID,
-      DYLAN_BOLE_RESTAURANT_NAME,
-      dylanBoleMenus,
-      targetDate,
-      { dryRun: isDryRun },
-    );
-    console.log(
-      `Successfully completed scraping for ${DYLAN_BOLE_RESTAURANT_NAME} (${DYLAN_BOLE_RESTAURANT_ID})`,
-    );
-  } catch (error) {
-    console.error("Error processing Dylan Böle:", error);
-  }
-
-  // 4. Dylan La Ilma (RSS Feed)
-  console.log("\nProcessing target: Dylan La Ilma (RSS Feed)");
-  try {
-    const dylanLaIlmaMenusRaw = await fetchDylanLaIlmaMenu(targetDate);
-    const dylanLaIlmaMenus = await tagMenuItems(
-      dylanLaIlmaMenusRaw,
-      DYLAN_LA_ILMA_RESTAURANT_NAME,
-    );
-    await updateGoogleSheet(
-      DYLAN_LA_ILMA_RESTAURANT_ID,
-      DYLAN_LA_ILMA_RESTAURANT_NAME,
-      dylanLaIlmaMenus,
-      targetDate,
-      { dryRun: isDryRun },
-    );
-    console.log(
-      `Successfully completed scraping for ${DYLAN_LA_ILMA_RESTAURANT_NAME} (${DYLAN_LA_ILMA_RESTAURANT_ID})`,
-    );
-  } catch (error) {
-    console.error("Error processing Dylan La Ilma:", error);
-  }
-
-  // 5. Pasilan Linkki (RSS Feed)
-  console.log("\nProcessing target: Pasilan Linkki (RSS Feed)");
-  try {
-    const linkkiMenusRaw = await fetchPasilanLinkkiMenu(targetDate);
-    const linkkiMenus = await tagMenuItems(
-      linkkiMenusRaw,
-      PASILAN_LINKKI_RESTAURANT_NAME,
-    );
-    await updateGoogleSheet(
-      PASILAN_LINKKI_RESTAURANT_ID,
-      PASILAN_LINKKI_RESTAURANT_NAME,
-      linkkiMenus,
-      targetDate,
-      { dryRun: isDryRun },
-    );
-    console.log(
-      `Successfully completed scraping for ${PASILAN_LINKKI_RESTAURANT_NAME} (${PASILAN_LINKKI_RESTAURANT_ID})`,
-    );
-  } catch (error) {
-    console.error("Error processing Pasilan Linkki:", error);
-  }
-
-  // 6. Iso Paja (Website Cheerio)
-  console.log("\nProcessing target: Iso Paja (Website Cheerio)");
-  try {
-    const isoPajaMenusRaw = await fetchIsoPajaMenu(targetDate);
-    const isoPajaMenus = await tagMenuItems(
-      isoPajaMenusRaw,
-      ISO_PAJA_RESTAURANT_NAME,
-    );
-    await updateGoogleSheet(
-      ISO_PAJA_RESTAURANT_ID,
-      ISO_PAJA_RESTAURANT_NAME,
-      isoPajaMenus,
-      targetDate,
-      { dryRun: isDryRun },
-    );
-    console.log(
-      `Successfully completed scraping for ${ISO_PAJA_RESTAURANT_NAME} (${ISO_PAJA_RESTAURANT_ID})`,
-    );
-  } catch (error) {
-    console.error("Error processing Iso Paja:", error);
-  }
-
-  // 7. Akseli (Website Cheerio)
-  console.log("\nProcessing target: Akseli (Website Cheerio)");
-  try {
-    const akseliMenusRaw = await fetchAkseliMenu(targetDate);
-    const akseliMenus = await tagMenuItems(
-      akseliMenusRaw,
-      AKSELI_RESTAURANT_NAME,
-    );
-    await updateGoogleSheet(
-      AKSELI_RESTAURANT_ID,
-      AKSELI_RESTAURANT_NAME,
-      akseliMenus,
-      targetDate,
-      { dryRun: isDryRun },
-    );
-    console.log(
-      `Successfully completed scraping for ${AKSELI_RESTAURANT_NAME} (${AKSELI_RESTAURANT_ID})`,
-    );
-  } catch (error) {
-    console.error("Error processing Akseli:", error);
-  }
-
-  // 8. Päättäri (Website Cheerio)
-  console.log("\nProcessing target: Päättäri (Website Cheerio)");
-  try {
-    const paattariMenusRaw = await fetchPaattariMenu(targetDate);
-    const paattariMenus = await tagMenuItems(
-      paattariMenusRaw,
-      PAATTARI_RESTAURANT_NAME,
-    );
-    await updateGoogleSheet(
-      PAATTARI_RESTAURANT_ID,
-      PAATTARI_RESTAURANT_NAME,
-      paattariMenus,
-      targetDate,
-      { dryRun: isDryRun },
-    );
-    console.log(
-      `Successfully completed scraping for ${PAATTARI_RESTAURANT_NAME} (${PAATTARI_RESTAURANT_ID})`,
-    );
-  } catch (error) {
-    console.error("Error processing Päättäri:", error);
-  }
-
-  // 9. Ninan Keittiö Fennia (Website Cheerio)
-  console.log("\nProcessing target: Ninan Keittiö Fennia (Website Cheerio)");
-  try {
-    const fenniaMenusRaw = await fetchFenniaMenu(targetDate);
-    const fenniaMenus = await tagMenuItems(
-      fenniaMenusRaw,
-      FENNIA_RESTAURANT_NAME,
-    );
-    await updateGoogleSheet(
-      FENNIA_RESTAURANT_ID,
-      FENNIA_RESTAURANT_NAME,
-      fenniaMenus,
-      targetDate,
-      { dryRun: isDryRun },
-    );
-    console.log(
-      `Successfully completed scraping for ${FENNIA_RESTAURANT_NAME} (${FENNIA_RESTAURANT_ID})`,
-    );
-  } catch (error) {
-    console.error("Error processing Ninan Keittiö Fennia:", error);
-  }
-
-  // 10. Ravintola Piano (Website Cheerio)
-  console.log("\nProcessing target: Ravintola Piano (Website Cheerio)");
-  try {
-    const pianoMenusRaw = await fetchPianoMenu(targetDate);
-    const pianoMenus = await tagMenuItems(pianoMenusRaw, PIANO_RESTAURANT_NAME);
-    await updateGoogleSheet(
-      PIANO_RESTAURANT_ID,
-      PIANO_RESTAURANT_NAME,
-      pianoMenus,
-      targetDate,
-      { dryRun: isDryRun },
-    );
-    console.log(
-      `Successfully completed scraping for ${PIANO_RESTAURANT_NAME} (${PIANO_RESTAURANT_ID})`,
-    );
-  } catch (error) {
-    console.error("Error processing Ravintola Piano:", error);
-  }
-
-  // 11. Opening Hours (All restaurants)
-  console.log("\nProcessing target: Restaurant Opening Hours");
-  try {
-    const openingHours = await fetchAllOpeningHours();
-    await updateGoogleSheetOpeningHours(openingHours, { dryRun: isDryRun });
-    console.log(
-      `Successfully completed opening hours update for ${openingHours.length} restaurants`,
-    );
-  } catch (error) {
-    console.error("Error processing opening hours:", error);
-  }
-
-  // 12. Revalidate frontend cache (in production, skipped in dry run)
-  if (isDryRun) {
-    console.log(
-      "\n[Revalidate] Skipping frontend revalidation (dry run mode).",
-    );
-  } else {
-    console.log("\nTriggering on-demand frontend revalidation...");
-    await triggerRevalidation();
-  }
-
-  console.log("\n=== Campus Lunch List Scraper Finished ===");
+  if (weekArg !== undefined && singleArg !== undefined)
+    throw new Error("Use either --week or --date, not both");
+  const envDate =
+    process.env.TARGET_DATE ||
+    process.env.DATE ||
+    process.env.SCRAPE_DATE ||
+    undefined;
+  const anchor = weekArg ?? singleArg ?? envDate ?? getHelsinkiDateString();
+  if (!isIsoDate(anchor)) throw new Error(`Invalid date: ${anchor}`);
+  return {
+    anchor,
+    dates:
+      weekArg !== undefined || (singleArg === undefined && !envDate)
+        ? getWeekDates(anchor)
+        : [anchor],
+  };
 }
 
+async function main() {
+  const { anchor, dates } = resolveScrapeDates();
+  const dryRun = resolveIsDryRun();
+  console.log(`Scraping ${dates.join(", ")}${dryRun ? " [DRY RUN]" : ""}`);
+  const fetchSource = createSourceFetcher();
+  const sync = await createWeeklySync(
+    dryRun,
+    process.argv.includes("--skip-tagging"),
+  );
+  let failures = 0;
+  for (const source of getSources()) {
+    try {
+      const days = await fetchSource(source, dates);
+      if (days.some((day) => day.state === "failed")) failures++;
+      await sync(source, days, anchor);
+    } catch (error) {
+      failures++;
+      console.error(`[${source.name}] Sync failed:`, error);
+    }
+  }
+  try {
+    await updateGoogleSheetOpeningHours(await fetchAllOpeningHours(), {
+      dryRun,
+    });
+  } catch (error) {
+    console.error("Opening hours failed:", error);
+    failures++;
+  }
+  if (!dryRun) await triggerRevalidation();
+  if (failures)
+    throw new Error(
+      `${failures} source/sync failures; other Restaurants were processed`,
+    );
+}
 export { main };
-
 const isMain =
   process.argv[1] &&
   (process.argv[1] === fileURLToPath(import.meta.url) ||
     process.argv[1].endsWith("/index.ts") ||
     process.argv[1].endsWith("/index.js"));
-
-if (isMain) {
-  main().catch((err: unknown) => {
-    console.error("Fatal error running scraper pipeline:", err);
-    process.exit(1);
+if (isMain)
+  main().catch((error: unknown) => {
+    console.error(error);
+    process.exitCode = 1;
   });
-}

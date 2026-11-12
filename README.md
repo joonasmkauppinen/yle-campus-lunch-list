@@ -88,10 +88,10 @@ tooling
 
 ## Scraper App
 
-The ingestion pipeline in [`apps/scraper`](./apps/scraper) is a standalone Node.js CLI tool responsible for fetching, parsing, and syncing daily restaurant menus to Google Sheets:
+The ingestion pipeline in [`apps/scraper`](./apps/scraper) is a standalone Node.js CLI tool responsible for fetching, parsing, and syncing the current week’s restaurant menus to Google Sheets:
 
 - **Data Ingestion**: Scrapes HTML web pages with Cheerio, parses RSS XML feeds, and fetches JSON APIs.
-- **Date Handling**: Defaults to the current date in `Europe/Helsinki` timezone, or accepts a target date via CLI flag (`--date YYYY-MM-DD` / `-d YYYY-MM-DD`) or `TARGET_DATE` environment variable.
+- **Date Handling**: Defaults to the current Monday–Sunday week in `Europe/Helsinki`. Use `--week YYYY-MM-DD` for the week containing a date, or `--date YYYY-MM-DD` / `-d YYYY-MM-DD` (or `TARGET_DATE`) for a single-day refresh that preserves the other days.
 - **Dry Run Mode**: Accepts `--dry-run` (or `-n` / `DRY_RUN=true`) to parse all menus and output payloads to console without updating Google Sheets or consuming Google Cloud quota.
 - **Google Sheets Sync**: Authenticates via Google Service Account JWT and batch-writes dishes, dietary flags, and metadata into restaurant-specific tabs.
 - **Docker Support**: Includes a [`Dockerfile`](./apps/scraper/Dockerfile) for scheduled execution on servers.
@@ -120,7 +120,7 @@ pnpm test
 
 ## Page revalidation & Data flow
 
-1. **Scraping & Storage**: The scraper fetches menu data daily (or manually) from diverse sources and writes the formatted dishes to individual restaurant sheets in Google Sheets.
+1. **Scraping & Storage**: The scraper refreshes the entire current week daily (or manually) from diverse sources and writes the formatted dishes to individual restaurant sheets in Google Sheets.
 2. **Next.js Caching**: The Next.js frontend reads menu data from Google Sheets using the Google Sheets API, cached with time-based ISR (`export const revalidate = 3600`, revalidating every 1 hour).
 
 ## Lunch list data sources
@@ -148,20 +148,54 @@ Data is scraped with Cheerio from: [`https://nordrest.fi/restaurang/ravintola-pa
 ### Dylan Luft
 
 Data is fetched from the Lounastaja RSS feed:
-`https://lounastaja.app/api/v1/rss/week/5843f3ec-6a2c-49ba-ba3e-b384f6c996f1/current?days=current&language=fi`
+`https://lounastaja.app/api/v1/rss/week/5843f3ec-6a2c-49ba-ba3e-b384f6c996f1/current?language=fi`
 
 ### Dylan Böle
 
 Data is fetched from the Lounastaja RSS feed:
-`https://lounastaja.app/api/v1/rss/week/3aba0b64-0d43-41ea-b665-1d2d6c0f2d5e/current?days=current&language=fi`
+`https://lounastaja.app/api/v1/rss/week/3aba0b64-0d43-41ea-b665-1d2d6c0f2d5e/current?language=fi`
 
 ### Dylan La Ilma
 
 Data is fetched from the Lounastaja RSS feed:
-`https://lounastaja.app/api/v1/rss/week/70835b81-ec1f-443f-92bb-9832d21fb3af/current?days=current&language=fi`
+`https://lounastaja.app/api/v1/rss/week/70835b81-ec1f-443f-92bb-9832d21fb3af/current?language=fi`
 
 ### Pasilan Linkki
 
 Data is fetched from the Compass Group RSS feed:
-`https://www.compass-group.fi/menuapi/feed/rss/current-day?costNumber=3642&language=fi`
+`https://www.compass-group.fi/menuapi/feed/rss/current-week?costNumber=3642&language=fi`
 
+## Weekly menus and date navigation
+
+Both the main page and Restaurant pages have Monday–Sunday date tabs below the
+page title. Fresh visits select today in Helsinki; `?date=YYYY-MM-DD` links
+preserve the selected day between pages. Restaurant cards, opening hours and
+AI Dish Tag suggestions follow that day. The radiator and legacy API remain
+today-only.
+
+Each Restaurant keeps its existing seven-column Sheet tab with dated rows.
+A `menu-status` tab records availability, refresh timestamps and AI tagging
+fingerprints. Published dates replace their dishes atomically with status;
+failed or unavailable dates preserve last-good data with a freshness warning.
+Unknown days are never assumed closed. Tags are generated per complete daily
+menu and reused when its ordered text/flags and tagging version are unchanged.
+
+Validate the full week without Sheets reads/writes or paid AI requests:
+
+```bash
+pnpm --filter @acme/scraper dev -- --dry-run --skip-tagging
+pnpm --filter @acme/scraper dev -- --dry-run --skip-tagging --week 2026-11-12
+```
+
+Dry run alone still exercises AI tagging if configured; `--skip-tagging`
+explicitly disables it. Dry run never revalidates production pages.
+
+Recommended Unraid schedule: 06:00 and 10:00 Europe/Helsinki every day,
+including weekends for Huoltamo. This repository does not configure the Unraid
+scheduler. Configure a scheduler/host lock around the entire Docker invocation
+so scheduled and manual live runs never overlap; the shared status tab requires
+a single writer. Set the scheduler timezone and verify DST behavior. Deploy the
+weekly-compatible frontend reader before enabling the weekly scraper. Menu
+URLs that only expose the current week cannot backfill arbitrary historical dates.
+
+See [the implementation plan](docs/specs/full-week-menus.md) for rollout details.
